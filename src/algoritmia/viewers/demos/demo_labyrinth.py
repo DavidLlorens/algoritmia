@@ -8,10 +8,6 @@ Vertex = tuple[int, int]
 Edge = tuple[Vertex, Vertex]
 
 
-def a(b: [int, float]) -> [int, float]:
-    return b
-
-
 def create_labyrinth_mfset(num_rows: int, num_cols: int, extra_corridors: int = 0) -> UndirectedGraph[Vertex]:
     # Crear lista de vértices
     v = [(r, c) for r in range(num_rows) for c in range(num_cols)]
@@ -49,10 +45,10 @@ def create_labyrinth_mfset(num_rows: int, num_cols: int, extra_corridors: int = 
 if __name__ == '__main__':
     random.seed(42)
 
-    cell_size = 8  # 60
-    num_rows, num_cols = 16, 16  # 6, 8
+    cell_size = 60
+    num_rows, num_cols = 6, 8
 
-    g = create_labyrinth_mfset(num_rows, num_cols, extra_corridors=3)
+    g = create_labyrinth_mfset(num_rows, num_cols, extra_corridors=0) # 3
 
     lv = LabyrinthViewer(g, margin=10,
                          canvas_width=num_cols * cell_size + 20,

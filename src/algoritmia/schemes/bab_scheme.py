@@ -15,7 +15,7 @@ from algoritmia.schemes.bt_scheme import DecisionSequence
 Solution = TypeVar('Solution')
 
 Decision = TypeVar('Decision')
-Score = int | float
+Score = Union[int, float]
 
 
 @total_ordering  # Implementando  < y ==, genera el resto

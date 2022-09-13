@@ -11,7 +11,7 @@ import tkinter
 
 from easypaint import EasyPaint
 
-Num = int | float
+Num = Union[int, float]
 Label = str
 
 

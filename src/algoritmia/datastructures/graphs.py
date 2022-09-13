@@ -4,7 +4,7 @@ from typing import *
 
 Vertex = TypeVar("Vertex")
 Edge = tuple[Vertex, Vertex]
-Weight = int | float
+Weight = Union[int, float]
 
 
 # UndirectedGraph, Digraph -----------------------------------------------------
@@ -79,7 +79,7 @@ class IGraph(ABC, Generic[Vertex]):
     def remove_vertex(self, v: Vertex):
         if v not in self._v: return
         if v not in self._s: raise Exception('Impossible 3')
-        if v not in self._p: raise Exception('Impossible 3')
+        if v not in self._p: raise Exception('Impossible 4')
         self._v.remove(v)
 
         for suc in self._s[v]:
@@ -125,7 +125,7 @@ class Digraph(IGraph[Vertex]):
 
 
 class WeightingFunction(Generic[Vertex], dict[Edge, Weight], Callable[[Vertex, Vertex], Weight]):
-    def __init__(self, data: Iterable[tuple[Edge, Weight]], symmetrical: bool = False):
+    def __init__(self, data: Union[Iterable[tuple[Edge, Weight]], dict[Edge, Weight]], symmetrical: bool = False):
         super().__init__(data)
         self.symmetrical = symmetrical
         to_delete = []
@@ -142,7 +142,7 @@ class WeightingFunction(Generic[Vertex], dict[Edge, Weight], Callable[[Vertex, V
         for (v, u) in to_delete:
             del self[v, u]
 
-    def __call__(self, u: Vertex | Edge, v: Optional[Vertex] = None) -> Weight:
+    def __call__(self, u: Union[Vertex, Edge], v: Optional[Vertex] = None) -> Weight:
         if v is None:
             u, v = u
         # if u == v:

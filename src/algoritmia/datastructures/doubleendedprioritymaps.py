@@ -22,7 +22,7 @@ class IDoubleEndedPriorityDict(IPriorityMap[K, T]):
 
 
 class MinMaxIntervalHeapMap(IDoubleEndedPriorityDict[K, T]):
-    def __init__(self, data: Iterable[tuple[K, T]] | dict[K, T] = (), capacity: int = 0):
+    def __init__(self, data: Union[Iterable[tuple[K, T]], dict[K, T]] = (), capacity: int = 0):
         super().__init__()
         if isinstance(data, Dict):
             data = data.items()

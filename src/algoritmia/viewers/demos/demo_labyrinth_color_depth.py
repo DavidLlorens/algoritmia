@@ -5,7 +5,7 @@ import sys
 from algoritmia.datastructures.graphs import UndirectedGraph
 from algoritmia.datastructures.mergefindsets import MergeFindSet
 from algoritmia.datastructures.queues import Fifo
-from algoritmia.viewers.labyrinth_color_viewer import LabyrinthViewerColor
+from algoritmia.viewers.labyrinth_viewer_color import LabyrinthViewerColor
 from algoritmia.algorithms.traversers import bf_edge_traverser, df_edge_traverser
 
 Vertex = tuple[int, int]
@@ -116,7 +116,8 @@ if __name__ == '__main__':
     g = create_laberinth(num_rows, num_cols, tipo)
     lv = LabyrinthViewerColor(g,
                               canvas_width=num_cols * cell_size + 20,
-                              canvas_height=num_rows * cell_size + 20, margin=10)
+                              canvas_height=num_rows * cell_size + 20, margin=10,
+                              wall_width=4)
 
     start = (0, 0)  # (num_rows//2, num_cols//2)
     matriz_dist = matriz_distancias_anchura(g, start)

@@ -35,11 +35,12 @@ Edge = tuple[Vertex, Vertex]
 class LabyrinthViewer(EasyPaint):
     def __init__(self, lab: UndirectedGraph,
                  canvas_width: int = 400, canvas_height: int = 400,
-                 margin: int = 10):
+                 margin: int = 10, wall_width: int = 2):
         EasyPaint.__init__(self)
 
         self.visible_l = True
         self.visible_g = False
+        self.wall_width = wall_width
 
         # check 'lab' type
         if not isinstance(lab, UndirectedGraph) or \
@@ -87,7 +88,7 @@ class LabyrinthViewer(EasyPaint):
         mw = self.mw
         mh = self.mh
         color = 'black'
-        width = 2
+        width = self.wall_width
 
         # Draw borders
         self.create_rectangle(mw / 2, mh / 2, self.canvas_width - mw / 2, self.canvas_height - mh / 2,

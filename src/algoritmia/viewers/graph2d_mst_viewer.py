@@ -4,7 +4,7 @@ from enum import Enum
 from algoritmia.datastructures.graphs import UndirectedGraph
 from easypaint import EasyPaint
 
-Num = int | float
+Num = Union[int, float]
 Vertex = tuple[Num, Num]
 
 

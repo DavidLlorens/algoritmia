@@ -49,10 +49,10 @@ labyrinth = UndirectedGraph(E=corridors)
 pos_start = (0, 0)
 pos_treasure = (1, 3)
 
-# pos_treasure = find_treasure_breadthfirst(lab, pos_start, pos_treasure)
-pos_treasure = find_treasure_depthfirst(labyrinth, pos_start, pos_treasure)
+# room = find_treasure_breadthfirst(labyrinth, pos_start, pos_treasure)
+room = find_treasure_depthfirst(labyrinth, pos_start, pos_treasure)
 
-if pos_treasure is None:
+if room is None:
     print('Treasure not found.')
 else:
-    print(f'Treasure found on room {pos_treasure}.')
+    print(f'Treasure found on room {room}.')

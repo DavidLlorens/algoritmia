@@ -16,8 +16,8 @@ Path = list[Vertex]
 class LabyrinthViewerColor(LabyrinthViewer):
     def __init__(self, lab: UndirectedGraph,
                  canvas_width: int = 400, canvas_height: int = 400,
-                 margin: int = 10):
-        LabyrinthViewer.__init__(self, lab, canvas_width, canvas_height, margin)
+                 margin: int = 10, wall_width: int = 2):
+        LabyrinthViewer.__init__(self, lab, canvas_width, canvas_height, margin, wall_width)
         self.state = 0
         self.vertex_painted_per_iteration = 20
         self.tt = None

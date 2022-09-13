@@ -29,7 +29,7 @@ class IPriorityMap(ABC, dict[K, T]):
 class MinHeapMap(IPriorityMap[K, T]):
     _opt: Callable[[T, T], T] = min
 
-    def __init__(self, data: Iterable[tuple[K, T]] | dict[K, T] = (), capacity: int = 0):
+    def __init__(self, data: Union[Iterable[tuple[K, T]], dict[K, T]] = (), capacity: int = 0):
         super().__init__()
         # self._opt = opt
         self._index = {}

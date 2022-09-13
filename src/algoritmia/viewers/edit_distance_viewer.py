@@ -6,7 +6,7 @@ import tkinter
 from algoritmia.datastructures.graphs import Digraph
 from easypaint import EasyPaint
 
-Num = int | float
+Num = Union[int, float]
 Vertex = tuple[Num, Num]
 Score = int
 Decision = str
