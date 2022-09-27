@@ -1,5 +1,8 @@
+from __future__ import annotations
+
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
-from typing import *
+from typing import TypeVar
 
 from algoritmia.datastructures.graphs import UndirectedGraph, WeightingFunction
 from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solve
@@ -9,13 +12,13 @@ Decision = TypeVar('Decision')
 Solution = tuple[Decision, ...]
 
 
-def hamiltoniancycle_solve(graph: UndirectedGraph) -> Iterable[Solution]:
+def hamiltoniancycle_solve(graph: UndirectedGraph) -> Iterator[Solution]:
     class HamiltonianCycleDS(DecisionSequence):
         def is_solution(self):
             ds = self.decisions()
             return len(ds) == len(graph.V) and ds[0] in graph.succs(ds[-1])
 
-        def successors(self) -> Iterable['HamiltonianCycleDS']:
+        def successors(self) -> Iterable[HamiltonianCycleDS]:
             ds = self.decisions()
             if len(ds) < len(graph.V):
                 for v in graph.succs(ds[-1]):
@@ -32,7 +35,7 @@ State = tuple[int, tuple[int, ...]]
 Score = float
 
 
-def hamiltoniancycle_opt_solve(graph: UndirectedGraph, wf: WeightingFunction):
+def hamiltoniancycle_opt_solve(graph: UndirectedGraph, wf: WeightingFunction) -> Iterator[Solution]:
     @dataclass
     class Extra:
         ls: int = 0
@@ -45,7 +48,7 @@ def hamiltoniancycle_opt_solve(graph: UndirectedGraph, wf: WeightingFunction):
         def solution(self) -> Solution:
             return self.score(), self.decisions()
 
-        def successors(self) -> Iterable['HamiltonianCycleDS']:
+        def successors(self) -> Iterable[HamiltonianCycleDS]:
             ds = self.decisions()
             if len(ds) < len(graph.V):
                 for v in graph.succs(ds[-1]):
@@ -74,14 +77,14 @@ if __name__ == "__main__":
     G = UndirectedGraph(E=[(0, 2), (0, 3), (0, 9), (1, 3), (1, 4), (1, 8), (2, 3), (2, 5), (3, 4),
                            (3, 6), (4, 7), (5, 6), (5, 8), (6, 7), (6, 8), (6, 9)])
     d: dict[tuple[int, int], int] = {}
-    for (u, v) in G.E:
-        d[u, v] = abs(u - v)
-    wf = WeightingFunction((e for e in d.items()), symmetrical=True)
+    for (u2, v2) in G.E:
+        d[u2, v2] = abs(u2 - v2)
 
     print("hamiltoniancycle_solve:")
     for solution in hamiltoniancycle_solve(G):
         print(solution)
     print()
     print("hamiltoniancycle_opt_solve:")
-    for solution in hamiltoniancycle_opt_solve(G, wf):
+    wf2 = WeightingFunction((e for e in d.items()), symmetrical=True)
+    for solution in hamiltoniancycle_opt_solve(G, wf2):
         print(solution)

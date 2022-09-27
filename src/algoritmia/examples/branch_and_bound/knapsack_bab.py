@@ -1,11 +1,13 @@
+from __future__ import annotations
+
+from collections.abc import Iterable
 from dataclasses import dataclass
 from random import seed, randint
-from typing import *
 
 from algoritmia.schemes.bab_scheme import BoundedDecisionSequence, bab_max_solve
 
 Decision = int  # 0 o 1
-Solution = tuple[int, int, tuple[Decision,...]]  # (value, weight, decisions)
+Solution = tuple[int, int, tuple[Decision, ...]]  # (value, weight, decisions)
 
 
 def knapsack_bab_solve(weights: list[int], values: list[int], capacity: int) -> Solution:
@@ -29,7 +31,7 @@ def knapsack_bab_solve(weights: list[int], values: list[int], capacity: int) -> 
         def solution(self) -> Solution:
             return self.extra.value, self.extra.weight, self.decisions()
 
-        def successors(self) -> Iterable["KnapsackBabDS"]:
+        def successors(self) -> Iterable[KnapsackBabDS]:
             n = len(self)
             if n < len(values):
                 if weights[n] <= capacity - self.extra.weight:
@@ -76,7 +78,7 @@ def knapsack_bab_solve2(weights: list[int], values: list[int], capacity: int):
         def solution(self) -> Solution:
             return self.extra.value, self.extra.weight, self.decisions()
 
-        def successors(self) -> Iterable["KnapsackBabDS"]:
+        def successors(self) -> Iterable[KnapsackBabDS]:
             n = len(self)
             if n < len(values):
                 if weights[n] <= capacity - self.extra.weight:

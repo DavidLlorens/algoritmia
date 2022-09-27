@@ -1,4 +1,5 @@
-from typing import *
+from collections.abc import Callable, Iterable
+from typing import Optional, TypeVar
 
 infinity = float("+inf")
 

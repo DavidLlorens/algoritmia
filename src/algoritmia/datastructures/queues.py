@@ -1,5 +1,6 @@
 from abc import abstractmethod, ABC
-from typing import *
+from collections.abc import Iterable, Sized
+from typing import TypeVar, Generic
 
 from algoritmia.datastructures.linkedlists import LinkedList
 
@@ -11,7 +12,7 @@ T = TypeVar('T')
 
 
 class IQueue(ABC, Sized, Generic[T]):
-    def __init__(self, mylist: List):
+    def __init__(self, mylist: list):
         self._list = mylist
 
     @abstractmethod

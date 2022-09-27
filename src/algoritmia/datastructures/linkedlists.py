@@ -1,5 +1,6 @@
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
-from typing import *
+from typing import Generic, TypeVar, Optional
 
 # Lista enlazada con puntero a cabeza y cola.
 # Cumple la interfaz list de Python.
@@ -120,7 +121,7 @@ class LinkedList(list[T]):
             left = left.next
             right = right.prev
 
-    def __iter__(self) -> Iterable[T]:
+    def __iter__(self) -> Iterator[T]:
         node = self._head
         while node is not None:
             yield node.value

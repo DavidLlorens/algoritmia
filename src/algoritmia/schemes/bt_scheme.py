@@ -5,8 +5,11 @@ Version: 4.0 (23-oct-2021)
          (c) Universitat Jaume I 2021
 @license: GPL3
 """
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import *
+from collections.abc import Iterator, Iterable
+from typing import TypeVar
 
 infinity = float("infinity")
 
@@ -33,7 +36,7 @@ class DecisionSequence(ABC):
     def __len__(self):  # len(objeto) devuelve el número de decisiones del objeto
         return len(self._decisions)
 
-    def add_decision(self, d: Decision, extra_fields=None) -> 'DecisionSequence':
+    def add_decision(self, d: Decision, extra_fields=None) -> DecisionSequence:
         return self.__class__(extra_fields, self._decisions + (d,))
 
     def decisions(self) -> tuple[Decision, ...]:
@@ -51,12 +54,12 @@ class DecisionSequence(ABC):
         pass
 
     @abstractmethod
-    def successors(self) -> Iterable["DecisionSequence"]:
+    def successors(self) -> Iterable[DecisionSequence]:
         pass
 
 
-def bt_solve(initial_ds: DecisionSequence) -> Iterable[Solution]:
-    def bt(ds: DecisionSequence) -> Iterable[Solution]:
+def bt_solve(initial_ds: DecisionSequence) -> Iterator[Solution]:
+    def bt(ds: DecisionSequence) -> Iterator[Solution]:
         if ds.is_solution():
             yield ds.solution()
         for new_ds in ds.successors():
@@ -67,8 +70,8 @@ def bt_solve(initial_ds: DecisionSequence) -> Iterable[Solution]:
 
 #  Esquema para BT con control de visitados --------------------------------------------------------
 
-def bt_vc_solve(initial_ds: DecisionSequence) -> Iterable[Solution]:
-    def bt(ds: DecisionSequence) -> Iterable[Solution]:
+def bt_vc_solve(initial_ds: DecisionSequence) -> Iterator[Solution]:
+    def bt(ds: DecisionSequence) -> Iterator[Solution]:
         seen.add(ds.state())  # El método state debe devolver un objeto inmutable
         if ds.is_solution():
             yield ds.solution()
@@ -85,7 +88,7 @@ def bt_vc_solve(initial_ds: DecisionSequence) -> Iterable[Solution]:
 
 class ScoredDecisionSequence(DecisionSequence):
     @abstractmethod
-    def successors(self) -> Iterable["ScoredDecisionSequence"]:
+    def successors(self) -> Iterable[ScoredDecisionSequence]:
         pass
 
     @abstractmethod
@@ -95,8 +98,8 @@ class ScoredDecisionSequence(DecisionSequence):
 
 
 # Solver de minimización (p.e. para el problema del cambio)
-def bt_min_solve(initial_ds: ScoredDecisionSequence) -> Iterable[Solution]:
-    def bt(ds: ScoredDecisionSequence) -> Iterable[Solution]:
+def bt_min_solve(initial_ds: ScoredDecisionSequence) -> Iterator[Solution]:
+    def bt(ds: ScoredDecisionSequence) -> Iterator[Solution]:
         nonlocal bs
         ds_score = ds.score()
         best_seen[ds.state()] = ds_score
@@ -114,8 +117,8 @@ def bt_min_solve(initial_ds: ScoredDecisionSequence) -> Iterable[Solution]:
 
 
 # Solver de maximización (p.e. para el problema de la mochila)
-def bt_max_solve(initial_ds: ScoredDecisionSequence) -> Iterable[Solution]:
-    def bt(ds: ScoredDecisionSequence) -> Iterable[Solution]:
+def bt_max_solve(initial_ds: ScoredDecisionSequence) -> Iterator[Solution]:
+    def bt(ds: ScoredDecisionSequence) -> Iterator[Solution]:
         nonlocal bs
         ds_score = ds.score()
         best_seen[ds.state()] = ds_score

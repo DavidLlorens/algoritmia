@@ -1,11 +1,11 @@
-from typing import *
+from collections.abc import Iterator
 
 from algoritmia.datastructures.graphs import UndirectedGraph, Vertex
 
 from traversers import EdgeTraverser
 
 
-def spanning_forest(g: UndirectedGraph[Vertex], traverser: EdgeTraverser) -> Iterable[UndirectedGraph]:
+def spanning_forest(g: UndirectedGraph[Vertex], traverser: EdgeTraverser) -> Iterator[UndirectedGraph]:
     pending_vertices = set(g.V)
     while len(pending_vertices) > 0:
         u = pending_vertices.pop()

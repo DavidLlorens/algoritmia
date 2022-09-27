@@ -5,9 +5,11 @@ Version: 4.0 (23-oct-2021)
          (c) Universitat Jaume I 2021
 @license: GPL3
 """
+from __future__ import annotations
+
 from abc import abstractmethod
 from functools import total_ordering
-from typing import *
+from typing import Optional, TypeVar, Union
 
 from algoritmia.datastructures.priorityqueues import MaxHeap, MinHeap
 from algoritmia.schemes.bt_scheme import DecisionSequence
@@ -48,10 +50,10 @@ class BoundedDecisionSequence(DecisionSequence):
         return self._pes
 
     # Comparar dos BabDecisionSequence es comparar sus cotas optimistas
-    def __lt__(self, other: "BoundedDecisionSequence") -> bool:
+    def __lt__(self, other: BoundedDecisionSequence) -> bool:
         return self._opt < other._opt
 
-    def __eq__(self, other: "BoundedDecisionSequence") -> bool:
+    def __eq__(self, other: BoundedDecisionSequence) -> bool:
         return self._opt == other._opt
 
 

@@ -1,14 +1,16 @@
-from typing import *
+from __future__ import annotations
+
+from collections.abc import Iterable, Iterator
 
 from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solve, Solution
 
 
-def nqueens_solve(n: int) -> Iterable[Solution]:
+def nqueens_solve(n: int) -> Iterator[Solution]:
     class NQueensDS(DecisionSequence):
         def is_solution(self) -> bool:
             return len(self) == n
 
-        def successors(self) -> Iterable["NQueensDS"]:
+        def successors(self) -> Iterable[NQueensDS]:
             t = len(self)
             if t < n:
                 decisions = self.decisions()

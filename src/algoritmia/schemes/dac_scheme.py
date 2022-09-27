@@ -5,8 +5,11 @@ Version: 4.0 (23-oct-2021)
          (c) Universitat Jaume I 2021
 @license: GPL3
 """
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import *
+from collections.abc import Iterable
+from typing import TypeVar
 
 Solution = TypeVar('Solution')
 
@@ -22,7 +25,7 @@ class IDivideAndConquerProblem(ABC):
     def trivial_solution(self) -> Solution: pass
 
     @abstractmethod
-    def divide(self) -> Iterable["IDivideAndConquerProblem"]: pass
+    def divide(self) -> Iterable[IDivideAndConquerProblem]: pass
 
     @abstractmethod
     def combine(self, solutions: Iterable[Solution]) -> Solution: pass
@@ -47,7 +50,7 @@ class IDecreaseAndConquerProblem(ABC):
     def trivial_solution(self) -> Solution: pass
 
     @abstractmethod
-    def decrease(self) -> "IDecreaseAndConquerProblem": pass
+    def decrease(self) -> IDecreaseAndConquerProblem: pass
 
     def process(self, s: Solution) -> Solution:
         return s

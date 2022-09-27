@@ -1,10 +1,10 @@
-from typing import *
-
+from typing import Optional
+from collections.abc import Iterator
 from algoritmia.datastructures.graphs import Digraph, Vertex
 
 
-def topological_sort(g: Digraph[Vertex]) -> list[Vertex]:
-    def traverse_from(v):  # depthfirst postorder
+def topological_sort(g: Digraph[Vertex]) -> Optional[list[Vertex]]:
+    def traverse_from(v) -> Iterator[Vertex]:  # depthfirst postorder
         pending.remove(v)
         for suc in g.succs(v):
             if suc in pending:
@@ -13,13 +13,15 @@ def topological_sort(g: Digraph[Vertex]) -> list[Vertex]:
 
     def next_vertex_no_preds() -> Optional[Vertex]:
         for v in pending:
-            if len(g.preds(v)) == 0: return v
-        raise Exception("Incompatible graph")
+            if len(g.preds(v)) == 0:
+                return v
 
     pending = set(g.V)
     lv = []
     while len(pending) > 0:
         u = next_vertex_no_preds()
+        if u is None:
+            return None
         vertices = list(traverse_from(u))
         pending -= set(vertices)
         lv.extend(vertices)

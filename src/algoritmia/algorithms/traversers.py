@@ -1,18 +1,18 @@
-from typing import *
+from collections.abc import Iterator, Callable
 from math import sqrt
 
 from algoritmia.datastructures.graphs import IGraph, Vertex, Edge, WeightingFunction, Weight
-from algoritmia.datastructures.queues import Fifo
 from algoritmia.datastructures.prioritymaps import MinHeapMap
+from algoritmia.datastructures.queues import Fifo
 from algoritmia.utils import argmin, infinity
 
-VertexTraverser = Callable[[IGraph, Vertex], Iterable[Vertex]]
-EdgeTraverser = Callable[[IGraph, Vertex], Iterable[Edge]]
+VertexTraverser = Callable[[IGraph, Vertex], Iterator[Vertex]]
+EdgeTraverser = Callable[[IGraph, Vertex], Iterator[Edge]]
 
 
 # Vertex traversers ----------------------------------------------------------------
 
-def bf_vertex_traverser(graph: IGraph, v_initial: Vertex) -> Iterable[Vertex]:
+def bf_vertex_traverser(graph: IGraph, v_initial: Vertex) -> Iterator[Vertex]:
     queue = Fifo()
     seen = set()
     queue.push(v_initial)
@@ -26,8 +26,8 @@ def bf_vertex_traverser(graph: IGraph, v_initial: Vertex) -> Iterable[Vertex]:
                 seen.add(suc)
 
 
-def df_vertex_traverser(graph: IGraph, v_initial: Vertex) -> Iterable[Vertex]:
-    def traverse_from(v: Vertex) -> Iterable[Vertex]:
+def df_vertex_traverser(graph: IGraph, v_initial: Vertex) -> Iterator[Vertex]:
+    def traverse_from(v: Vertex) -> Iterator[Vertex]:
         seen.add(v)
         yield v  # pre-order
         for suc in graph.succs(v):
@@ -41,7 +41,7 @@ def df_vertex_traverser(graph: IGraph, v_initial: Vertex) -> Iterable[Vertex]:
 
 # Edge traversers ----------------------------------------------------------------
 
-def bf_edge_traverser(graph: IGraph, v_initial: Vertex) -> Iterable[Edge]:
+def bf_edge_traverser(graph: IGraph, v_initial: Vertex) -> Iterator[Edge]:
     queue = Fifo()
     seen = set()
     queue.push((v_initial, v_initial))
@@ -55,8 +55,8 @@ def bf_edge_traverser(graph: IGraph, v_initial: Vertex) -> Iterable[Edge]:
                 seen.add(suc)
 
 
-def df_edge_traverser(graph: IGraph, v_initial: Vertex) -> Iterable[Edge]:
-    def traverse_from(u: Vertex, v: Vertex) -> Iterable[Edge]:
+def df_edge_traverser(graph: IGraph, v_initial: Vertex) -> Iterator[Edge]:
+    def traverse_from(u: Vertex, v: Vertex) -> Iterator[Edge]:
         seen.add(v)
         yield u, v  # pre-order
         for suc in graph.succs(v):
@@ -70,7 +70,7 @@ def df_edge_traverser(graph: IGraph, v_initial: Vertex) -> Iterable[Edge]:
 
 # Con diccionario: O(|V|^2)
 def dijkstra_edge_traverser(g: IGraph, d: WeightingFunction,
-                            v_initial: Vertex) -> Iterable[Edge]:
+                            v_initial: Vertex) -> Iterator[Edge]:
     D: dict[Vertex, Weight] = dict((v, infinity) for v in g.V)
     D[v_initial] = 0
     bp: dict[Vertex, Vertex] = {v_initial: v_initial}
@@ -89,7 +89,7 @@ def dijkstra_edge_traverser(g: IGraph, d: WeightingFunction,
 
 # Con diccionario de prioridad: O(|V| + |E| log |V|)
 def dijkstra_hm_edge_traverser(g: IGraph, d: WeightingFunction,
-                               v_initial: Vertex) -> Iterable[Edge]:
+                               v_initial: Vertex) -> Iterator[Edge]:
     D: MinHeapMap[Vertex, Weight] = MinHeapMap((v, infinity) for v in g.V)  # O(|V|)
     D[v_initial] = 0
     bp: dict[Vertex, Vertex] = {v_initial: v_initial}
@@ -113,7 +113,7 @@ def d_eu(u, v):
 
 
 def dijkstra_metric_edge_traverser(g: IGraph, d: WeightingFunction,
-                                   v_initial: Vertex, v_final: Vertex) -> Iterable[Edge]:
+                                   v_initial: Vertex, v_final: Vertex) -> Iterator[Edge]:
     D: dict[Vertex, Weight] = dict((v, infinity) for v in g.V)
     D[v_initial] = 0
     bp: dict[Vertex, Vertex] = {v_initial: v_initial}

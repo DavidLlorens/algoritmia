@@ -1,5 +1,7 @@
+from __future__ import annotations
+
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
-from typing import *
 
 from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solve, bt_vc_solve
 from algoritmia.schemes.bt_scheme import ScoredDecisionSequence, bt_min_solve
@@ -9,7 +11,7 @@ Solution = tuple[Decision, ...]
 State = tuple[int, int]
 
 
-def coin_change_solve_naif(v: tuple[int, ...], Q: int) -> Iterable[Solution]:
+def coin_change_solve_naif(v: tuple[int, ...], Q: int) -> Iterator[Solution]:
     def calc(ds: tuple[int, ...]) -> int:
         return sum(ds[i] * v[i] for i in range(len(ds)))
 
@@ -18,7 +20,7 @@ def coin_change_solve_naif(v: tuple[int, ...], Q: int) -> Iterable[Solution]:
             q = calc(self.decisions())
             return len(self) == len(v) and q == Q
 
-        def successors(self) -> Iterable["CoinChangeDS"]:
+        def successors(self) -> Iterable[CoinChangeDS]:
             n = len(self)
             if n < len(v):
                 q = calc(self.decisions())
@@ -30,7 +32,7 @@ def coin_change_solve_naif(v: tuple[int, ...], Q: int) -> Iterable[Solution]:
     return bt_solve(initial_ds)
 
 
-def coin_change_solve(v: tuple[int, ...], Q: int) -> Iterable[Solution]:
+def coin_change_solve(v: tuple[int, ...], Q: int) -> Iterator[Solution]:
     @dataclass
     class Extra:
         pending: int
@@ -39,7 +41,7 @@ def coin_change_solve(v: tuple[int, ...], Q: int) -> Iterable[Solution]:
         def is_solution(self) -> bool:
             return len(self) == len(v) and self.extra.pending == 0
 
-        def successors(self) -> Iterable["CoinChangeDS"]:
+        def successors(self) -> Iterable[CoinChangeDS]:
             n = len(self)
             if n < len(v):
                 for num_coins in range(self.extra.pending // v[n] + 1):
@@ -50,7 +52,7 @@ def coin_change_solve(v: tuple[int, ...], Q: int) -> Iterable[Solution]:
     return bt_solve(initial_ds)
 
 
-def coin_change_vc_solve(v: tuple[int, ...], Q: int) -> Iterable[Solution]:
+def coin_change_vc_solve(v: tuple[int, ...], Q: int) -> Iterator[Solution]:
     @dataclass
     class Extra:
         pending: int
@@ -59,7 +61,7 @@ def coin_change_vc_solve(v: tuple[int, ...], Q: int) -> Iterable[Solution]:
         def is_solution(self) -> bool:
             return len(self) == len(v) and self.extra.pending == 0
 
-        def successors(self) -> Iterable["CoinChangeDS"]:
+        def successors(self) -> Iterable[CoinChangeDS]:
             n = len(self)
             if n < len(v):
                 for num_coins in range(self.extra.pending // v[n] + 1):
@@ -73,7 +75,7 @@ def coin_change_vc_solve(v: tuple[int, ...], Q: int) -> Iterable[Solution]:
     return bt_vc_solve(initial_ds)
 
 
-def coin_change_opt_solve(v: tuple[int, ...], Q: int) -> Iterable[Solution]:
+def coin_change_opt_solve(v: tuple[int, ...], Q: int) -> Iterator[Solution]:
     @dataclass
     class Extra:
         pending: int
@@ -82,7 +84,7 @@ def coin_change_opt_solve(v: tuple[int, ...], Q: int) -> Iterable[Solution]:
         def is_solution(self) -> bool:
             return len(self) == len(v) and self.extra.pending == 0
 
-        def successors(self) -> Iterable["CoinChangeDS"]:
+        def successors(self) -> Iterable[CoinChangeDS]:
             n = len(self)
             if n < len(v):
                 for num_coins in range(self.extra.pending // v[n] + 1):

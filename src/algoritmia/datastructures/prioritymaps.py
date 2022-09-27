@@ -1,7 +1,8 @@
 from abc import abstractmethod, ABC
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from itertools import chain, repeat
 from math import log, sqrt
-from typing import *
+from typing import Generic, TypeVar, Union, Optional
 
 K = TypeVar('K')
 T = TypeVar('T')
@@ -33,9 +34,9 @@ class MinHeapMap(IPriorityMap[K, T]):
         super().__init__()
         # self._opt = opt
         self._index = {}
-        if isinstance(data, Dict):
+        if isinstance(data, dict):
             data = data.items()
-        elif isinstance(data, Iterable):
+        elif not isinstance(data, Sequence):
             data = tuple(data)
         for (i, (key, _)) in enumerate(data):
             self._index[key] = i + 1
@@ -137,15 +138,15 @@ class MinHeapMap(IPriorityMap[K, T]):
             self._heapify(i)
         del self._index[key]
 
-    def keys(self) -> Iterable[K]:
+    def keys(self) -> Iterator[K]:
         for key in self._index:
             yield key
 
-    def values(self) -> Iterable[T]:
+    def values(self) -> Iterator[T]:
         for key in self._index:
             yield self._heap[self._index[key]][0]
 
-    def items(self) -> Iterable[tuple[K, T]]:
+    def items(self) -> Iterator[tuple[K, T]]:
         for key in self._index:
             yield self._heap[self._index[key]][1], self._heap[self._index[key]][0]
 
@@ -160,7 +161,7 @@ class MinHeapMap(IPriorityMap[K, T]):
         self[key] = default
         return default
 
-    def __iter__(self) -> Iterable[K]:
+    def __iter__(self) -> Iterator[K]:
         for key in self._index:
             yield key
 
@@ -357,10 +358,10 @@ class MinFibonacciHeap(IPriorityMap[K, T]):
     def keys(self) -> Iterable[K]:
         return self._map.keys()
 
-    def values(self) -> Iterable[T]:
+    def values(self) -> Iterator[T]:
         for key in self._map: yield self._map[key].value
 
-    def items(self) -> Iterable[tuple[K, T]]:
+    def items(self) -> Iterator[tuple[K, T]]:
         for key in self._map:
             yield key, self._map[key].value
 
@@ -379,7 +380,7 @@ class MinFibonacciHeap(IPriorityMap[K, T]):
     def __len__(self) -> "int":
         return self._size
 
-    def __iter__(self) -> Iterable[K]:
+    def __iter__(self) -> Iterator[K]:
         for key in self._map: yield key
 
     def __repr__(self) -> str:

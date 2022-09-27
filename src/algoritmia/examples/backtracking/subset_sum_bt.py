@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from random import random, seed
-from typing import *
+from collections.abc import Iterable, Iterator
 
 from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solve, bt_vc_solve
 from algoritmia.schemes.bt_scheme import ScoredDecisionSequence, bt_min_solve
@@ -10,19 +12,19 @@ Solution = tuple[int, tuple[Decision]]
 State = tuple[int, int]
 
 
-def sumset_solve(e: tuple[int, ...], S: int) -> Iterable[Solution]:
+def sumset_solve(e: tuple[int, ...], s: int) -> Iterator[Solution]:
     @dataclass
     class Extra:
         acc_sum: int  # acumulated sum
 
     class SumSetDS(DecisionSequence):
         def is_solution(self) -> bool:
-            return len(self) == len(e) and self.extra.acc_sum == S
+            return len(self) == len(e) and self.extra.acc_sum == s
 
-        def successors(self) -> Iterable["SumSetDS"]:
+        def successors(self) -> Iterable[SumSetDS]:
             if len(self) < len(e):
                 yield self.add_decision(0, self.extra)
-                if self.extra.acc_sum + e[len(self)] <= S:
+                if self.extra.acc_sum + e[len(self)] <= s:
                     acc_sum2 = self.extra.acc_sum + e[len(self)]
                     yield self.add_decision(1, Extra(acc_sum2))
 
@@ -30,19 +32,19 @@ def sumset_solve(e: tuple[int, ...], S: int) -> Iterable[Solution]:
     return bt_solve(initial_ds)
 
 
-def sumset_vc_solve(e: tuple[int, ...], S: int) -> Iterable[Solution]:
+def sumset_vc_solve(e: tuple[int, ...], s: int) -> Iterator[Solution]:
     @dataclass
     class Extra:
         acc_sum: int  # accumulated sum
 
     class SumSetDS(DecisionSequence):
         def is_solution(self) -> bool:
-            return len(self) == len(e) and self.extra.acc_sum == S
+            return len(self) == len(e) and self.extra.acc_sum == s
 
-        def successors(self) -> Iterable["SumSetDS"]:
+        def successors(self) -> Iterable[SumSetDS]:
             if len(self) < len(e):
                 yield self.add_decision(0, self.extra)
-                if self.extra.acc_sum + e[len(self)] <= S:
+                if self.extra.acc_sum + e[len(self)] <= s:
                     acc_sum2 = self.extra.acc_sum + e[len(self)]
                     yield self.add_decision(1, Extra(acc_sum2))
 
@@ -53,19 +55,19 @@ def sumset_vc_solve(e: tuple[int, ...], S: int) -> Iterable[Solution]:
     return bt_vc_solve(initial_ds)
 
 
-def sumset_opt_solve(e: tuple[int, ...], S: int) -> Iterable[Solution]:
+def sumset_opt_solve(e: tuple[int, ...], s: int) -> Iterator[Solution]:
     @dataclass
     class Extra:
         acc_sum: int = 0  # acumulated sum
 
     class SumSetDS(ScoredDecisionSequence):
         def is_solution(self) -> bool:
-            return len(self) == len(e) and self.extra.acc_sum == S
+            return len(self) == len(e) and self.extra.acc_sum == s
 
-        def successors(self) -> Iterable["SumSetDS"]:
+        def successors(self) -> Iterable[SumSetDS]:
             if len(self) < len(e):
                 yield self.add_decision(0, self.extra)
-                if self.extra.acc_sum + e[len(self)] <= S:
+                if self.extra.acc_sum + e[len(self)] <= s:
                     acc_sum2 = self.extra.acc_sum + e[len(self)]
                     yield self.add_decision(1, Extra(acc_sum2))
 

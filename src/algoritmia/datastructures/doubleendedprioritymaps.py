@@ -1,5 +1,6 @@
 from abc import abstractmethod
-from typing import *
+from collections.abc import Sequence, Iterable, Iterator
+from typing import Union, Optional
 
 from algoritmia.datastructures.prioritymaps import IPriorityMap, K, T
 
@@ -24,7 +25,7 @@ class IDoubleEndedPriorityDict(IPriorityMap[K, T]):
 class MinMaxIntervalHeapMap(IDoubleEndedPriorityDict[K, T]):
     def __init__(self, data: Union[Iterable[tuple[K, T]], dict[K, T]] = (), capacity: int = 0):
         super().__init__()
-        if isinstance(data, Dict):
+        if isinstance(data, dict):
             data = data.items()
         elif not isinstance(data, Sequence):
             data = tuple(data)
@@ -42,7 +43,7 @@ class MinMaxIntervalHeapMap(IDoubleEndedPriorityDict[K, T]):
             self._heapify_min(v)
             self._heapify_max(v)
 
-    def _children(self, i: int) -> Iterable[int]:
+    def _children(self, i: int) -> Iterator[int]:
         j = 2 * (i + 1)
         if j < self._size: yield j
         j += 2
@@ -208,7 +209,7 @@ class MinMaxIntervalHeapMap(IDoubleEndedPriorityDict[K, T]):
     def extract_max_value(self) -> T:
         return self.extract_max_item()[1]
 
-    def extract_max_item(self) -> " (K, T)":
+    def extract_max_item(self) -> tuple[K, T]:
         if self._size == 0: raise Exception("Empty Interval Heap")
         if self._size == 1:
             retval = (self._heap[0][1], self._heap[0][0])
@@ -278,13 +279,13 @@ class MinMaxIntervalHeapMap(IDoubleEndedPriorityDict[K, T]):
             self._index[self._heap[i][1]] = i
             i = parent
 
-    def keys(self) -> Iterable[K]:
+    def keys(self) -> Iterator[K]:
         for key in self._index: yield key
 
-    def values(self) -> Iterable[T]:
+    def values(self) -> Iterator[T]:
         for key in self._index: yield self._heap[self._index[key]][0]
 
-    def items(self) -> Iterable[tuple[K, T]]:
+    def items(self) -> Iterator[tuple[K, T]]:
         for key in self._index:
             yield self._heap[self._index[key]][1], self._heap[self._index[key]][0]
 
@@ -297,16 +298,16 @@ class MinMaxIntervalHeapMap(IDoubleEndedPriorityDict[K, T]):
         self[key] = default
         return default
 
-    def __contains__(self, key: K) -> "bool":
+    def __contains__(self, key: K) -> bool:
         return key in self._index
 
-    def __iter__(self) -> Iterable[K]:
+    def __iter__(self) -> Iterator[K]:
         for key in self._index: yield key
 
     def __len__(self) -> int:
         return self._size
 
-    def __repr__(self) -> "str":
+    def __repr__(self) -> str:
         return '{}({!r})'.format(self.__class__.__name__,
                                  [(k, v) for (v, k) in self._heap[:self._size]])
 

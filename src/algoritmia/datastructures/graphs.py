@@ -1,6 +1,7 @@
 import sys
 from abc import ABC, abstractmethod
-from typing import *
+from collections.abc import Callable, Iterable
+from typing import Generic, TypeVar, Optional, Union
 
 Vertex = TypeVar("Vertex")
 Edge = tuple[Vertex, Vertex]
@@ -48,10 +49,10 @@ class IGraph(ABC, Generic[Vertex]):
         for e in to_delete:
             self._e.remove(e)
 
-    def succs(self, v: Vertex):
+    def succs(self, v: Vertex) -> set[Vertex]:
         return self._s[v]
 
-    def preds(self, v: Vertex):
+    def preds(self, v: Vertex) -> set[Vertex]:
         return self._p[v]
 
     def out_degree(self, u: Vertex) -> int:

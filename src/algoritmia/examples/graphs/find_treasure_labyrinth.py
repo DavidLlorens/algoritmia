@@ -1,12 +1,14 @@
-from typing import *
+from typing import Optional
 
 from algoritmia.datastructures.graphs import UndirectedGraph
 from algoritmia.datastructures.queues import Fifo
 
 Vertex = tuple[int, int]
+Edge = tuple[Vertex, Vertex]
 
-
-def find_treasure_breadthfirst(g: UndirectedGraph, v_start: Vertex, v_treasure: Vertex) -> Optional[Vertex]:
+def find_treasure_breadthfirst(g: UndirectedGraph[Vertex],
+                               v_start: Vertex,
+                               v_treasure: Vertex) -> Optional[Vertex]:
     queue = Fifo()
     seen = set()
     queue.push(v_start)
@@ -22,18 +24,20 @@ def find_treasure_breadthfirst(g: UndirectedGraph, v_start: Vertex, v_treasure: 
     return None
 
 
-def find_treasure_depthfirst(g: UndirectedGraph, v_start: Vertex, v_treasure: Vertex) -> Optional[Vertex]:
+def find_treasure_depthfirst(g: UndirectedGraph[Vertex],
+                             v_start: Vertex,
+                             v_treasure: Vertex) -> Optional[Vertex]:
     def explorar_desde(v):
         seen.add(v)
-        if v == v_treasure:  # preorder
-            return v  # preorder
+        if v == v_treasure:     # preorder
+            return v            # preorder
         for suc in g.succs(v):
             if suc not in seen:
                 res = explorar_desde(suc)
                 if res is not None:
                     return res
-        # if v == v_treasure:    # postorder
-        #    return v           # postorder
+        # if v == v_treasure:     # postorder
+        #    return v             # postorder
 
     seen = set()
     return explorar_desde(v_start)
@@ -41,9 +45,9 @@ def find_treasure_depthfirst(g: UndirectedGraph, v_start: Vertex, v_treasure: Ve
 
 # Main program -------------------------------------------------------------------------
 
-corridors = [((0, 0), (0, 1)), ((0, 2), (0, 3)), ((1, 0), (1, 1)), ((0, 1), (0, 2)),
-             ((2, 0), (1, 0)), ((2, 1), (2, 2)), ((2, 2), (2, 3)), ((0, 1), (1, 1)),
-             ((0, 2), (1, 2)), ((0, 3), (1, 3)), ((1, 1), (2, 1)), ((1, 2), (2, 2))]
+corridors: list[Edge] = [((0, 0), (0, 1)), ((0, 2), (0, 3)), ((1, 0), (1, 1)), ((0, 1), (0, 2)),
+                         ((2, 0), (1, 0)), ((2, 1), (2, 2)), ((2, 2), (2, 3)), ((0, 1), (1, 1)),
+                         ((0, 2), (1, 2)), ((0, 3), (1, 3)), ((1, 1), (2, 1)), ((1, 2), (2, 2))]
 labyrinth = UndirectedGraph(E=corridors)
 
 pos_start = (0, 0)

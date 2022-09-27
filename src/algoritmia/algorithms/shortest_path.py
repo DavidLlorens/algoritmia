@@ -1,8 +1,8 @@
-from typing import TypeVar, Iterable
-
-from algoritmia.datastructures.graphs import IGraph, UndirectedGraph, WeightingFunction
+from collections.abc import Iterable
+from typing import TypeVar
 
 from algoritmia.algorithms.traversers import bf_edge_traverser, dijkstra_edge_traverser, dijkstra_metric_edge_traverser
+from algoritmia.datastructures.graphs import IGraph, UndirectedGraph, WeightingFunction
 
 Vertex = TypeVar('Vertex')
 Edge = tuple[Vertex, Vertex]
@@ -26,7 +26,6 @@ def shortest_path_metric_graph(g: IGraph[Vertex], d: WeightingFunction,
     return path_recover(edges, v_target)
 
 
-# Slide 37
 def path_recover(edges: Iterable[Edge], v: Vertex) -> Path:
     # Creates backpointer dictionary (bp)
     bp = {}

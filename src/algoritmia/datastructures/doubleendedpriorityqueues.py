@@ -1,21 +1,22 @@
-from typing import *
 from abc import abstractmethod
+from collections.abc import Iterator, Collection
+from typing import TypeVar
 
 from algoritmia.datastructures.priorityqueues import IPriorityQueue
 
 T = TypeVar('T')
 
 
-class IDoubleEndedPriorityQueue(IPriorityQueue):
+class IDoubleEndedPriorityQueue(IPriorityQueue[T]):
     @abstractmethod
-    def worst(self): pass
+    def worst(self) -> T: pass
 
     @abstractmethod
-    def extract_worst(self): pass
+    def extract_worst(self) -> T: pass
 
 
 class IntervalHeap(IDoubleEndedPriorityQueue):
-    def __init__(self, data: Sequence[T] = (), capacity: int = 0):
+    def __init__(self, data: Collection[T] = (), capacity: int = 0):
         capacity = max(capacity, len(data))
         self._heap = list(data) + [None] * (capacity - len(data))
         self._size = len(data)
@@ -61,7 +62,7 @@ class IntervalHeap(IDoubleEndedPriorityQueue):
             if i + 1 < self._size:
                 self._swap(i)
 
-    def _children(self, i: int) -> Iterable[int]:
+    def _children(self, i: int) -> Iterator[int]:
         j = 2 * (i + 1)
         if j < self._size: yield j
         j += 2
@@ -154,7 +155,7 @@ class IntervalHeap(IDoubleEndedPriorityQueue):
     def __len__(self) -> int:
         return self._size
 
-    def __iter__(self) -> Iterable[T]:
+    def __iter__(self) -> Iterator[T]:
         for i in range(self._size):
             yield self._heap[i]
 

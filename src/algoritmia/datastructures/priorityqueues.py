@@ -1,6 +1,7 @@
 from abc import abstractmethod, ABC
+from collections.abc import Callable, Iterator, Sequence, Sized
 from itertools import chain, repeat
-from typing import *
+from typing import Generic, TypeVar
 
 T = TypeVar('T')
 
@@ -70,7 +71,7 @@ class MinHeap(IPriorityQueue[T]):
             self._heap[i], self._heap[parent] = self._heap[parent], self._heap[i]
             i, parent = parent, parent // 2
 
-    def __iter__(self) -> Iterable[T]:
+    def __iter__(self) -> Iterator[T]:
         for i in range(1, self._size + 1): yield self._heap[i]
 
     def __len__(self) -> int:

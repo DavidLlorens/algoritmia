@@ -1,14 +1,13 @@
-from typing import *
+from collections.abc import Iterator
 
+from algoritmia.algorithms.traversers import VertexTraverser
 from algoritmia.datastructures.graphs import UndirectedGraph, Vertex
-
-from traversers import VertexTraverser
 
 CC = list[Vertex]  # Connected Component
 
 
 def connected_components(g: UndirectedGraph[Vertex],
-                         vertex_traverser: VertexTraverser) -> Iterable[CC]:
+                         vertex_traverser: VertexTraverser) -> Iterator[CC]:
     pending_vertices = set(g.V)
     while len(pending_vertices) > 0:
         u = pending_vertices.pop()
