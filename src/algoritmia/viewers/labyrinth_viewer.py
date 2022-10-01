@@ -25,17 +25,21 @@ Dibuja un laberinto a partir de un grafo no dirigido con las siguientes caracter
 
 import tkinter
 
-from algoritmia.datastructures.graphs import UndirectedGraph
 from easypaint import EasyPaint
+
+from algoritmia.datastructures.graphs import UndirectedGraph
 
 Vertex = tuple[int, int]
 Edge = tuple[Vertex, Vertex]
 
 
 class LabyrinthViewer(EasyPaint):
-    def __init__(self, lab: UndirectedGraph,
-                 canvas_width: int = 400, canvas_height: int = 400,
-                 margin: int = 10, wall_width: int = 2):
+    def __init__(self,
+                 lab: UndirectedGraph[Vertex],
+                 canvas_width: int = 400,
+                 canvas_height: int = 400,
+                 margin: int = 10,
+                 wall_width: int = 2):
         EasyPaint.__init__(self)
 
         self.visible_l = True
@@ -186,7 +190,7 @@ if __name__ == '__main__':
          ((2, 3), (2, 4))]
 
     # Laberinto en forma de grafo no dirigido
-    graph = UndirectedGraph(E=e)
+    graph: UndirectedGraph[Vertex] = UndirectedGraph(E=e)
 
     # Obligatorio: Crea un LabyrinthViewer pasándole el grafo del laberinto
     lv = LabyrinthViewer(graph, canvas_width=600, canvas_height=400, margin=10)
@@ -201,11 +205,9 @@ if __name__ == '__main__':
     lv.add_marked_cell((3, 4), 'pink')
 
     # Opcional: Visualiza un camino en azul
-    example_path = [(0, 0), (1, 0), (1, 1), (1, 2), (0, 2), (0, 3), (1, 3), (1, 4), (0, 4), (0, 5), (0, 6), (0, 7),
-                    (1, 7),
-                    (1, 8), (2, 8), (2, 7), (2, 6), (1, 6), (1, 5), (2, 5), (2, 4), (2, 3), (3, 3), (4, 3), (4, 4),
-                    (3, 4),
-                    (3, 5), (3, 6), (3, 7), (3, 8), (3, 9), (4, 9)]
+    example_path = [(0, 0), (1, 0), (1, 1), (1, 2), (0, 2), (0, 3), (1, 3), (1, 4), (0, 4), (0, 5), (0, 6),
+                    (0, 7), (1, 7), (1, 8), (2, 8), (2, 7), (2, 6), (1, 6), (1, 5), (2, 5), (2, 4), (2, 3),
+                    (3, 3), (4, 3), (4, 4), (3, 4), (3, 5), (3, 6), (3, 7), (3, 8), (3, 9), (4, 9)]
     lv.add_path(example_path, 'red', 1)
 
     # Obligatorio: Muestra el laberinto

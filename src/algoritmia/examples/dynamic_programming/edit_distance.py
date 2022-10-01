@@ -32,16 +32,16 @@ def edit_distance(mode: RecMode, s: str, t: str) -> tuple[Score, list[Decision]]
             return 0
         if (m, n) not in mem:
             if n == 0:
-                mem[m, n] = D_classic(m - 1, n) + 1, (m - 1, n), 'D'
+                mem[m, n] = D_optimized(m - 1, n) + 1, (m - 1, n), 'D'
             elif m == 0:
-                mem[m, n] = D_classic(m, n - 1) + 1, (m, n - 1), 'I'
+                mem[m, n] = D_optimized(m, n - 1) + 1, (m, n - 1), 'I'
             else:
                 if s[m - 1] == t[n - 1]:
-                    mem[m, n] = D_classic(m - 1, n - 1), (m - 1, n - 1), '-'
+                    mem[m, n] = D_optimized(m - 1, n - 1), (m - 1, n - 1), '-'
                 else:
-                    mem[m, n] = min((D_classic(m - 1, n) + 1, (m - 1, n), 'D'),
-                                    (D_classic(m, n - 1) + 1, (m, n - 1), 'I'),
-                                    (D_classic(m - 1, n - 1) + 1, (m - 1, n - 1), 'S'))
+                    mem[m, n] = min((D_optimized(m - 1, n) + 1, (m - 1, n), 'D'),
+                                    (D_optimized(m, n - 1) + 1, (m, n - 1), 'I'),
+                                    (D_optimized(m - 1, n - 1) + 1, (m - 1, n - 1), 'S'))
         return mem[m, n][0]
 
     mem: dict[LParams, tuple[Score, LParams, Decision]] = {}
@@ -63,9 +63,9 @@ def edit_distance(mode: RecMode, s: str, t: str) -> tuple[Score, list[Decision]]
 # ------------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    mode = RecMode.Classic
-    my_source, my_target = 'costa', 'casa'
-    print(f'Edit distance fom "{my_source}" to "{my_target}":')
-    print(f'\tMode: {mode}')
-    res_score, res_decisions = edit_distance(mode, my_source, my_target)
-    print(f'\tScore: {res_score}\n\tDecisions: {res_decisions}')
+    for mode in [RecMode.Classic, RecMode.Optimized]:
+        my_source, my_target = 'costa', 'casa'
+        print(f'Edit distance fom "{my_source}" to "{my_target}":')
+        print(f'\tMode: {mode}')
+        res_score, res_decisions = edit_distance(mode, my_source, my_target)
+        print(f'\tScore: {res_score}\n\tDecisions: {res_decisions}')

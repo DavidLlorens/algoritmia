@@ -5,9 +5,9 @@ Visor de grafos de dependencias y trellis de programacion dinámica
 02/12/2021: Version 1
 """
 
-from typing import *
-from math import sin, cos, pi, sqrt, atan2
 import tkinter
+from math import sin, cos, pi, sqrt, atan2
+from typing import Optional, Union
 
 from easypaint import EasyPaint
 
@@ -198,9 +198,11 @@ class DPViewer(EasyPaint):
                          (x4 + 0.5) * cell_size + m[0], (y4 + 0.5) * cell_size + m[1],
                          color, width=width, capstyle=tkinter.ROUND, tag=tag)
         if pos >= 0:
-            def x(t): return t * x1 + (1 - t) * x2
+            def x(t):
+                return t * x1 + (1 - t) * x2
 
-            def y(t): return t * y1 + (1 - t) * y2
+            def y(t):
+                return t * y1 + (1 - t) * y2
 
             xm, ym = x(pos), y(pos)
             xr, yr = x2 - x1, y2 - y1

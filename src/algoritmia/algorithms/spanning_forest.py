@@ -1,11 +1,10 @@
 from collections.abc import Iterator
 
-from algoritmia.datastructures.graphs import UndirectedGraph, Vertex
+from algoritmia.datastructures.graphs import UndirectedGraph, TVertex
 
-from traversers import EdgeTraverser
+from traversers import TEdgeTraverser
 
-
-def spanning_forest(g: UndirectedGraph[Vertex], traverser: EdgeTraverser) -> Iterator[UndirectedGraph]:
+def spanning_forest(g: UndirectedGraph[TVertex], traverser: TEdgeTraverser) -> Iterator[UndirectedGraph]:
     pending_vertices = set(g.V)
     while len(pending_vertices) > 0:
         u = pending_vertices.pop()
@@ -18,6 +17,9 @@ def spanning_forest(g: UndirectedGraph[Vertex], traverser: EdgeTraverser) -> Ite
 
 if __name__ == '__main__':
     from traversers import bf_edge_traverser, df_edge_traverser
+
+    Vertex = tuple[int, int]
+    Edge = tuple[Vertex, Vertex]
 
     edges = [((0, 0), (0, 1)), ((0, 2), (0, 3)), ((1, 0), (1, 1)), ((2, 0), (2, 1)),
              ((2, 2), (2, 3)), ((0, 1), (1, 1)), ((0, 2), (1, 2)), ((0, 3), (1, 3)),

@@ -24,12 +24,13 @@ Dos modos de funcionamiento según parámetro del constructor (vertexmode):
    (0,0)---(8,0)
 """
 
-from typing import *
-from math import sin, cos, pi, sqrt
 import tkinter
+from math import sin, cos, pi, sqrt
+from typing import Optional, Union
+
+from easypaint import EasyPaint
 
 from algoritmia.datastructures.graphs import IGraph, UndirectedGraph, Digraph
-from easypaint import EasyPaint
 
 Num = Union[int, float]
 Vertex = tuple[Num, Num]
@@ -174,12 +175,14 @@ class Graph2dViewer(EasyPaint):
 
 if __name__ == '__main__':
     c = {'A': (10, 1), 'B': (15, 4), 'C': (10, 7), 'D': (20, 4)}
-    v_label = dict((v, k) for (k, v) in c.items())
+    v_label0 = dict((v, k) for (k, v) in c.items())
 
     edges = [('A', 'B'), ('A', 'C'), ('B', 'D'), ('C', 'B')]
     edges2 = [(c[u], c[v]) for (u, v) in edges]
 
-    # g = UndirectedGraph(E=edges2)
-    g = Digraph(E=edges2)
-    viewer = Graph2dViewer(g, v_label, canvas_width=400, canvas_height=300)
+    # Descomenta una de los dos lineas siguientes:
+    # g0: UndirectedGraph[Vertex] = UndirectedGraph(E=edges2)
+    g0: Digraph[Vertex] = Digraph(E=edges2)
+
+    viewer = Graph2dViewer(g0, v_label0, canvas_width=400, canvas_height=300)
     viewer.run()

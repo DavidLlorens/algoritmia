@@ -1,29 +1,19 @@
-from typing import *
-
-from algoritmia.datastructures.graphs import UndirectedGraph
-
-T = TypeVar('T')
+from algoritmia.datastructures.graphs import UndirectedGraph, TVertex
 
 
 # agrupa los vertices que pueden compartir color
-def coloring_solve(g: UndirectedGraph) -> list[set[T]]:
-    solution = []
+def coloring_solve(g: UndirectedGraph[TVertex]) -> list[set[TVertex]]:
+    solution: list[set[TVertex]] = []
+    vertex_set = set(g.V)  # Creamos una copia de los vértices
 
-    # Creamos un nuevo conjunto con todos los vértices del grafo
-    vertex_set = set(g.V)
-
-    # Mientras queden vértices en el conjunto que no tengan grupo
     while len(vertex_set) > 0:
-        # Creamos un nuevo grupo
-        grupo = set()
-        # Recorremos todos los vertices sin grupo
+        grupo = set()  # Creamos un nuevo grupo vacío
+        # Añadimos los vértices cuyos sucesores no estén ya en grupo
         for v in vertex_set:
             if not any(suc in grupo for suc in g.succs(v)):
                 grupo.add(v)
-        # Cerramos el grupo, lo añadimos a la solución y
-        # quitamos de vertex_set los vértices que hemos metido en el nuevo grupo
-        solution.append(grupo)
-        vertex_set -= grupo
+        solution.append(grupo)  # Añadimos el grupo a la solución
+        vertex_set -= grupo     # Quitamos los vértices del grupo de V
 
     return solution
 

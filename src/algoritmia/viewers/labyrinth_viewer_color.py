@@ -14,7 +14,8 @@ Path = list[Vertex]
 
 
 class LabyrinthViewerColor(LabyrinthViewer):
-    def __init__(self, lab: UndirectedGraph,
+    def __init__(self,
+                 lab: UndirectedGraph[Vertex],
                  canvas_width: int = 400, canvas_height: int = 400,
                  margin: int = 10, wall_width: int = 2):
         LabyrinthViewer.__init__(self, lab, canvas_width, canvas_height, margin, wall_width)
@@ -68,7 +69,8 @@ if __name__ == '__main__':
         return "#{:02x}{:02x}{:02x}".format(int(255 * r), int(255 * g), int(255 * b))
 
 
-    def matriz_distancias_anchura(grafo: UndirectedGraph, v_inicial: Vertex) -> dict[Vertex, int]:
+    def matriz_distancias_anchura(grafo: UndirectedGraph[Vertex],
+                                  v_inicial: Vertex) -> dict[Vertex, int]:
         dist: dict[Vertex, int] = {}
         queue = Fifo()
         seen: set[Vertex] = set()
@@ -95,19 +97,19 @@ if __name__ == '__main__':
          ((0, 7), (1, 7)), ((4, 2), (4, 3)), ((0, 8), (0, 9)), ((3, 5), (3, 4)), ((1, 8), (1, 7)), ((0, 9), (1, 9)),
          ((2, 3), (2, 4))]
 
-    g = UndirectedGraph(E=e)
-    num_rows, num_cols = max(v[0] for v in g.V)+1, max(v[1] for v in g.V)+1
+    g0: UndirectedGraph[Vertex] = UndirectedGraph(E=e)
+    num_rows, num_cols = max(v[0] for v in g0.V) + 1, max(v[1] for v in g0.V) + 1
     cell_size = 40
-    margin = 10
+    margin0 = 10
 
     # Laberinto en forma de grafo no dirigido
 
-    lv = LabyrinthViewerColor(g,
-                              canvas_width=num_cols * cell_size + margin * 2,
-                              canvas_height=num_rows * cell_size + margin * 2, margin=margin)
+    lv = LabyrinthViewerColor(g0,
+                              canvas_width=num_cols * cell_size + margin0 * 2,
+                              canvas_height=num_rows * cell_size + margin0 * 2, margin=margin0)
 
     start = (0, 0)  # (num_rows//2, num_cols//2)
-    matriz_dist = matriz_distancias_anchura(g, start)
+    matriz_dist = matriz_distancias_anchura(g0, start)
     maxvalue = max(matriz_dist.values())
     for (v, k) in sorted([(v, k) for (k, v) in matriz_dist.items()]):
         lv.add_marked_cell(k, int2col(v, maxvalue))

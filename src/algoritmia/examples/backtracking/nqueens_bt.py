@@ -2,11 +2,17 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Iterator
 
-from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solve, Solution
+from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solve
+
+Decision = int  # Número de fila donde colocar la reina
+
+# 'bt_solve' devuelve un Iterator del tipo devuelto por el método 'solution' de
+# la clase 'DecisionSequence', cuya implementación por defecto devuelve una tupla con las decisiones:
+SolutionDS = tuple[Decision, ...]
 
 
-def nqueens_solve(n: int) -> Iterator[Solution]:
-    class NQueensDS(DecisionSequence):
+def nqueens_solve(n: int) -> Iterator[SolutionDS]:
+    class NQueensDS(DecisionSequence[Decision]):
         def is_solution(self) -> bool:
             return len(self) == n
 

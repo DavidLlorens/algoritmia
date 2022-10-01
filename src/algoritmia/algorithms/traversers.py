@@ -1,18 +1,19 @@
 from collections.abc import Iterator, Callable
 from math import sqrt
 
-from algoritmia.datastructures.graphs import IGraph, Vertex, Edge, WeightingFunction, Weight
+from algoritmia.datastructures.graphs import IGraph, TVertex, TEdge, WeightingFunction, Weight
 from algoritmia.datastructures.prioritymaps import MinHeapMap
 from algoritmia.datastructures.queues import Fifo
 from algoritmia.utils import argmin, infinity
 
-VertexTraverser = Callable[[IGraph, Vertex], Iterator[Vertex]]
-EdgeTraverser = Callable[[IGraph, Vertex], Iterator[Edge]]
+TVertexTraverser = Callable[[IGraph[TVertex], TVertex], Iterator[TVertex]]
+TEdgeTraverser = Callable[[IGraph[TVertex], TVertex], Iterator[TEdge]]
 
 
-# Vertex traversers ----------------------------------------------------------------
+# TV traversers ----------------------------------------------------------------
 
-def bf_vertex_traverser(graph: IGraph, v_initial: Vertex) -> Iterator[Vertex]:
+def bf_vertex_traverser(graph: IGraph[TVertex],
+                        v_initial: TVertex) -> Iterator[TVertex]:
     queue = Fifo()
     seen = set()
     queue.push(v_initial)
@@ -26,8 +27,9 @@ def bf_vertex_traverser(graph: IGraph, v_initial: Vertex) -> Iterator[Vertex]:
                 seen.add(suc)
 
 
-def df_vertex_traverser(graph: IGraph, v_initial: Vertex) -> Iterator[Vertex]:
-    def traverse_from(v: Vertex) -> Iterator[Vertex]:
+def df_vertex_traverser(graph: IGraph[TVertex],
+                        v_initial: TVertex) -> Iterator[TVertex]:
+    def traverse_from(v: TVertex) -> Iterator[TVertex]:
         seen.add(v)
         yield v  # pre-order
         for suc in graph.succs(v):
@@ -39,9 +41,10 @@ def df_vertex_traverser(graph: IGraph, v_initial: Vertex) -> Iterator[Vertex]:
     yield from traverse_from(v_initial)
 
 
-# Edge traversers ----------------------------------------------------------------
+# TE traversers ----------------------------------------------------------------
 
-def bf_edge_traverser(graph: IGraph, v_initial: Vertex) -> Iterator[Edge]:
+def bf_edge_traverser(graph: IGraph[TVertex],
+                      v_initial: TVertex) -> Iterator[TEdge]:
     queue = Fifo()
     seen = set()
     queue.push((v_initial, v_initial))
@@ -55,8 +58,9 @@ def bf_edge_traverser(graph: IGraph, v_initial: Vertex) -> Iterator[Edge]:
                 seen.add(suc)
 
 
-def df_edge_traverser(graph: IGraph, v_initial: Vertex) -> Iterator[Edge]:
-    def traverse_from(u: Vertex, v: Vertex) -> Iterator[Edge]:
+def df_edge_traverser(graph: IGraph[TVertex],
+                      v_initial: TVertex) -> Iterator[TEdge]:
+    def traverse_from(u: TVertex, v: TVertex) -> Iterator[TEdge]:
         seen.add(v)
         yield u, v  # pre-order
         for suc in graph.succs(v):
@@ -69,12 +73,13 @@ def df_edge_traverser(graph: IGraph, v_initial: Vertex) -> Iterator[Edge]:
 
 
 # Con diccionario: O(|V|^2)
-def dijkstra_edge_traverser(g: IGraph, d: WeightingFunction,
-                            v_initial: Vertex) -> Iterator[Edge]:
-    D: dict[Vertex, Weight] = dict((v, infinity) for v in g.V)
+def dijkstra_edge_traverser(g: IGraph[TVertex],
+                            d: WeightingFunction[TVertex],
+                            v_initial: TVertex) -> Iterator[TEdge]:
+    D: dict[TVertex, Weight] = dict((v, infinity) for v in g.V)
     D[v_initial] = 0
-    bp: dict[Vertex, Vertex] = {v_initial: v_initial}
-    fixed: set[Vertex] = set()
+    bp: dict[TVertex, TVertex] = {v_initial: v_initial}
+    fixed: set[TVertex] = set()
     while len(bp) > 0:  # O(|V|) veces
         v = argmin(bp.keys(), lambda u: D[u])  # O(|V|)
         fixed.add(v)
@@ -88,12 +93,13 @@ def dijkstra_edge_traverser(g: IGraph, d: WeightingFunction,
 
 
 # Con diccionario de prioridad: O(|V| + |E| log |V|)
-def dijkstra_hm_edge_traverser(g: IGraph, d: WeightingFunction,
-                               v_initial: Vertex) -> Iterator[Edge]:
-    D: MinHeapMap[Vertex, Weight] = MinHeapMap((v, infinity) for v in g.V)  # O(|V|)
+def dijkstra_hm_edge_traverser(g: IGraph[TVertex],
+                               d: WeightingFunction[TVertex],
+                               v_initial: TVertex) -> Iterator[TEdge]:
+    D: MinHeapMap[TVertex, Weight] = MinHeapMap((v, infinity) for v in g.V)  # O(|V|)
     D[v_initial] = 0
-    bp: dict[Vertex, Vertex] = {v_initial: v_initial}
-    fixed: set[Vertex] = set()
+    bp: dict[TVertex, TVertex] = {v_initial: v_initial}
+    fixed: set[TVertex] = set()
     while len(D) > 0:
         v, dv = D.extract_opt_item()  # O(log |V|), O(|V|) veces
         fixed.add(v)
@@ -112,12 +118,13 @@ def d_eu(u, v):
     return sqrt(a * a + b * b)
 
 
-def dijkstra_metric_edge_traverser(g: IGraph, d: WeightingFunction,
-                                   v_initial: Vertex, v_final: Vertex) -> Iterator[Edge]:
-    D: dict[Vertex, Weight] = dict((v, infinity) for v in g.V)
+def dijkstra_metric_edge_traverser(g: IGraph[TVertex],
+                                   d: WeightingFunction[TVertex],
+                                   v_initial: TVertex, v_final: TVertex) -> Iterator[TEdge]:
+    D: dict[TVertex, Weight] = dict((v, infinity) for v in g.V)
     D[v_initial] = 0
-    bp: dict[Vertex, Vertex] = {v_initial: v_initial}
-    fixed: set[Vertex] = set()
+    bp: dict[TVertex, TVertex] = {v_initial: v_initial}
+    fixed: set[TVertex] = set()
     while len(bp) > 0:
         v = argmin(bp.keys(), lambda u: D[u] + d_eu(u, v_final))
         fixed.add(v)
@@ -135,11 +142,14 @@ def dijkstra_metric_edge_traverser(g: IGraph, d: WeightingFunction,
 if __name__ == '__main__':
     from algoritmia.datastructures.graphs import UndirectedGraph
 
+    Vertex = tuple[int, int]
+    Edge = tuple[Vertex, Vertex]
+
     my_edges = [((0, 0), (0, 1)), ((0, 2), (0, 3)), ((1, 0), (1, 1)), ((0, 1), (0, 2)),
                 ((2, 0), (1, 0)), ((2, 1), (2, 2)), ((2, 2), (2, 3)), ((0, 1), (1, 1)),
                 ((0, 2), (1, 2)), ((0, 3), (1, 3)), ((1, 1), (2, 1)), ((1, 2), (2, 2))]
 
-    my_graph = UndirectedGraph(E=my_edges)
+    my_graph = UndirectedGraph[Vertex](E=my_edges)
     my_vertex_source = (0, 0)
 
     print('vertex_traverser_breadthfirst:', list(bf_vertex_traverser(my_graph, my_vertex_source)))

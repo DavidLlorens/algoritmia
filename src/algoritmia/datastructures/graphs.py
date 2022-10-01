@@ -3,29 +3,28 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable, Iterable
 from typing import Generic, TypeVar, Optional, Union
 
-Vertex = TypeVar("Vertex")
-Edge = tuple[Vertex, Vertex]
+TVertex = TypeVar("TVertex")        # Generic Vertex
+TEdge = tuple[TVertex, TVertex]     # Generic Edge
 Weight = Union[int, float]
-
 
 # UndirectedGraph, Digraph -----------------------------------------------------
 
 
 # Abstract class (no instances)
-class IGraph(ABC, Generic[Vertex]):
+class IGraph(ABC, Generic[TVertex]):
     @abstractmethod
     def is_directed(self) -> bool:
         pass
 
-    def __init__(self, V: Iterable[Vertex] = None, E: Iterable[Edge] = ()):
-        self._e: list[Edge] = list(E)
+    def __init__(self, V: Iterable[TVertex] = None, E: Iterable[TEdge] = ()):
+        self._e: list[TEdge] = list(E)
         if V is None:
-            self._v: set[Vertex] = set(v for e in self._e for v in e)
+            self._v: set[TVertex] = set(v for e in self._e for v in e)
         else:
-            self._v: set[Vertex] = set(V)
+            self._v: set[TVertex] = set(V)
 
-        self._s: dict[Vertex, set[Vertex]] = dict((v, set()) for v in self._v)
-        self._p: dict[Vertex, set[Vertex]] = dict((v, set()) for v in self._v) if self.is_directed() else self._s
+        self._s: dict[TVertex, set[TVertex]] = dict((v, set()) for v in self._v)
+        self._p: dict[TVertex, set[TVertex]] = dict((v, set()) for v in self._v) if self.is_directed() else self._s
 
         to_delete = []
         # Crea los diccionarioos self._s y self._p
@@ -49,27 +48,27 @@ class IGraph(ABC, Generic[Vertex]):
         for e in to_delete:
             self._e.remove(e)
 
-    def succs(self, v: Vertex) -> set[Vertex]:
+    def succs(self, v: TVertex) -> set[TVertex]:
         return self._s[v]
 
-    def preds(self, v: Vertex) -> set[Vertex]:
+    def preds(self, v: TVertex) -> set[TVertex]:
         return self._p[v]
 
-    def out_degree(self, u: Vertex) -> int:
+    def out_degree(self, u: TVertex) -> int:
         return len(self._s[u])
 
-    def in_degree(self, v: Vertex) -> int:
+    def in_degree(self, v: TVertex) -> int:
         return len(self._p[v])
 
     @property
-    def V(self) -> set[Vertex]:
+    def V(self) -> set[TVertex]:
         return self._v
 
     @property
-    def E(self) -> list[Edge]:
+    def E(self) -> list[TEdge]:
         return self._e
 
-    def add_vertex(self, v: Vertex):
+    def add_vertex(self, v: TVertex):
         if v in self._v: return
         if v in self._s: raise Exception('Impossible 1')
         if v in self._p: raise Exception('Impossible 2')
@@ -77,7 +76,7 @@ class IGraph(ABC, Generic[Vertex]):
         self._s[v] = set()
         self._p[v] = set()
 
-    def remove_vertex(self, v: Vertex):
+    def remove_vertex(self, v: TVertex):
         if v not in self._v: return
         if v not in self._s: raise Exception('Impossible 3')
         if v not in self._p: raise Exception('Impossible 4')
@@ -90,7 +89,7 @@ class IGraph(ABC, Generic[Vertex]):
         e = [(u, w) for (u, w) in self._e if u != v and w != v]
         self._e = e
 
-    def add_edge(self, e: Edge):
+    def add_edge(self, e: TEdge):
         u, v = e
         self.add_vertex(u)
         self.add_vertex(v)
@@ -100,7 +99,7 @@ class IGraph(ABC, Generic[Vertex]):
         self._s[u].add(v)
         self._p[v].add(u)
 
-    def remove_edge(self, e: Edge):
+    def remove_edge(self, e: TEdge):
         u, v = e
         if u in self._s: self._s[u].discard(v)
         if v in self._p: self._p[v].discard(u)
@@ -112,12 +111,12 @@ class IGraph(ABC, Generic[Vertex]):
         return f"{self.__class__.__name__}(V={list(self.V)}, E={list(self.E)})"
 
 
-class UndirectedGraph(IGraph[Vertex]):
+class UndirectedGraph(IGraph[TVertex]):
     def is_directed(self) -> bool:
         return False
 
 
-class Digraph(IGraph[Vertex]):
+class Digraph(IGraph[TVertex]):
     def is_directed(self) -> bool:
         return True
 
@@ -125,8 +124,8 @@ class Digraph(IGraph[Vertex]):
 # WeightingFunction -----------------------------------------------------------------
 
 
-class WeightingFunction(Generic[Vertex], dict[Edge, Weight], Callable[[Vertex, Vertex], Weight]):
-    def __init__(self, data: Union[Iterable[tuple[Edge, Weight]], dict[Edge, Weight]], symmetrical: bool = False):
+class WeightingFunction(Generic[TVertex], dict[TEdge, Weight], Callable[[TVertex, TVertex], Weight]):
+    def __init__(self, data: Union[Iterable[tuple[TEdge, Weight]], dict[TEdge, Weight]], symmetrical: bool = False):
         super().__init__(data)
         self.symmetrical = symmetrical
         to_delete = []
@@ -143,7 +142,7 @@ class WeightingFunction(Generic[Vertex], dict[Edge, Weight], Callable[[Vertex, V
         for (v, u) in to_delete:
             del self[v, u]
 
-    def __call__(self, u: Union[Vertex, Edge], v: Optional[Vertex] = None) -> Weight:
+    def __call__(self, u: Union[TVertex, TEdge], v: Optional[TVertex] = None) -> Weight:
         if v is None:
             u, v = u
         # if u == v:
@@ -158,7 +157,7 @@ class WeightingFunction(Generic[Vertex], dict[Edge, Weight], Callable[[Vertex, V
 
 
 if __name__ == '__main__':
-    g = Digraph[int](E=[(1, 2)])
+    g = Digraph(E=[(1, 2)])
     print(g)
     print(isinstance(g, IGraph))
     print(isinstance(g, Digraph))

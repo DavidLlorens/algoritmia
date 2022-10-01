@@ -1,8 +1,9 @@
-from typing import *
 from enum import Enum
+from typing import Optional, Union
+
+from easypaint import EasyPaint
 
 from algoritmia.datastructures.graphs import UndirectedGraph
-from easypaint import EasyPaint
 
 Num = Union[int, float]
 Vertex = tuple[Num, Num]
@@ -89,7 +90,7 @@ class Graph2dMstViewer(EasyPaint):
 
 
 if __name__ == '__main__':
-    from algoritmia.algorithms.mst import kruskal, prim
+    from algoritmia.algorithms.mst import prim
     from algoritmia.data.iberia import iberia2d, km2d
 
     # g_msf = kruskal(iberia2d, km2d)

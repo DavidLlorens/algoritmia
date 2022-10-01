@@ -1,17 +1,16 @@
 from typing import Optional
 from collections.abc import Iterator
-from algoritmia.datastructures.graphs import Digraph, Vertex
+from algoritmia.datastructures.graphs import Digraph, TVertex
 
-
-def topological_sort(g: Digraph[Vertex]) -> Optional[list[Vertex]]:
-    def traverse_from(v) -> Iterator[Vertex]:  # depthfirst postorder
+def topological_sort(g: Digraph[TVertex]) -> Optional[list[TVertex]]:
+    def traverse_from(v) -> Iterator[TVertex]:  # depthfirst postorder
         pending.remove(v)
         for suc in g.succs(v):
             if suc in pending:
                 yield from traverse_from(suc)
         yield v
 
-    def next_vertex_no_preds() -> Optional[Vertex]:
+    def next_vertex_no_preds() -> Optional[TVertex]:
         for v in pending:
             if len(g.preds(v)) == 0:
                 return v

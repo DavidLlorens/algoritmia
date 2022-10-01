@@ -1,30 +1,34 @@
 """
-Version: 4.0 (23-oct-2021)
+Version: 4.1 (29-sep-2022)
+         4.0 (23-oct-2021)
 
 @author: David Llorens (dllorens@uji.es)
-         (c) Universitat Jaume I 2021
+         (c) Universitat Jaume I 2022
 @license: GPL3
 """
 from __future__ import annotations
 
 from abc import abstractmethod
 from functools import total_ordering
-from typing import Optional, TypeVar, Union
+from typing import Optional, Generic, Union, Any
 
 from algoritmia.datastructures.priorityqueues import MaxHeap, MinHeap
-from algoritmia.schemes.bt_scheme import DecisionSequence
+from algoritmia.schemes.bt_scheme import DecisionSequence, TDecision
 
-Solution = TypeVar('Solution')
-
-Decision = TypeVar('Decision')
 Score = Union[int, float]
 
+# 'bab_max_solve' y 'bab_min_solve' devuelven un Iterator del tipo devuelto por el método 'solution()' de
+# la clase 'BoundedDecisionSequence', cuya implementación por defecto devuelve una tupla de dos elementos:
+# el Score y una tupla con las decisones:
+# tuple[Score, tuple[TDecision, ...]]
+Solution = Any
 
 @total_ordering  # Implementando  < y ==, genera el resto
-class BoundedDecisionSequence(DecisionSequence):
+class BoundedDecisionSequence(Generic[TDecision],
+                              DecisionSequence[TDecision]):
     __slots__ = ("_pes", "_opt")
 
-    def __init__(self, extra_fields=None, decisions: tuple[Decision, ...] = ()):
+    def __init__(self, extra_fields=None, decisions: tuple[TDecision, ...] = ()):
         super().__init__(extra_fields, decisions)
         self._pes: Score = self.calculate_pes_bound()
         self._opt: Score = self.calculate_opt_bound()
@@ -49,15 +53,19 @@ class BoundedDecisionSequence(DecisionSequence):
     def pes(self) -> Score:
         return self._pes
 
+    def solution(self) -> Solution:
+        return self._pes, self.decisions()
+
     # Comparar dos BabDecisionSequence es comparar sus cotas optimistas
-    def __lt__(self, other: BoundedDecisionSequence) -> bool:
+    def __lt__(self, other: BoundedDecisionSequence[TDecision]) -> bool:
         return self._opt < other._opt
 
-    def __eq__(self, other: BoundedDecisionSequence) -> bool:
+    def __eq__(self, other: BoundedDecisionSequence[TDecision]) -> bool:
         return self._opt == other._opt
 
 
-def bab_max_solve(initial_ds: BoundedDecisionSequence) -> Optional[Solution]:
+
+def bab_max_solve(initial_ds: BoundedDecisionSequence[TDecision]) -> Optional[Solution]:
     heap = MaxHeap()
     heap.add(initial_ds)
     bps = initial_ds.pes()
@@ -71,7 +79,7 @@ def bab_max_solve(initial_ds: BoundedDecisionSequence) -> Optional[Solution]:
                 heap.add(new_ps)
 
 
-def bab_min_solve(initial_ds: BoundedDecisionSequence) -> Optional[Solution]:
+def bab_min_solve(initial_ds: BoundedDecisionSequence[TDecision]) -> Optional[Solution]:
     heap = MinHeap()
     heap.add(initial_ds)
     bps = initial_ds.pes()

@@ -1,10 +1,11 @@
-from math import sin, cos, pi, sqrt
-from typing import *
-from enum import Enum
 import tkinter
+from enum import Enum
+from math import sin, cos, pi, sqrt
+from typing import Optional, Union
+
+from easypaint import EasyPaint
 
 from algoritmia.datastructures.graphs import Digraph
-from easypaint import EasyPaint
 
 Num = Union[int, float]
 Vertex = tuple[Num, Num]
@@ -41,7 +42,9 @@ def run(s: str, t: str, sol: list[Decision]) -> str:
     res.insert(p, '|')
     return ''.join(res)
 
+
 Trellis = dict[Vertex, tuple[str, Score, Decision]]
+
 
 def edit_distance(mode: RecMode, s: str, t: str) -> tuple[Digraph, Trellis, list[Vertex]]:
     LParams = tuple[int, int]

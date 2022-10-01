@@ -1,23 +1,32 @@
 from __future__ import annotations
 
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from random import random, seed
-from collections.abc import Iterable, Iterator
 
-from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solve, bt_vc_solve
+from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solve
 from algoritmia.schemes.bt_scheme import ScoredDecisionSequence, bt_min_solve
+from algoritmia.schemes.bt_scheme import StateDecisionSequence, bt_vc_solve
 
 Decision = int
-Solution = tuple[int, tuple[Decision]]
-State = tuple[int, int]
+Score = int
+
+# 'bt_solve' y 'bt_vc_solve' devuelven un Iterator del tipo devuelto por el método 'solution' de
+# la clase 'DecisionSequence', cuya implementación por defecto devuelve una tupla con las decisiones:
+SolutionDS = tuple[Decision, ...]
+
+# 'bt_min_solve' y 'bt_max_solve' devuelven un Iterator del tipo devuelto por el método 'solution' de
+# la clase 'ScoredDecisionSequence', cuya implementación por defecto devuelve una tupla de dos elementos:
+# el Score y una tupla con las decisones:
+SolutionSDS = tuple[Score, tuple[Decision, ...]]
 
 
-def sumset_solve(e: tuple[int, ...], s: int) -> Iterator[Solution]:
+def sumset_solve(e: tuple[int, ...], s: int) -> Iterator[SolutionDS]:
     @dataclass
     class Extra:
         acc_sum: int  # acumulated sum
 
-    class SumSetDS(DecisionSequence):
+    class SumSetDS(DecisionSequence[Decision]):
         def is_solution(self) -> bool:
             return len(self) == len(e) and self.extra.acc_sum == s
 
@@ -32,12 +41,12 @@ def sumset_solve(e: tuple[int, ...], s: int) -> Iterator[Solution]:
     return bt_solve(initial_ds)
 
 
-def sumset_vc_solve(e: tuple[int, ...], s: int) -> Iterator[Solution]:
+def sumset_vc_solve(e: tuple[int, ...], s: int) -> Iterator[SolutionDS]:
     @dataclass
     class Extra:
         acc_sum: int  # accumulated sum
 
-    class SumSetDS(DecisionSequence):
+    class SumSetDS(StateDecisionSequence[Decision]):
         def is_solution(self) -> bool:
             return len(self) == len(e) and self.extra.acc_sum == s
 
@@ -48,19 +57,20 @@ def sumset_vc_solve(e: tuple[int, ...], s: int) -> Iterator[Solution]:
                     acc_sum2 = self.extra.acc_sum + e[len(self)]
                     yield self.add_decision(1, Extra(acc_sum2))
 
-        def state(self) -> State:
+        # Sobreescribimos 'state()'
+        def state(self) -> tuple[int, int]:
             return len(self), self.extra.acc_sum
 
     initial_ds = SumSetDS(Extra(0))
     return bt_vc_solve(initial_ds)
 
 
-def sumset_opt_solve(e: tuple[int, ...], s: int) -> Iterator[Solution]:
+def sumset_opt_solve(e: tuple[int, ...], s: int) -> Iterator[SolutionSDS]:
     @dataclass
     class Extra:
         acc_sum: int = 0  # acumulated sum
 
-    class SumSetDS(ScoredDecisionSequence):
+    class SumSetDS(ScoredDecisionSequence[Decision]):
         def is_solution(self) -> bool:
             return len(self) == len(e) and self.extra.acc_sum == s
 
@@ -71,10 +81,11 @@ def sumset_opt_solve(e: tuple[int, ...], s: int) -> Iterator[Solution]:
                     acc_sum2 = self.extra.acc_sum + e[len(self)]
                     yield self.add_decision(1, Extra(acc_sum2))
 
-        def state(self) -> State:
+        # Sobreescribimos 'state()'
+        def state(self) -> tuple[int, int]:
             return len(self), self.extra.acc_sum
 
-        def score(self) -> int:
+        def score(self) -> Score:
             return sum(self.decisions())
 
     initial_ds = SumSetDS(Extra())

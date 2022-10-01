@@ -1,5 +1,29 @@
 # Changelog
 
+## [2.0.5] - 2022-10-01
+
+- Los tipos genericos de la bilioteca se han renombrado añadiendo una 'T' como prefijo:
+  - `algoritmia.schemes`: `TDecision`
+  - `algoritmia.datastructures.graphs`: `TVertex`, `TEdge`
+  - `algoritmia.algorithms.traversers`: `TVertexTraverser`, `TEdgeTraverser`
+  - `algoritmia.algorithms.connected_components`: `TCC`
+  - `algoritmia.algorithms.shortest_path`: `TPath`
+
+- Añadidos tipos y comentarios:
+  - `algoritmia/examples/backtracking/*.py` 
+  - `algoritmia/examples/branch_and_bound/*.py`
+  - `algoritmia/examples/dynamic_programming/*.py`
+  
+- Modificaciones:
+  - `algoritmia/schemes/bt_scheme.py`: Añadido `StateDecisionSequence(DecisionSequence)` para `bt_vc_solve()`.
+
+- Bugs corregidos:
+  - `algoritmia/examples/dynamic_programming/edit_distance.py`
+
+- Cambio de nombre de archivo:
+  - `algoritmia/examples/dynamic_programming/shortest_path_dp.py` a
+    `algoritmia/examples/dynamic_programming/shortest_path_graph.py`
+
 ## [2.0.4] - 2022-09-27
 
 - Las funciones con `yield` ahora devuelven un `Iterator[T]` (antes era `Iterable[T]`). Ahora podemos usar `next()` sin que haya un error de tipo. El cambio no supone ningún problema, pues `Iterator` hereda de `Iterable`. 

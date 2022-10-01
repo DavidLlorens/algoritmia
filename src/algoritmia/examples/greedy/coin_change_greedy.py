@@ -1,4 +1,4 @@
-from typing import *
+from typing import Optional
 
 
 def coin_change_solve_naif(v: tuple[int, ...], Q: int) -> Optional[list[int]]:

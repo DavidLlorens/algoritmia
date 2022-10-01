@@ -1,13 +1,13 @@
 from collections.abc import Iterator
 
-from algoritmia.algorithms.traversers import VertexTraverser
-from algoritmia.datastructures.graphs import UndirectedGraph, Vertex
+from algoritmia.algorithms.traversers import TVertexTraverser
+from algoritmia.datastructures.graphs import UndirectedGraph, TVertex
 
-CC = list[Vertex]  # Connected Component
+TCC = list[TVertex]  # Generic Connected Component
 
 
-def connected_components(g: UndirectedGraph[Vertex],
-                         vertex_traverser: VertexTraverser) -> Iterator[CC]:
+def connected_components(g: UndirectedGraph[TVertex],
+                         vertex_traverser: TVertexTraverser) -> Iterator[TCC]:
     pending_vertices = set(g.V)
     while len(pending_vertices) > 0:
         u = pending_vertices.pop()
@@ -18,10 +18,12 @@ def connected_components(g: UndirectedGraph[Vertex],
 
 if __name__ == '__main__':
     from traversers import bf_vertex_traverser, df_vertex_traverser
+    Vertex = tuple[int, int]
+    Edge = tuple[Vertex, Vertex]
 
-    edges = [((0, 0), (0, 1)), ((0, 2), (0, 3)), ((1, 0), (1, 1)), ((2, 0), (2, 1)),
-             ((2, 2), (2, 3)), ((0, 1), (1, 1)), ((0, 2), (1, 2)), ((0, 3), (1, 3)),
-             ((1, 2), (2, 2))]
+    edges: list[Edge] = [((0, 0), (0, 1)), ((0, 2), (0, 3)), ((1, 0), (1, 1)),
+                         ((2, 2), (2, 3)), ((0, 1), (1, 1)), ((0, 2), (1, 2)),
+                         ((1, 2), (2, 2)), ((2, 0), (2, 1)), ((0, 3), (1, 3))]
 
     my_graph = UndirectedGraph(E=edges)
 

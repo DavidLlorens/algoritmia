@@ -5,8 +5,9 @@ Created on 19/11/2018
 """
 import sys
 
-from algoritmia.datastructures.kdtrees import Axis, KDTree, KDNode, KDLeaf
 from easypaint import EasyPaint
+
+from algoritmia.datastructures.kdtrees import Axis, KDTree, KDNode, KDLeaf
 
 
 class KDTreeViewer(EasyPaint):

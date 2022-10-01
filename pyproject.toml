@@ -18,20 +18,18 @@ dependencies = [
     "easypaint",
 ]
 authors = [
-  {email = "dllorens@uji.es"},
-  {name = "David LLorens"}
+    {name = "David Llorens - Andrés Marzal"},
 ]
+
 maintainers = [
-  {name = "David LLorens", email = "dllorens@uji.es"}
+    {name = "David Llorens", email = "dllorens@uji.es"}
 ]
-#authors = [
-#    { name="David LLorens", email="dllorens@uji.es" },
-#]
+
 #dynamic = ["version"]
 
 [project.urls]
 homepage = "https://github.com/DavidLlorens/algoritmia"
-changelog = "https://github.com/me/spam/blob/master/CHANGELOG.md"
+changelog = "https://github.com/DavidLlorens/algoritmia/blob/main/CHANGELOG.md"
 
 #[project.optional-dependencies]
 #pdf = ["ReportLab>=1.2", "RXP"]
