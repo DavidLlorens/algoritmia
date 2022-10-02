@@ -2,26 +2,34 @@ from typing import Optional
 
 
 def coin_change_solve_naif(v: tuple[int, ...], Q: int) -> Optional[list[int]]:
-    res = []
-    for v_i in v:
-        res.append(Q // v_i)
-        Q = Q % v_i
+    res: list[int] = []
+    for i in range(len(v)):
+        res.append(Q // v[i])
+        Q = Q % v[i]
     if Q == 0:
         return res
     return None
 
 
 def coin_change_solve(v: tuple[int, ...], Q: int) -> Optional[list[int]]:
-    # creamos vector de índices para recorrer 'valores' de mayor a menor valor
-    indices_ordenados = sorted(range(len(v)), key=lambda i: -v[i])
+    # Los índices para recorrer la lista v son la lista [0, 1, 3, ...]
+    indices = list(range(len(v)))
+    # Podemos ordenarlos para recorrer v de mayor a menor valor
+    sorted_indices: list[int] = sorted(indices, key=lambda i: -v[i])
 
-    res = [0] * len(v)
-    for i in indices_ordenados:
+    res: list[int] = [0] * len(v)
+    for i in sorted_indices:  # Si usamos 'indices' recorreremos v en orden
         res[i] = Q // v[i]
         Q = Q % v[i]
     if Q == 0:
         return res
     return None
+
+
+if __name__ == '__main__':
+    print(coin_change_solve((1, 2, 5, 10), 6))  # Ok: [1, 0, 1, 0]
+    print(coin_change_solve((1, 9, 15), 19))  # Mal: [4, 0, 1]
+    print(coin_change_solve((2, 9, 15), 10))  # Mal: None
 
 
 if __name__ == '__main__':

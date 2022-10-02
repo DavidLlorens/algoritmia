@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.0.6] - 2022-10-02
+
+- Añadidos algunos tipos que faltaban: 
+  - `algoritmia/examples/greedy/coin_change_greedy.py`
+  - `algoritmia/examples/greedy/knapsack_fraq_greedy.py`
+  - `algoritmia/algorithms/mst.py`
+- Cambios estéticos:
+  - `algoritmia/examples/greedy/coin_change_greedy.py`
+  - `algoritmia/examples/greedy/knapsack_fraq_greedy.py`
+- Añadido nuevo ejemplo: 
+  - `algoritmia/examples/greedy/activities_selector_greedy.py`
+- `algoritmia/algorithms/shortest_path.py`: 
+  - Anadidos dos algoritmos de programación dinámica
+  - Añadidos comentarios adicionales
+
 ## [2.0.5] - 2022-10-01
 
 - Los tipos genericos de la bilioteca se han renombrado añadiendo una 'T' como prefijo:
@@ -20,7 +35,7 @@
 - Bugs corregidos:
   - `algoritmia/examples/dynamic_programming/edit_distance.py`
 
-- Cambio de nombre de archivo:
+- Cambios de nombre de archivo:
   - `algoritmia/examples/dynamic_programming/shortest_path_dp.py` a
     `algoritmia/examples/dynamic_programming/shortest_path_graph.py`
 

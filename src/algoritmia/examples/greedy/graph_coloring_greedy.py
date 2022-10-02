@@ -10,8 +10,19 @@ def coloring_solve(g: UndirectedGraph[TVertex]) -> list[set[TVertex]]:
         grupo = set()  # Creamos un nuevo grupo vacío
         # Añadimos los vértices cuyos sucesores no estén ya en grupo
         for v in vertex_set:
+            # Simple code --------
+            #can_add_v = True
+            #for suc in g.succs(v):
+            #    if suc in grupo:
+            #        can_add_v = False  # v tiene un sucesor en el grupo
+            #        break
+            #if can_add_v:
+            #    grupo.add(v)
+
+            # Estas dos lineas (con generadores) reemplazan a las siete anteriores
             if not any(suc in grupo for suc in g.succs(v)):
                 grupo.add(v)
+
         solution.append(grupo)  # Añadimos el grupo a la solución
         vertex_set -= grupo     # Quitamos los vértices del grupo de V
 

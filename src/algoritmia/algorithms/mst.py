@@ -10,7 +10,7 @@ from algoritmia.utils import argmin
 def kruskal(g: UndirectedGraph[TVertex],
             d: WeightingFunction[TVertex]) -> UndirectedGraph[TVertex]:
     edges: list[TEdge] = []
-    forest = MergeFindSet[TVertex]((v,) for v in g.V)
+    forest: MergeFindSet[TVertex] = MergeFindSet((v,) for v in g.V)
     n = 0
     for (u, v) in sorted(g.E, key=lambda e: d(e)):
         if forest.find(u) != forest.find(v):

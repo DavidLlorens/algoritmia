@@ -4,7 +4,7 @@ def beneficio(v: list[int], sol: list[float]) -> float:
 
 
 def mochila_fraq0(C: int, v: list[int], w: list[int]) -> list[float]:
-    x = [0.0] * len(w)
+    x: list[float] = [0.0] * len(w)
     for i in range(len(w)):
         x[i] = min(1.0, C / w[i])
         C -= x[i] * w[i]
@@ -12,9 +12,9 @@ def mochila_fraq0(C: int, v: list[int], w: list[int]) -> list[float]:
 
 
 def mochila_fraq(C: int, v: list[int], w: list[int]) -> list[float]:
-    indices_ordenados = sorted(range(len(w)), key=lambda i: -v[i] / w[i])
-    x = [0.0] * len(w)
-    for i in indices_ordenados:
+    sorted_indices: list[int] = sorted(range(len(w)), key=lambda i: -v[i] / w[i])
+    x: list[float] = [0.0] * len(w)
+    for i in sorted_indices:
         x[i] = min(1.0, C / w[i])
         C -= x[i] * w[i]
     return x
