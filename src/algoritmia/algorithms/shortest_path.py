@@ -77,7 +77,7 @@ LParams = TVertex               # Para sp_acyclic_digraph()
 LParams2 = tuple[TVertex, int]  # Para sp_digraph()/bellman_ford()
 
 
-# Devuelve el camino más corto entre dos vértices en digrafos ponderados acíclicos
+# Devuelve el camino más corto entre dos vértices en dígrafos ponderados acíclicos
 # Coste temporal: O(|V| + |E|)
 def shortest_path_acyclic_digraph(g: Digraph[TVertex],
                                   d: WeightingFunction[TVertex],

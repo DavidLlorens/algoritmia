@@ -24,7 +24,7 @@ if __name__ == '__main__':
     capacity, values, weights = 50, [60, 30, 40, 20, 75], [40, 30, 20, 10, 50]
 
     solution = mochila_fraq0(capacity, values, weights)
-    print(solution, beneficio(values, solution))  # [1, 0.3333333, 0, 0, 0] 70.0
+    print(solution, beneficio(values, solution))  # Mal: [1, 0.3333333, 0, 0, 0] 70.0
 
     solution = mochila_fraq(capacity, values, weights)
-    print(solution, beneficio(values, solution))  # [0.5, 0, 1, 1, 0] 90.0
+    print(solution, beneficio(values, solution))  # Ok: [0.5, 0, 1, 1, 0] 90.0

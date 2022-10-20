@@ -9,7 +9,7 @@ Version:  4.1 (29-sep-2022)
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import Iterator, Iterable
+from collections.abc import Iterator
 from typing import TypeVar, Generic, Any, Union
 
 infinity = float("infinity")
@@ -48,7 +48,7 @@ class DecisionSequence(ABC, Generic[TDecision]):
         pass
 
     @abstractmethod
-    def successors(self) -> Iterable[DecisionSequence]:
+    def successors(self) -> Iterator[DecisionSequence]:
         pass
 
 
@@ -66,7 +66,7 @@ def bt_solve(initial_ds: DecisionSequence[TDecision]) -> Iterator[Solution]:
 
 class StateDecisionSequence(DecisionSequence[TDecision]):
     @abstractmethod
-    def successors(self) -> Iterable[StateDecisionSequence]:
+    def successors(self) -> Iterator[StateDecisionSequence]:
         pass
 
     def state(self) -> Any:
@@ -92,7 +92,7 @@ def bt_vc_solve(initial_ds: StateDecisionSequence[TDecision]) -> Iterator[Soluti
 
 class ScoredDecisionSequence(StateDecisionSequence[TDecision]):
     @abstractmethod
-    def successors(self) -> Iterable[ScoredDecisionSequence]:
+    def successors(self) -> Iterator[ScoredDecisionSequence]:
         pass
 
     @abstractmethod
@@ -100,7 +100,7 @@ class ScoredDecisionSequence(StateDecisionSequence[TDecision]):
         # result of applying the objective function to the partial solution
         pass
 
-    # Sobreescribimos 'solution()'
+    # Sobrescribimos 'solution()'
     def solution(self) -> Solution:
         return self.score(), self.decisions()
 

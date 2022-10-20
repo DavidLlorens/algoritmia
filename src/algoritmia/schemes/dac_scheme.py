@@ -60,8 +60,8 @@ def dec_solve(problem: IDecreaseAndConquerProblem) -> Solution:
     if problem.is_simple():
         return problem.trivial_solution()
     else:
-        smallerproblem = problem.decrease()
-        return problem.process(dec_solve(smallerproblem))
+        smaller_problem = problem.decrease()
+        return problem.process(dec_solve(smaller_problem))
 
 
 def tail_dec_solve(problem: IDecreaseAndConquerProblem) -> Solution:

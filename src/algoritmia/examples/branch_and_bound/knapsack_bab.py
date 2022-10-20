@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Iterator
 from dataclasses import dataclass
 from random import seed, randint
 from typing import Optional
@@ -40,7 +40,7 @@ def knapsack_bab_solve(weights: list[int],
         def is_solution(self) -> bool:
             return len(self) == len(values)
 
-        def successors(self) -> Iterable[KnapsackBabDS]:
+        def successors(self) -> Iterator[KnapsackBabDS]:
             n = len(self)
             if n < len(values):
                 if weights[n] <= capacity - self.extra.weight:
@@ -91,7 +91,7 @@ def knapsack_bab_solve2(weights: list[int],
         def is_solution(self) -> bool:
             return len(self) == len(values)
 
-        def successors(self) -> Iterable[KnapsackBabDS]:
+        def successors(self) -> Iterator[KnapsackBabDS]:
             n = len(self)
             if n < len(values):
                 if weights[n] <= capacity - self.extra.weight:
@@ -140,4 +140,4 @@ if __name__ == "__main__":
     for W, V, C in [i1, i2, i3]:
         print(f"Instancia:\n  Pesos = {W}\n  Valores = {V}\n  Capacidad = {C}")
         print(f"Solution:\n  {knapsack_bab_solve(W, V, C)}\n")
-        #print(f"Solution:\n  {knapsack_bab_solve2(W, V, C)}\n")
+        # print(f"Solution:\n  {knapsack_bab_solve2(W, V, C)}\n")

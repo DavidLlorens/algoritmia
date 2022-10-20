@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterator
 from dataclasses import dataclass
 from random import random, seed
 
@@ -30,7 +30,7 @@ def sumset_solve(e: tuple[int, ...], s: int) -> Iterator[SolutionDS]:
         def is_solution(self) -> bool:
             return len(self) == len(e) and self.extra.acc_sum == s
 
-        def successors(self) -> Iterable[SumSetDS]:
+        def successors(self) -> Iterator[SumSetDS]:
             if len(self) < len(e):
                 yield self.add_decision(0, self.extra)
                 if self.extra.acc_sum + e[len(self)] <= s:
@@ -50,7 +50,7 @@ def sumset_vc_solve(e: tuple[int, ...], s: int) -> Iterator[SolutionDS]:
         def is_solution(self) -> bool:
             return len(self) == len(e) and self.extra.acc_sum == s
 
-        def successors(self) -> Iterable[SumSetDS]:
+        def successors(self) -> Iterator[SumSetDS]:
             if len(self) < len(e):
                 yield self.add_decision(0, self.extra)
                 if self.extra.acc_sum + e[len(self)] <= s:
@@ -74,7 +74,7 @@ def sumset_opt_solve(e: tuple[int, ...], s: int) -> Iterator[SolutionSDS]:
         def is_solution(self) -> bool:
             return len(self) == len(e) and self.extra.acc_sum == s
 
-        def successors(self) -> Iterable[SumSetDS]:
+        def successors(self) -> Iterator[SumSetDS]:
             if len(self) < len(e):
                 yield self.add_decision(0, self.extra)
                 if self.extra.acc_sum + e[len(self)] <= s:
@@ -103,16 +103,27 @@ if __name__ == "__main__":
     # Instance
     elements, target_sum = (640, 777, 276, 224, 737, 677, 893, 87, 422, 30), 1199
 
+    # Basic version
+    print('Basic versión (all solutions):')
+    has_solutions = False
+    for i, sol in enumerate(sumset_solve(elements, target_sum)):
+        has_solutions = True
+        print(f'\tSolution {i+1}: {sol}')
+    if not has_solutions:
+        print('\tThere are no solutions')
+
     # Visited control version
+    print('Visited control version:')
     try:
-        first_sol = next(iter(sumset_vc_solve(elements, target_sum)))
-        print(f'Visited control version - First solution: {first_sol}')
+        first_sol = next(sumset_vc_solve(elements, target_sum))
+        print(f'\tFirst solution: {first_sol}')
     except StopIteration:
-        print(f'Visited control version - There is no solution.')
+        print('\tThere are no solutions')
 
     # Optimization version
+    print('Optimization version:')
     sols_opt = list(sumset_opt_solve(elements, target_sum))
     if len(sols_opt) > 0:
-        print(f'Optimization version    - Best solution:  {sols_opt[-1]}')
+        print(f'\tBest solution: {sols_opt[-1]}')
     else:
-        print("Optimization version     - There is no solution.")
+        print('\tThere are no solutions')

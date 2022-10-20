@@ -19,7 +19,7 @@ Score = Union[int, float]
 
 # 'bab_max_solve' y 'bab_min_solve' devuelven un Iterator del tipo devuelto por el método 'solution()' de
 # la clase 'BoundedDecisionSequence', cuya implementación por defecto devuelve una tupla de dos elementos:
-# el Score y una tupla con las decisones:
+# el Score y una tupla con las decisiones:
 # tuple[Score, tuple[TDecision, ...]]
 Solution = Any
 
@@ -45,11 +45,11 @@ class BoundedDecisionSequence(Generic[TDecision],
     def calculate_pes_bound(self) -> Score:
         pass
 
-    # Optimistic bound. Must be iqual to score() for full solutions
+    # Optimistic bound. Must be equal to score() for full solutions
     def opt(self) -> Score:
         return self._opt
 
-    # Pessimistic bound. Must be iqual to score() for full solutions
+    # Pessimistic bound. Must be equal to score() for full solutions
     def pes(self) -> Score:
         return self._pes
 

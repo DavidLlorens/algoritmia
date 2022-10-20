@@ -1,5 +1,5 @@
 """
-Visor de grafos de dependencias y trellis de programacion dinámica
+Visor de grafos de dependencias y trellis de programación dinámica
 @author: David Llorens dllorens@uji.es
 
 02/12/2021: Version 1

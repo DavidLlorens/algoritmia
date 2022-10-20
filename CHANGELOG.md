@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.0.7] - 2022-10-06
+  - `algoritmia/schemes/bt_scheme.py`. El método abstracto `successors()` de la clase `DecisionsSequence` ahora devuelve 
+    `Iterator` en lugar de `Iterable`. Afectados:
+    - `algoritmia/examples/branch_and_bound/*.py` 
+    - `algoritmia/examples/backtracking/*.py` 
+  - Bug corregidos:
+    - `algoritmia/algorithms/topological_sort.py` (no afectaba a su funcionamiento).
+  - Añadidos comentarios al código:
+    - `algoritmia/datastructures/graphs.py`
+
 ## [2.0.6] - 2022-10-02
 
 - Añadidos algunos tipos que faltaban: 

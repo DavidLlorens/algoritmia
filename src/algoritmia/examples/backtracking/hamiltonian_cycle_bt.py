@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterator
 from dataclasses import dataclass
 
 from algoritmia.datastructures.graphs import UndirectedGraph, TVertex, WeightingFunction
@@ -26,7 +26,7 @@ def hamiltoniancycle_solve(graph: UndirectedGraph[TVertex]) -> Iterator[Solution
             ds = self.decisions()
             return len(ds) == len(graph.V) and ds[0] in graph.succs(ds[-1])
 
-        def successors(self) -> Iterable[HamiltonianCycleDS]:
+        def successors(self) -> Iterator[HamiltonianCycleDS]:
             ds = self.decisions()
             if len(ds) < len(graph.V):
                 for v in graph.succs(ds[-1]):
@@ -49,7 +49,7 @@ def hamiltoniancycle_opt_solve(graph: UndirectedGraph[TVertex],
             ds = self.decisions()
             return len(ds) == len(graph.V) and ds[0] in graph.succs(ds[-1])
 
-        def successors(self) -> Iterable[HamiltonianCycleDS]:
+        def successors(self) -> Iterator[HamiltonianCycleDS]:
             ds = self.decisions()
             if len(ds) < len(graph.V):
                 for v in graph.succs(ds[-1]):
@@ -82,15 +82,22 @@ if __name__ == "__main__":
                          (3, 6), (4, 7), (5, 6), (5, 8), (6, 7), (6, 8), (6, 9)]
     g = UndirectedGraph(E=edges)
 
-    print("hamiltoniancycle_solve:")
-    for solution in hamiltoniancycle_solve(g):
-        print(solution)
-    print()
+    print('Basic versión (all solutions):')
+    has_solutions = False
+    for sol in hamiltoniancycle_solve(g):
+        has_solutions = True
+        print(f'\tSolution: {sol}')
+    if not has_solutions:
+        print('\tThere are no solutions')
 
-    print("hamiltoniancycle_opt_solve:")
+    # Optimization version
+    print('Optimization version:')
     d: dict[tuple[int, int], int] = {}
     for (u2, v2) in g.E:
         d[u2, v2] = abs(u2 - v2)
     wf2 = WeightingFunction((e for e in d.items()), symmetrical=True)
-    for solution_opt in hamiltoniancycle_opt_solve(g, wf2):
-        print(solution_opt)
+    sols_opt = list(hamiltoniancycle_opt_solve(g, wf2))
+    if len(sols_opt) > 0:
+        print(f'\tBest solution: {sols_opt[-1]}')
+    else:
+        print('\tThere are no solutions')

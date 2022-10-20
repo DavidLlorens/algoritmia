@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterator
 from dataclasses import dataclass
 
 from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solve
@@ -29,7 +29,7 @@ def coin_change_solve_naif(v: tuple[int, ...], Q: int) -> Iterator[SolutionDS]:
             q = calc(self.decisions())
             return len(self) == len(v) and q == Q
 
-        def successors(self) -> Iterable[CoinChangeDS]:
+        def successors(self) -> Iterator[CoinChangeDS]:
             n = len(self)
             if n < len(v):
                 q = calc(self.decisions())
@@ -50,7 +50,7 @@ def coin_change_solve(v: tuple[int, ...], Q: int) -> Iterator[SolutionDS]:
         def is_solution(self) -> bool:
             return len(self) == len(v) and self.extra.pending == 0
 
-        def successors(self) -> Iterable[CoinChangeDS]:
+        def successors(self) -> Iterator[CoinChangeDS]:
             n = len(self)
             if n < len(v):
                 for num_coins in range(self.extra.pending // v[n] + 1):
@@ -70,7 +70,7 @@ def coin_change_vc_solve(v: tuple[int, ...], Q: int) -> Iterator[SolutionDS]:
         def is_solution(self) -> bool:
             return len(self) == len(v) and self.extra.pending == 0
 
-        def successors(self) -> Iterable[CoinChangeDS]:
+        def successors(self) -> Iterator[CoinChangeDS]:
             n = len(self)
             if n < len(v):
                 for num_coins in range(self.extra.pending // v[n] + 1):
@@ -93,7 +93,7 @@ def coin_change_opt_solve(v: tuple[int, ...], Q: int) -> Iterator[SolutionSDS]:
         def is_solution(self) -> bool:
             return len(self) == len(v) and self.extra.pending == 0
 
-        def successors(self) -> Iterable[CoinChangeDS]:
+        def successors(self) -> Iterator[CoinChangeDS]:
             n = len(self)
             if n < len(v):
                 for num_coins in range(self.extra.pending // v[n] + 1):
@@ -113,8 +113,28 @@ def coin_change_opt_solve(v: tuple[int, ...], Q: int) -> Iterator[SolutionSDS]:
 # Programa principal ---------------------------------
 if __name__ == "__main__":
     coins, quantity = (1, 2, 5), 7
-    for solve in [coin_change_solve, coin_change_vc_solve, coin_change_opt_solve]:
-        print(solve.__name__)
-        for sol in solve(coins, quantity):
-            print(sol)
-        print()
+
+    # Basic version
+    print('Basic versión (all solutions):')
+    has_solutions = False
+    for i, sol in enumerate(coin_change_solve(coins, quantity)):
+        has_solutions = True
+        print(f'\tSolution {i+1}: {sol}')
+    if not has_solutions:
+        print('\tThere are no solutions')
+
+    # Visited control version
+    print('Visited control version:')
+    try:
+        first_sol = next(coin_change_vc_solve(coins, quantity))
+        print(f'\tFirst solution: {first_sol}')
+    except StopIteration:
+        print('\tThere are no solutions')
+
+    # Optimization version
+    print('Optimization version:')
+    sols_opt = list(coin_change_opt_solve(coins, quantity))
+    if len(sols_opt) > 0:
+        print(f'\tBest solution: {sols_opt[-1]}')
+    else:
+        print('\tThere are no solutions')

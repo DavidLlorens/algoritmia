@@ -119,7 +119,7 @@ def d_eu(u, v):
 
 
 # Con diccionario: O(|V|^2)
-# En la práctica el coste es O(|V|) para grafos densos y O(sqrt(|V|)) para grafos dispersos.
+# En la práctica el coste es O(|V|) para grafos densos y O(sqrt(|V|) para grafos dispersos.
 def dijkstra_metric_edge_traverser(g: IGraph[TVertex],
                                    d: WeightingFunction[TVertex],
                                    v_initial: TVertex, v_final: TVertex) -> Iterator[TEdge]:
