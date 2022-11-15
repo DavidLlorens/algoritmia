@@ -8,7 +8,7 @@ Version: 4.0 (23-oct-2021)
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import Iterable
+from collections.abc import Iterator
 from typing import Any
 
 Solution = Any
@@ -25,10 +25,10 @@ class IDivideAndConquerProblem(ABC):
     def trivial_solution(self) -> Solution: pass
 
     @abstractmethod
-    def divide(self) -> Iterable[IDivideAndConquerProblem]: pass
+    def divide(self) -> Iterator[IDivideAndConquerProblem]: pass
 
     @abstractmethod
-    def combine(self, solutions: Iterable[Solution]) -> Solution: pass
+    def combine(self, solutions: Iterator[Solution]) -> Solution: pass
 
 
 def div_solve(problem: IDivideAndConquerProblem) -> Solution:
