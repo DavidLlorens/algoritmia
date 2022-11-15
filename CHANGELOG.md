@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.0.8] - 2022-11-15
+  - `algoritmia/schemes/bt_scheme.py`. Añadido State como sinónimo de Any.
+  - `algoritmia/algorithms/traversers.py`. Cambios en dos comentarios.
+
 ## [2.0.7] - 2022-10-06
   - `algoritmia/schemes/bt_scheme.py`. El método abstracto `successors()` de la clase `DecisionsSequence` ahora devuelve 
     `Iterator` en lugar de `Iterable`. Afectados:

@@ -10,7 +10,7 @@ TVertexTraverser = Callable[[IGraph[TVertex], TVertex], Iterator[TVertex]]
 TEdgeTraverser = Callable[[IGraph[TVertex], TVertex], Iterator[TEdge]]
 
 
-# TV traversers ----------------------------------------------------------------
+# Vertex traversers ----------------------------------------------------------------
 
 def bf_vertex_traverser(graph: IGraph[TVertex],
                         v_initial: TVertex) -> Iterator[TVertex]:
@@ -41,7 +41,7 @@ def df_vertex_traverser(graph: IGraph[TVertex],
     yield from traverse_from(v_initial)
 
 
-# TE traversers ----------------------------------------------------------------
+# Edge traversers ----------------------------------------------------------------
 
 def bf_edge_traverser(graph: IGraph[TVertex],
                       v_initial: TVertex) -> Iterator[TEdge]:

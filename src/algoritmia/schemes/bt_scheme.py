@@ -16,6 +16,7 @@ infinity = float("infinity")
 
 TDecision = TypeVar('TDecision', contravariant=True)
 Solution = Any
+State = Any
 
 
 # Esquema para BT básico --------------------------------------------------------------------------
@@ -25,7 +26,7 @@ class DecisionSequence(ABC, Generic[TDecision]):
 
     def __init__(self, extra_fields=None, decisions: tuple[TDecision, ...] = ()):
         self._decisions = decisions
-        self._extra_fields = extra_fields
+        self._extra_fields: Any = extra_fields
 
     @property
     def extra(self) -> Any:
@@ -69,7 +70,7 @@ class StateDecisionSequence(DecisionSequence[TDecision]):
     def successors(self) -> Iterator[StateDecisionSequence]:
         pass
 
-    def state(self) -> Any:
+    def state(self) -> State:
         # The returned object must be of an inmutable type
         return self._decisions
 
