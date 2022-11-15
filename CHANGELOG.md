@@ -4,6 +4,7 @@
   - `algoritmia/schemes/bt_scheme.py`. Añadido State como sinónimo de Any.
   - `algoritmia/algorithms/traversers.py`. Cambios en dos comentarios.
   - `algoritmia/schemes/dac_scheme.py`. Cambiado Iterable por Iterator.
+  - `algoritmia/examples/divide_and_conquer/*`. Añadir varios ejemplos.
 
 ## [2.0.7] - 2022-10-06
   - `algoritmia/schemes/bt_scheme.py`. El método abstracto `successors()` de la clase `DecisionsSequence` ahora devuelve 
