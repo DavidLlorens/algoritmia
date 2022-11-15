@@ -16,13 +16,13 @@ class MergesortProblem(IDivideAndConquerProblem):
         return self.v
 
     def divide(self) -> Iterator[MergesortProblem]:
-        h = len(self.v) // 2
-        yield MergesortProblem(self.v[:h])
-        yield MergesortProblem(self.v[h:])
+        half = len(self.v) // 2
+        yield MergesortProblem(self.v[:half])
+        yield MergesortProblem(self.v[half:])
 
     def combine(self, sols: Iterator[list[int]]) -> list[int]:
         left, right = sols
-        c = [0] * (len(left) + len(right))
+        c = [0] * (len(left) + len(right))  # Vector auxiliar
         i, j, k = 0, 0, 0
         while i < len(left) and j < len(right):
             if left[i] < right[j]:

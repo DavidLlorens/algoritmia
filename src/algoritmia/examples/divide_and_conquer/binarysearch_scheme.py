@@ -6,21 +6,21 @@ from algoritmia.schemes.dac_scheme import IDecreaseAndConquerProblem, dec_solve,
 
 
 class BinarySearchProblem(IDecreaseAndConquerProblem):
-    def __init__(self, v: list[int], elem: int, begin: int, end: int):
-        self.v, self.elem, self.begin, self.end = v, elem, begin, end
+    def __init__(self, v: list[int], elem: int, start: int, end: int):
+        self.v, self.elem, self.start, self.end = v, elem, start, end
 
     def is_simple(self) -> bool:
-        return self.end - self.begin <= 1
+        return self.end - self.start <= 1
 
     def trivial_solution(self) -> Optional[int]:
-        if self.begin == self.end or self.elem != self.v[self.begin]:
+        if self.start == self.end or self.elem != self.v[self.start]:
             return None
-        return self.begin
+        return self.start
 
     def decrease(self) -> BinarySearchProblem:
-        h = (self.begin + self.end) // 2
+        h = (self.start + self.end) // 2
         if self.elem < self.v[h]:
-            return BinarySearchProblem(self.v, self.elem, self.begin, h)
+            return BinarySearchProblem(self.v, self.elem, self.start, h)
         elif self.elem > self.v[h]:
             return BinarySearchProblem(self.v, self.elem, h + 1, self.end)
         else:  # self.elem == self.v[h]:
