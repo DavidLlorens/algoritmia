@@ -30,8 +30,12 @@ class BinarySearchProblem(IDecreaseAndConquerProblem):
 if __name__ == "__main__":
     my_sorted_list = [2, 3, 3, 11, 12, 18, 21, 29, 30, 37, 43, 75, 82, 98]
     num = 30
+    print('list:', my_sorted_list)
+    print('number to find:', num)
     problem = BinarySearchProblem(my_sorted_list, num, 0, len(my_sorted_list))
+
     pos = dec_solve(problem)
-    print('dec_solve: Valor {} en {}.'.format(num, pos))
+
+    print(f'dec_solve: number found at index {pos}')
     pos = iter_dec_solve(problem)
-    print('iter_dec_solve: Valor {} en {}.'.format(num, pos))
+    print(f'iter_dec_solve: number found at index {pos}')
