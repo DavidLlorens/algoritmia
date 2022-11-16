@@ -3,16 +3,16 @@
 ## [2.0.9] - 2022-11-16
   - `algoritmia/schemes/bt_scheme.py`. Tipo devuelto por successors más específico.
   - `algoritmia/schemes/bab_scheme.py`. Corregido tipo de BoundedDecisionDequence. Tipo devuelto por successors más específico. 
-  - Cambios menores (para quitar warnings de PyCharm):
+  - Cambios menores (para evitar warnings de PyCharm):
     - `algoritmia/examples/backtracking/coin_change_bt.py` 
     - `algoritmia/examples/backtracking/nqueens_bt.py`
     - `algoritmia/examples/branch_and_bound/knapsack_bab.py`
 
 ## [2.0.8] - 2022-11-15
-  - `algoritmia/schemes/bt_scheme.py`. Añadido State como sinónimo de Any.
+  - `algoritmia/schemes/bt_scheme.py`. Añadido tipo State como sinónimo de Any.
   - `algoritmia/algorithms/traversers.py`. Cambios en dos comentarios.
   - `algoritmia/schemes/dac_scheme.py`. Cambiado Iterable por Iterator.
-  - `algoritmia/examples/divide_and_conquer/*`. Añadir varios ejemplos.
+  - `algoritmia/examples/divide_and_conquer/*`. Añadidos varios ejemplos.
 
 ## [2.0.7] - 2022-10-06
   - `algoritmia/schemes/bt_scheme.py`. El método abstracto `successors()` de la clase `DecisionsSequence` ahora devuelve 
@@ -71,7 +71,7 @@
 
 - Las clases `Callable`, `Collection`, `Iterable`, `Iterator`, `Sequence` y `Sized`  se importan de `collection.abc` (antes se importaban de `typing`).
 - Reemplazados todos los `from typing import *` para que solo se importe lo utilizado.
-- Para evitar los anotaciones de tipo como texto en los métodos que nombran el tipo de su clase, utilizamos `from __future__ import annotations`.
+- Para evitar las anotaciones de tipo como texto en los métodos que nombran el tipo de su clase, utilizamos `from __future__ import annotations`.
 - Se han añadido las anotaciones de tipo a los métodos `succs` y `preds` de `IGraph`.
 ## [2.0.3] - 2022-09-01
 
