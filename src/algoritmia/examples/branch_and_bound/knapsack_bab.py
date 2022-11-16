@@ -20,9 +20,9 @@ Solution = tuple[Score, tuple[Decision, ...]]
 # En ese caso el tipo de 'Solution' sería:
 # Solution = tuple[Score, int, tuple[Decision, ...]]  # (value, weight, decisions)
 
-def knapsack_bab_solve(weights: list[int],
-                       values: list[int],
-                       capacity: int) -> Optional[Solution]:
+def knapsack_bab_solve_naif(weights: list[int],
+                            values: list[int],
+                            capacity: int) -> Optional[Solution]:
     @dataclass
     class Extra:
         weight: int = 0
@@ -57,7 +57,7 @@ def knapsack_bab_solve(weights: list[int],
 
 
 # Versión con mejores cotas
-def knapsack_bab_solve2(weights: list[int],
+def knapsack_bab_solve(weights: list[int],
                         values: list[int],
                         capacity: int) -> Optional[Solution]:
     @dataclass
@@ -139,5 +139,5 @@ if __name__ == "__main__":
 
     for W, V, C in [i1, i2, i3]:
         print(f"Instancia:\n  Pesos = {W}\n  Valores = {V}\n  Capacidad = {C}")
+        # print(f"Solution:\n  {knapsack_bab_solve_naif(W, V, C)}\n")
         print(f"Solution:\n  {knapsack_bab_solve(W, V, C)}\n")
-        # print(f"Solution:\n  {knapsack_bab_solve2(W, V, C)}\n")

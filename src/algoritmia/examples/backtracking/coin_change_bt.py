@@ -117,9 +117,9 @@ if __name__ == "__main__":
     # Basic version
     print('Basic versión (all solutions):')
     has_solutions = False
-    for i, sol in enumerate(coin_change_solve(coins, quantity)):
+    for i0, sol in enumerate(coin_change_solve(coins, quantity)):
         has_solutions = True
-        print(f'\tSolution {i+1}: {sol}')
+        print(f'\tSolution {i0+1}: {sol}')
     if not has_solutions:
         print('\tThere are no solutions')
 

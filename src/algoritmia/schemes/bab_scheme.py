@@ -9,8 +9,9 @@ Version: 4.1 (29-sep-2022)
 from __future__ import annotations
 
 from abc import abstractmethod
+from collections.abc import Iterator
 from functools import total_ordering
-from typing import Optional, Generic, Union, Any
+from typing import Optional, Union, Any
 
 from algoritmia.datastructures.priorityqueues import MaxHeap, MinHeap
 from algoritmia.schemes.bt_scheme import DecisionSequence, TDecision
@@ -24,8 +25,7 @@ Score = Union[int, float]
 Solution = Any
 
 @total_ordering  # Implementando  < y ==, genera el resto
-class BoundedDecisionSequence(Generic[TDecision],
-                              DecisionSequence[TDecision]):
+class BoundedDecisionSequence(DecisionSequence[TDecision]):
     __slots__ = ("_pes", "_opt")
 
     def __init__(self, extra_fields=None, decisions: tuple[TDecision, ...] = ()):
@@ -45,6 +45,10 @@ class BoundedDecisionSequence(Generic[TDecision],
     def calculate_pes_bound(self) -> Score:
         pass
 
+    @abstractmethod
+    def successors(self) -> Iterator[BoundedDecisionSequence[TDecision]]:
+        pass
+
     # Optimistic bound. Must be equal to score() for full solutions
     def opt(self) -> Score:
         return self._opt
@@ -62,7 +66,6 @@ class BoundedDecisionSequence(Generic[TDecision],
 
     def __eq__(self, other: BoundedDecisionSequence[TDecision]) -> bool:
         return self._opt == other._opt
-
 
 
 def bab_max_solve(initial_ds: BoundedDecisionSequence[TDecision]) -> Optional[Solution]:

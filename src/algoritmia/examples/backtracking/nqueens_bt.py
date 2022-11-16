@@ -18,7 +18,7 @@ def nqueens_solve(board_size: int) -> Iterator[SolutionDS]:
             return len(self) == board_size
 
         def successors(self) -> Iterator[NQueensDS]:
-            n = len(self) # Número de decisiones ya tomadas (reinas colocadas)
+            n = len(self)       # Número de decisiones ya tomadas (reinas colocadas)
             if n < board_size:  # Si quedan decisiones por tomar (reinas por colocar)
                 for row in range(board_size):
                     if all(r != row and n - j != abs(row - r)

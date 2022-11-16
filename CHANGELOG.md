@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.9] - 2022-11-16
+  - `algoritmia/schemes/bt_scheme.py`. Tipo devuelto por successors más específico.
+  - `algoritmia/schemes/bab_scheme.py`. Corregido tipo de BoundedDecisionDequence. Tipo devuelto por successors más específico. 
+  - Cambios menores (para quitar warnings de PyCharm):
+    - `algoritmia/examples/backtracking/coin_change_bt.py` 
+    - `algoritmia/examples/backtracking/nqueens_bt.py`
+    - `algoritmia/examples/branch_and_bound/knapsack_bab.py`
+
 ## [2.0.8] - 2022-11-15
   - `algoritmia/schemes/bt_scheme.py`. Añadido State como sinónimo de Any.
   - `algoritmia/algorithms/traversers.py`. Cambios en dos comentarios.

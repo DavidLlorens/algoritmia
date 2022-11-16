@@ -49,7 +49,7 @@ class DecisionSequence(ABC, Generic[TDecision]):
         pass
 
     @abstractmethod
-    def successors(self) -> Iterator[DecisionSequence]:
+    def successors(self) -> Iterator[DecisionSequence[TDecision]]:
         pass
 
 
@@ -67,7 +67,7 @@ def bt_solve(initial_ds: DecisionSequence[TDecision]) -> Iterator[Solution]:
 
 class StateDecisionSequence(DecisionSequence[TDecision]):
     @abstractmethod
-    def successors(self) -> Iterator[StateDecisionSequence]:
+    def successors(self) -> Iterator[StateDecisionSequence[TDecision]]:
         pass
 
     def state(self) -> State:
@@ -93,7 +93,7 @@ def bt_vc_solve(initial_ds: StateDecisionSequence[TDecision]) -> Iterator[Soluti
 
 class ScoredDecisionSequence(StateDecisionSequence[TDecision]):
     @abstractmethod
-    def successors(self) -> Iterator[ScoredDecisionSequence]:
+    def successors(self) -> Iterator[ScoredDecisionSequence[TDecision]]:
         pass
 
     @abstractmethod
