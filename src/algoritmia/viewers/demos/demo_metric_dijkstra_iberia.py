@@ -1,19 +1,24 @@
 from algoritmia.viewers.graph2d_viewer import Graph2dViewer
-from algoritmia.algorithms.traversers import dijkstra_edge_traverser, dijkstra_metric_edge_traverser
-from algoritmia.data.iberia import iberia2d, km2d, coords2d
+from algoritmia.algorithms.traverse import traverse_dijkstra_dict, traverse_dijkstra_metric_dict
+from algoritmia.data.iberia import iberia, km, coords2d, iberia2d
+
+def dist(c1, c2):
+    u, v = coords2d[c1], coords2d[c2]
+    a, b = u[0] - v[0], u[1] - v[1]
+    return (a * a + b * b)**0.5
 
 if __name__ == '__main__':
-    v_initial = coords2d["Madrid"]
-    v_final = coords2d["Bilbao"]
-
-    edges = dijkstra_edge_traverser(iberia2d, km2d, v_initial)
-    # edges = dijkstra_metric_edge_traverser(iberia2d, km2d, v_initial, v_final)
+    v_initial = 'Madrid'
+    v_final = 'Bilbao'
+    edges = traverse_dijkstra_dict(iberia, km, v_initial)
+    #edges = traverse_dijkstra_metric_dict(iberia, km, dist,v_initial, v_final)
     colors = {}
-    for (u, v) in edges:
-        colors[v] = 'red'
-        if v == v_final: break
-    colors[v_initial] = 'palegreen'
-    colors[v_final] = 'palegreen'
+    for (c1, c2) in edges:
+        c1_pos = coords2d[c1]
+        c2_pos = coords2d[c2]
+        colors[c2_pos] = 'red'
+        if c2 == v_final: break
+    colors[coords2d[v_initial]] = colors[coords2d[v_final]] = 'palegreen'
 
     gv = Graph2dViewer(iberia2d, canvas_width=800, canvas_height=800, vertexmode=Graph2dViewer.X_Y, colors=colors)
     gv.run()

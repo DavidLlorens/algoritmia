@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.1.1] - 2023-09-07
+  - Módulo `algoritmia.traversers` renombrado `algoritmia.traverse`.
+  - `algoritmia/algorithms/traverse.py`: Las funciones `traverser_xx` renombradas `traverse_xxx`.
+  - `algoritmia/algorithms/topological_sort.py`: Implememntado sin iteradores.
+
+## [2.1.0] - 2023-09-07
+  - Añade la constante `algoritmia.VERSION`
+  - `algoritmia/algorithms/traversers.py`:
+    - Unificados los recorredores de vertices y los de aristas. Ahora solo son recorredores y devuelven, 
+      para cada vértice del recorrido, la arista que se utilizó por primera vez para llegar a él.
+    - Para hacerla más útil, la funcion `traverser_dijkstra_metric_dict` tiene un nuevo parámetro: una función para 
+      calcular la distancia euclídea entre dos vértices.
+  - `algoritmia/algorithms/topological_sort.py`. Lanza excepción si detecta algún ciclo.
+
 ## [2.0.9] - 2022-11-16
   - `algoritmia/schemes/bt_scheme.py`. Tipo devuelto por successors más específico.
   - `algoritmia/schemes/bab_scheme.py`. Corregido tipo de BoundedDecisionDequence. Tipo devuelto por successors más específico. 

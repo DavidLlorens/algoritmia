@@ -6,7 +6,7 @@ from algoritmia.datastructures.graphs import UndirectedGraph
 from algoritmia.datastructures.mergefindsets import MergeFindSet
 from algoritmia.datastructures.queues import Fifo
 from algoritmia.viewers.labyrinth_viewer_color import LabyrinthViewerColor
-from algoritmia.algorithms.traversers import bf_edge_traverser, df_edge_traverser
+from algoritmia.algorithms.traverse import traverse_bf, traverse_df
 
 Vertex = tuple[int, int]
 Edge = tuple[Vertex, Vertex]
@@ -90,11 +90,11 @@ def create_laberinth(num_rows: int, num_cols: int, tipo: int) -> UndirectedGraph
         g = create_labyrinth_mfset(num_rows, num_cols)
     elif tipo == 2:
         g_aux = create_labyrinth_nowalls(num_rows, num_cols)
-        edges = list(bf_edge_traverser(g_aux, (0, 0)))[1:]  # quitamos arista fantasma
+        edges = list(traverse_bf(g_aux, (0, 0)))[1:]  # quitamos arista fantasma
         g = UndirectedGraph(E=edges)
     elif tipo == 3:
         g_aux = create_labyrinth_nowalls(num_rows, num_cols)
-        edges = list(df_edge_traverser(g_aux, (0, 0)))[1:]  # quitamos arista fantasma
+        edges = list(traverse_df(g_aux, (0, 0)))[1:]  # quitamos arista fantasma
         g = UndirectedGraph(E=edges)
     else:
         raise Exception('Unknown tipo')

@@ -58,6 +58,7 @@ class Graph2dMstViewer(EasyPaint):
             self.draw_graph()
 
     def draw_graph(self):
+        self.create_text(400, 40, "Press 'space' to toggle between GRAPH and MST", 14)
         w, h = self.size
         w -= self.margin
         h -= self.margin

@@ -1,7 +1,7 @@
-from collections.abc import Iterable
+from collections.abc import Iterable, Callable
 from typing import Union
 
-from algoritmia.algorithms.traversers import bf_edge_traverser, dijkstra_edge_traverser, dijkstra_metric_edge_traverser
+from algoritmia.algorithms.traverse import traverse_bf, traverse_dijkstra_dict, traverse_dijkstra_metric_dict
 from algoritmia.datastructures.graphs import IGraph, Digraph, TVertex, TEdge, WeightingFunction
 from algoritmia.utils import infinity
 
@@ -24,7 +24,7 @@ TPath = list[TVertex]  # Generic path
 # Devuelve el camino más corto entre dos vértices en grafos no ponderados
 # Coste temporal: O(|V| + |E|)
 def shortest_path_unweighted_graph(g: IGraph[TVertex], v_source: TVertex, v_target: TVertex) -> TPath:
-    edges = bf_edge_traverser(g, v_source)
+    edges = traverse_bf(g, v_source)
     return path_recover(edges, v_target)
 
 
@@ -32,8 +32,8 @@ def shortest_path_unweighted_graph(g: IGraph[TVertex], v_source: TVertex, v_targ
 # Coste temporal: O(|V|^2)
 def shortest_path_positive_weighted_graph(g: IGraph[TVertex], d: WeightingFunction,
                                           v_source: TVertex, v_target: TVertex) -> TPath:
-    edges = dijkstra_edge_traverser(g, d, v_source)  # Con diccionario: O(|V|^2)
-    # edges = dijkstra_hm_edge_traverser(g, d, v_source)  # Con diccionario de prioridad: O(|V| + |E| log |V|)
+    edges = traverse_dijkstra_dict(g, d, v_source)  # Con diccionario: O(|V|^2)
+    # edges = traverse_dijkstra_heapmap(g, d, v_source)  # Con diccionario de prioridad: O(|V| + |E| log |V|)
     return path_recover(edges, v_target)
 
 
@@ -41,8 +41,9 @@ def shortest_path_positive_weighted_graph(g: IGraph[TVertex], d: WeightingFuncti
 # Coste temporal: O(|V|^2)
 # En la práctica es O(|V|) para grafos densos y O(sqrt(|V|)) para grafos dispersos.
 def shortest_path_metric_graph(g: IGraph[TVertex], d: WeightingFunction,
+                               dist: Callable[[TVertex, TVertex], float],
                                v_source: TVertex, v_target: TVertex) -> TPath:
-    edges = dijkstra_metric_edge_traverser(g, d, v_source, v_target)
+    edges = traverse_dijkstra_metric_dict(g, d, dist, v_source, v_target)
     return path_recover(edges, v_target)
 
 
@@ -183,10 +184,16 @@ if __name__ == '__main__':
     # ---------------
     # Output: ['Madrid', 'Venturada', 'Aranda de Duero', 'Lerma', 'Burgos', 'Miranda del Ebro', 'Armiñón', 'Basauri', 'Bilbao']
 
-    from algoritmia.data.iberia import iberia2d, km2d, coords2d, coords2d_inv
+    from algoritmia.data.iberia import iberia, km, coords2d
 
-    spath_mg = shortest_path_metric_graph(iberia2d, km2d, coords2d['Madrid'], coords2d['Bilbao'])
-    psath = [coords2d_inv[c] for c in spath_mg]
+    def dist(c1, c2):
+        u = coords2d[c1]
+        v = coords2d[c2]
+        a = u[0] - v[0]
+        b = u[1] - v[1]
+        return (a * a + b * b)**0.5
+
+    spath = shortest_path_metric_graph(iberia, km, dist, 'Madrid', 'Bilbao')
     print('shortest_path_metric_graph:', spath)
 
     # Digraph without cycles ----------------------

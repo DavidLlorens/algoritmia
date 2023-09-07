@@ -7,6 +7,12 @@ from easypaint import EasyPaint
 
 from algoritmia.datastructures.graphs import Digraph
 
+# TECLAS
+# - 'return', 'escape': Terminar la ejecución del programa
+# - 'p': Capturar imagen como edit_distance.eps
+# - 't': Cambiar el contenido de los nodos (3 posibilidades)
+# - 'a': Cambiar las aristas (Grafo de dependencias y Backpointers)
+
 Num = Union[int, float]
 Vertex = tuple[Num, Num]
 Score = int

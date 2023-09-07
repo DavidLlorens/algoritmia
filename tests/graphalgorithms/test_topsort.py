@@ -11,6 +11,7 @@ class TestTopsorter(unittest.TestCase):
                        ('C++', 'C#'), ('C++', 'Java'),
                        ('Java', 'C#')])
         ts = tuple(topological_sort(G))
+        print(ts)
         for (u,v) in G.E:
             self.assertTrue(ts.index(u) < ts.index(v))
 

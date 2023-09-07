@@ -1,23 +1,22 @@
 from collections.abc import Iterator
 
-from algoritmia.algorithms.traversers import TVertexTraverser
+from algoritmia.algorithms.traverse import Traverse
 from algoritmia.datastructures.graphs import UndirectedGraph, TVertex
 
 TCC = list[TVertex]  # Generic Connected Component
 
-
 def connected_components(g: UndirectedGraph[TVertex],
-                         vertex_traverser: TVertexTraverser) -> Iterator[TCC]:
+                         traverse: Traverse) -> Iterator[TCC]:
     pending_vertices = set(g.V)
     while len(pending_vertices) > 0:
         u = pending_vertices.pop()
-        visited_vertices = list(vertex_traverser(g, u))
+        visited_vertices = [v for (u, v) in traverse(g, u)]
         pending_vertices -= set(visited_vertices)
         yield visited_vertices
 
 
 if __name__ == '__main__':
-    from traversers import bf_vertex_traverser, df_vertex_traverser
+    from traverse import traverse_bf, traverse_df
     Vertex = tuple[int, int]
     Edge = tuple[Vertex, Vertex]
 
@@ -27,8 +26,8 @@ if __name__ == '__main__':
 
     my_graph = UndirectedGraph(E=edges)
 
-    ccs_bf = list(connected_components(my_graph, bf_vertex_traverser))
-    print("Breath first::", ccs_bf)
+    ccs_bf = list(connected_components(my_graph, traverse_bf))
+    print("Breath first:", ccs_bf)
 
-    ccs_df = list(connected_components(my_graph, df_vertex_traverser))
+    ccs_df = list(connected_components(my_graph, traverse_df))
     print("Depth first:", ccs_df)
