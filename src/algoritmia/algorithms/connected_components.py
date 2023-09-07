@@ -3,16 +3,16 @@ from collections.abc import Iterator
 from algoritmia.algorithms.traverse import Traverse
 from algoritmia.datastructures.graphs import UndirectedGraph, TVertex
 
-TCC = list[TVertex]  # Generic Connected Component
+CC = set[TVertex]  # Connected Component
 
 def connected_components(g: UndirectedGraph[TVertex],
-                         traverse: Traverse) -> Iterator[TCC]:
+                         traverse: Traverse) -> Iterator[CC]:
     pending_vertices = set(g.V)
     while len(pending_vertices) > 0:
         u = pending_vertices.pop()
-        visited_vertices = [v for (u, v) in traverse(g, u)]
-        pending_vertices -= set(visited_vertices)
-        yield visited_vertices
+        cc_vertices = set([v for (u, v) in traverse(g, u)])
+        pending_vertices -= cc_vertices
+        yield cc_vertices
 
 
 if __name__ == '__main__':

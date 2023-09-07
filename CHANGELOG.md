@@ -1,5 +1,7 @@
 # Changelog
 
+## [2.1.2] - 2023-09-07
+  - `algoritmia/algorithms/connected_components.py`: Los CCs son conjuntos de vértices (eran listas).
 ## [2.1.1] - 2023-09-07
   - Módulo `algoritmia.traversers` renombrado `algoritmia.traverse`.
   - `algoritmia/algorithms/traverse.py`: Las funciones `traverser_xx` renombradas `traverse_xxx`.
