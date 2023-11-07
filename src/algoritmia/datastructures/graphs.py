@@ -158,7 +158,9 @@ class Digraph(IGraph[TVertex]):
 # WeightingFunction -----------------------------------------------------------------
 
 
-class WeightingFunction(Generic[TVertex], dict[TEdge, Weight], Callable[[TVertex, TVertex], Weight]):
+class WeightingFunction(Generic[TVertex],
+                        dict[TEdge, Weight],
+                        Callable[[Union[TVertex, TEdge], Optional[TVertex]], Weight]):
     # O(|data|) = O(|E|)
     def __init__(self, data: Union[Iterable[tuple[TEdge, Weight]], dict[TEdge, Weight]], symmetrical: bool = False):
         super().__init__(data)

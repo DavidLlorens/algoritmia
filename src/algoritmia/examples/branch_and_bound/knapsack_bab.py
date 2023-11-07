@@ -5,10 +5,13 @@ from dataclasses import dataclass
 from random import seed, randint
 from typing import Optional
 
-from algoritmia.schemes.bab_scheme import BoundedDecisionSequence, bab_max_solve
+from algoritmia.schemes.bab_scheme import BabDecisionSequence, bab_max_solve
+from algoritmia.schemes.bt_scheme import State
 
-Decision = int  # 0 o 1
-Score = int
+# Tipos  --------------------------------------------------------------------------
+
+Decision = int  # 0 o 1 (coger o no un objeto)
+Score = int  # Valor de la mochila (suma del valor de los objetos que contiene)
 
 # 'bab_max_solve' devuelve un Iterator del tipo devuelto por el método 'solution' de
 # la clase 'BoundedDecisionSequence', cuya implementación por defecto devuelve una tupla de dos elementos:
@@ -20,6 +23,8 @@ Solution = tuple[Score, tuple[Decision, ...]]
 # En ese caso el tipo de 'Solution' sería:
 # Solution = tuple[Score, int, tuple[Decision, ...]]  # (value, weight, decisions)
 
+# Versión naif (cotas poco informadas) --------------------------------------------------------------------------
+
 def knapsack_bab_solve_naif(weights: list[int],
                             values: list[int],
                             capacity: int) -> Optional[Solution]:
@@ -28,14 +33,17 @@ def knapsack_bab_solve_naif(weights: list[int],
         weight: int = 0
         value: int = 0
 
-    class KnapsackBabDS(BoundedDecisionSequence[Decision]):
-        # Coge TODOS los objetos pendientes
-        def calculate_opt_bound(self) -> Score:
-            return self.extra.value + sum(values[len(self):])
-
-        # No coge NINGUNO de los objetos pendientes
-        def calculate_pes_bound(self) -> Score:
+    class KnapsackBabDS(BabDecisionSequence):
+        def f(self) -> int:
             return self.extra.value
+
+        # OPTIMISTA: Coge TODOS los objetos pendientes
+        def calculate_opt_bound(self) -> Score:
+            return self.f() + sum(values[len(self):])
+
+        # PESIMISTA: No coge NINGUNO de los objetos pendientes
+        def calculate_pes_bound(self) -> Score:
+            return self.f() + 0
 
         def is_solution(self) -> bool:
             return len(self) == len(values)
@@ -43,10 +51,14 @@ def knapsack_bab_solve_naif(weights: list[int],
         def successors(self) -> Iterator[KnapsackBabDS]:
             n = len(self)
             if n < len(values):
-                if weights[n] <= capacity - self.extra.weight:
-                    new_extra = Extra(self.extra.weight + weights[n], self.extra.value + values[n])
-                    yield self.add_decision(1, new_extra)
+                if weights[n] + self.extra.weight <= capacity:
+                    new_weight = self.extra.weight + weights[n]
+                    new_value = self.extra.value + values[n]
+                    yield self.add_decision(1, Extra(new_weight, new_value))
                 yield self.add_decision(0, self.extra)
+
+        def state(self) -> State:
+            return len(self), self.extra.weight
 
         # Podríamos sobreescribir 'solution()' para devolver también el peso:
         # def solution(self) -> Solution:
@@ -56,29 +68,30 @@ def knapsack_bab_solve_naif(weights: list[int],
     return bab_max_solve(initial_ds)
 
 
-# Versión con mejores cotas
+# Versión con cotas informadas --------------------------------------------------------------------------
+c = 0
 def knapsack_bab_solve(weights: list[int],
-                        values: list[int],
-                        capacity: int) -> Optional[Solution]:
+                       values: list[int],
+                       capacity: int) -> Optional[Solution]:
     @dataclass
     class Extra:
         weight: int = 0
         value: int = 0
 
-    class KnapsackBabDS(BoundedDecisionSequence[Decision]):
-        # IMPLEMENTAR: resolver mochila continua para los objetos que quedan (tema 3)
+    class KnapsackBabDS(BabDecisionSequence):
+        # OPTIMISTA: resolver mochila fraccionaria para los objetos que quedan (tema Voraces)
         def calculate_opt_bound(self) -> int:
             value = self.extra.value
             weight = self.extra.weight
             for i in range(len(self), len(weights)):
-                f = min(1, (capacity - weight) / weights[i])
+                f = min(1.0, (capacity - weight) / weights[i])
                 weight += f * weights[i]
                 value += f * values[i]
                 if f < 1:
                     break
             return value
 
-        # IMPLEMENTAR: modificación del optimista sin fraccionar
+        # PESISMISTA: modificación del optimista para que no fraccione
         def calculate_pes_bound(self) -> int:
             value = self.extra.value
             weight = self.extra.weight
@@ -88,16 +101,23 @@ def knapsack_bab_solve(weights: list[int],
                     value += values[i]
             return value
 
+        def f(self) -> int:
+            return self.extra.value
+
         def is_solution(self) -> bool:
             return len(self) == len(values)
 
         def successors(self) -> Iterator[KnapsackBabDS]:
             n = len(self)
             if n < len(values):
-                if weights[n] <= capacity - self.extra.weight:
-                    new_extra = Extra(self.extra.weight + weights[n], self.extra.value + values[n])
-                    yield self.add_decision(1, new_extra)
+                if weights[n] + self.extra.weight <= capacity:
+                    new_weight = self.extra.weight + weights[n]
+                    new_value = self.extra.value + values[n]
+                    yield self.add_decision(1, Extra(new_weight, new_value))
                 yield self.add_decision(0, self.extra)
+
+        def state(self) -> State:
+            return len(self), self.extra.weight
 
         # Podríamos sobreescribir 'solution()' para devolver también el peso:
         # def solution(self) -> Solution:
@@ -107,10 +127,12 @@ def knapsack_bab_solve(weights: list[int],
     return bab_max_solve(initial_ps)
 
 
-def sorted_by_dec_ratio(w_old: list[int], v_old: list[int]) -> tuple[list[int], list[int]]:
-    idxs: list[int] = sorted(range(len(w_old)), key=lambda i: -v_old[i] / w_old[i])
-    w_new = [w_old[i] for i in idxs]
-    v_new = [v_old[i] for i in idxs]
+# Funciones auxiliares para crear instancias  ----------------------------------------------
+
+def sorted_by_dec_ratio(weights: list[int], values: list[int]) -> tuple[list[int], list[int]]:
+    idxs: list[int] = sorted(range(len(weights)), key=lambda i: -values[i] / weights[i])
+    w_new = [weights[i] for i in idxs]
+    v_new = [values[i] for i in idxs]
     return w_new, v_new
 
 
@@ -124,7 +146,9 @@ def create_knapsack_problem(num_objects: int) -> tuple[list[int], list[int], int
     return weights, values, capacity
 
 
-# Main program -------------------------------------------------------
+# Programa principal -------------------------------------------------------------------------
+
+
 if __name__ == "__main__":
     # Cada instancia es una tupla (pesos, valores, capacidad):
 
@@ -134,10 +158,11 @@ if __name__ == "__main__":
     # Solution: value = 1118, decisions = (1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0)
     i2 = create_knapsack_problem(20)
 
-    # Solution: value = 1830, decisions = (1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    # Solution: value = 1830, decisions = (1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0...0)
     i3 = create_knapsack_problem(35)
 
     for W, V, C in [i1, i2, i3]:
-        print(f"Instancia:\n  Pesos = {W}\n  Valores = {V}\n  Capacidad = {C}")
-        # print(f"Solution:\n  {knapsack_bab_solve_naif(W, V, C)}\n")
-        print(f"Solution:\n  {knapsack_bab_solve(W, V, C)}\n")
+        print("-"*80)
+        print(f"Instancia:\n  Pesos = {W}\n  Valores = {V}\n  Capacidad = {C}\n")
+        print(f"knapsack_bab_solve:\n  {knapsack_bab_solve(W, V, C)}")
+    print("-"*80)

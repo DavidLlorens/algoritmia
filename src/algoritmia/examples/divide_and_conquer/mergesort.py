@@ -22,10 +22,10 @@ def mergesort_basic(v: list[int]) -> list[int]:
 
 
 def mergesort(v: list[int]):
-    def merge(begin: int, end: int, c: list[int]):
-        half = (begin + end) // 2
-        i, j, k = begin, half, begin
-        while i < half and j < end:
+    def merge(start: int, end: int, c: list[int]):
+        mid = (start + end) // 2
+        i, j, k = start, mid, start
+        while i < mid and j < end:
             if v[i] < v[j]:
                 c[k] = v[i]
                 i += 1
@@ -33,16 +33,16 @@ def mergesort(v: list[int]):
                 c[k] = v[j]
                 j += 1
             k += 1
-        while i < half: c[k] = v[i]; i += 1; k += 1
+        while i < mid: c[k] = v[i]; i += 1; k += 1
         while j < end: c[k] = v[j]; j += 1; k += 1
-        for k in range(begin, end): v[k] = c[k]
+        for k in range(start, end): v[k] = c[k]
 
-    def rec(begin: int, end: int, c: list[int]):
-        if end - begin > 1:
-            half = (begin + end) // 2
-            rec(begin, half, c)
-            rec(half, end, c)
-            merge(begin, end, c)
+    def rec(start: int, end: int, c: list[int]):
+        if end - start > 1:
+            mid = (start + end) // 2
+            rec(start, mid, c)
+            rec(mid, end, c)
+            merge(start, end, c)
 
     rec(0, len(v), [0] * len(v))
 

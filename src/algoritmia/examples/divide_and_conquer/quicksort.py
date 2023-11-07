@@ -18,13 +18,13 @@ def quicksort(v: list[int]):
         v[i + 1], v[r - 1] = v[r - 1], v[i + 1]
         return i + 1
 
-    def qs(p: int, r: int):
+    def rec(p: int, r: int):
         if r - p > 1:
             pivot_index = partition(p, r)
-            qs(p, pivot_index)
-            qs(pivot_index + 1, r)
+            rec(p, pivot_index)
+            rec(pivot_index + 1, r)
 
-    qs(0, len(v))
+    rec(0, len(v))
 
 
 if __name__ == "__main__":

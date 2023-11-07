@@ -1,12 +1,18 @@
 # Changelog
 
+## [3.0.0] - 2023-11-07
+  - Cambios significativos (incompatibles con versiones anteriores) en los esquemas de *búsqueda con retroceso* (bt) y *ramificación y acotación* (bab):
+    - `algoritmia/schemes/bt_scheme.py`
+    - `algoritmia/schemes/bab_scheme.py`
+  - Actualizados los ejemplos de los dos esquemas a la nueva implementación: 
+    - `algoritmia/examples/backtracking/*`
+    - `algoritmia/examples/branch_and_bound/*`
 ## [2.1.2] - 2023-09-07
   - `algoritmia/algorithms/connected_components.py`: Los CCs son conjuntos de vértices (eran listas).
 ## [2.1.1] - 2023-09-07
   - Módulo `algoritmia.traversers` renombrado `algoritmia.traverse`.
   - `algoritmia/algorithms/traverse.py`: Las funciones `traverser_xx` renombradas `traverse_xxx`.
   - `algoritmia/algorithms/topological_sort.py`: Implememntado sin iteradores.
-
 ## [2.1.0] - 2023-09-07
   - Añade la constante `algoritmia.VERSION`
   - `algoritmia/algorithms/traversers.py`:

@@ -18,13 +18,13 @@ class BinarySearchProblem(IDecreaseAndConquerProblem):
         return self.start
 
     def decrease(self) -> BinarySearchProblem:
-        h = (self.start + self.end) // 2
-        if self.elem < self.v[h]:
-            return BinarySearchProblem(self.v, self.elem, self.start, h)
-        elif self.elem > self.v[h]:
-            return BinarySearchProblem(self.v, self.elem, h + 1, self.end)
-        else:  # self.elem == self.v[h]:
-            return BinarySearchProblem(self.v, self.elem, h, h + 1)
+        mid = (self.start + self.end) // 2
+        if self.elem < self.v[mid]:
+            return BinarySearchProblem(self.v, self.elem, self.start, mid)
+        elif self.elem > self.v[mid]:
+            return BinarySearchProblem(self.v, self.elem, mid + 1, self.end)
+        else:  # self.elem == self.v[mid]:
+            return BinarySearchProblem(self.v, self.elem, mid, mid + 1)
 
 
 if __name__ == "__main__":

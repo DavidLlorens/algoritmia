@@ -9,8 +9,8 @@ Edge = tuple[Vertex, Vertex]
 def find_treasure_breadthfirst(g: UndirectedGraph[Vertex],
                                v_start: Vertex,
                                v_treasure: Vertex) -> Optional[Vertex]:
-    queue = Fifo()
-    seen = set()
+    queue: Fifo[Vertex] = Fifo()
+    seen: set[Vertex] = set()
     queue.push(v_start)
     seen.add(v_start)
     while len(queue) > 0:
@@ -27,7 +27,7 @@ def find_treasure_breadthfirst(g: UndirectedGraph[Vertex],
 def find_treasure_depthfirst(g: UndirectedGraph[Vertex],
                              v_start: Vertex,
                              v_treasure: Vertex) -> Optional[Vertex]:
-    def explorar_desde(v):
+    def explorar_desde(v: Vertex) -> Optional[Vertex]:
         seen.add(v)
         if v == v_treasure:     # preorder
             return v            # preorder

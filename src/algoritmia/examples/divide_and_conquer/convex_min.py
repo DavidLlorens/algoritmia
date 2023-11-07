@@ -1,17 +1,17 @@
 def convex_min(v: list[int]) -> int:
-    def _min(start: int, end: int) -> int:
+    def rec(start: int, end: int) -> int:
         if end - start == 1:
             return v[start]
         elif end - start == 2:
             return min(v[start], v[start + 1])
         else:
-            half = (start + end) // 2
-            if v[half - 1] < v[half]:
-                return _min(start, half)
+            mid = (start + end) // 2
+            if v[mid - 1] < v[mid]:
+                return rec(start, mid)
             else:
-                return _min(half, end)
+                return rec(mid, end)
 
-    return _min(0, len(v))
+    return rec(0, len(v))
 
 
 if __name__ == '__main__':

@@ -2,51 +2,51 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from dataclasses import dataclass
+from typing import Optional
 
-from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solve
-from algoritmia.schemes.bt_scheme import ScoredDecisionSequence, bt_min_solve
-from algoritmia.schemes.bt_scheme import StateDecisionSequence, bt_vc_solve
+from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solutions, bt_vc_solutions, min_solution
 
-Decision = int
-Score = int
+# Tipos  --------------------------------------------------------------------------
 
-# 'bt_solve' y 'bt_vc_solve' devuelven un Iterator del tipo devuelto por el método 'solution' de
+Decision = int  # Número de monedas del tipo actual
+Score = int  # Total de monedas utilizado
+
+# 'bt_solutions' y 'bt_vc_solutions' devuelven un Iterator del tipo devuelto por el método 'solution' de
 # la clase 'DecisionSequence', cuya implementación por defecto devuelve una tupla con las decisiones:
-SolutionDS = tuple[Decision, ...]
-
-# 'bt_min_solve' y 'bt_max_solve' devuelven un Iterator del tipo devuelto por el método 'solution' de
-# la clase 'ScoredDecisionSequence', cuya implementación por defecto devuelve una tupla de dos elementos:
-# el Score y una tupla con las decisones:
-SolutionSDS = tuple[Score, tuple[Decision, ...]]
+Solution = tuple[Decision, ...]
 
 
-def coin_change_solve_naif(v: tuple[int, ...], Q: int) -> Iterator[SolutionDS]:
-    def calc(ds: tuple[int, ...]) -> int:
-        return sum(ds[i] * v[i] for i in range(len(ds)))
+# --------------------------------------------------------------------------------
 
-    class CoinChangeDS(DecisionSequence[Decision]):
+def coin_change_solve_naif(v: tuple[int, ...], Q: int) -> Iterator[Solution]:
+    def calc_pending(ds: CoinChangeDS) -> int:
+        # Se calcula a partir del problema original y la secuencia de decisiones actual
+        return Q - sum(d * v[i] for i, d in enumerate(ds.decisions()))
+
+    class CoinChangeDS(DecisionSequence):
         def is_solution(self) -> bool:
-            q = calc(self.decisions())
-            return len(self) == len(v) and q == Q
+            pending = calc_pending(self)  # O(n)
+            return len(self) == len(v) and pending == 0
 
         def successors(self) -> Iterator[CoinChangeDS]:
             n = len(self)
             if n < len(v):
-                q = calc(self.decisions())
-                pending = Q - q
+                pending = calc_pending(self)  # O(n)
                 for num_coins in range(pending // v[n] + 1):
                     yield self.add_decision(num_coins)
 
     initial_ds = CoinChangeDS()
-    return bt_solve(initial_ds)
+    return bt_solutions(initial_ds)
 
 
-def coin_change_solve(v: tuple[int, ...], Q: int) -> Iterator[SolutionDS]:
+# --------------------------------------------------------------------------------
+
+def coin_change_solutions(v: tuple[int, ...], Q: int) -> Iterator[Solution]:
     @dataclass
     class Extra:
         pending: int
 
-    class CoinChangeDS(DecisionSequence[Decision]):
+    class CoinChangeDS(DecisionSequence):
         def is_solution(self) -> bool:
             return len(self) == len(v) and self.extra.pending == 0
 
@@ -58,15 +58,28 @@ def coin_change_solve(v: tuple[int, ...], Q: int) -> Iterator[SolutionDS]:
                     yield self.add_decision(num_coins, Extra(pending2))
 
     initial_ds = CoinChangeDS(Extra(Q))
-    return bt_solve(initial_ds)
+    return bt_solutions(initial_ds)
 
 
-def coin_change_vc_solve(v: tuple[int, ...], Q: int) -> Iterator[SolutionDS]:
+ScoredSolution = tuple[int, Solution]
+
+
+def coin_change_best_solution(v: tuple[int, ...], Q: int) -> Optional[ScoredSolution]:
+    def f(solution: Solution) -> int:
+        return sum(solution)
+
+    return min_solution(coin_change_solutions(v, Q), f)
+
+
+# --------------------------------------------------------------------------------
+
+
+def coin_change_vc_solutions(v: tuple[int, ...], Q: int) -> Iterator[Solution]:
     @dataclass
     class Extra:
         pending: int
 
-    class CoinChangeDS(StateDecisionSequence[Decision]):
+    class CoinChangeDS(DecisionSequence):
         def is_solution(self) -> bool:
             return len(self) == len(v) and self.extra.pending == 0
 
@@ -81,60 +94,32 @@ def coin_change_vc_solve(v: tuple[int, ...], Q: int) -> Iterator[SolutionDS]:
             return len(self), self.extra.pending
 
     initial_ds = CoinChangeDS(Extra(Q))
-    return bt_vc_solve(initial_ds)
+    return bt_vc_solutions(initial_ds)
 
 
-def coin_change_opt_solve(v: tuple[int, ...], Q: int) -> Iterator[SolutionSDS]:
-    @dataclass
-    class Extra:
-        pending: int
-
-    class CoinChangeDS(ScoredDecisionSequence[Decision]):
-        def is_solution(self) -> bool:
-            return len(self) == len(v) and self.extra.pending == 0
-
-        def successors(self) -> Iterator[CoinChangeDS]:
-            n = len(self)
-            if n < len(v):
-                for num_coins in range(self.extra.pending // v[n] + 1):
-                    pending2 = self.extra.pending - num_coins * v[n]
-                    yield self.add_decision(num_coins, Extra(pending2))
-
-        def state(self) -> tuple[int, int]:
-            return len(self), self.extra.pending
-
-        def score(self) -> int:
-            return sum(self.decisions())
-
-    initial_ds = CoinChangeDS(Extra(Q))
-    return bt_min_solve(initial_ds)
+# Programa principal --------------------------------------------------------------------------------
 
 
-# Programa principal ---------------------------------
 if __name__ == "__main__":
-    coins, quantity = (1, 2, 5), 7
+    v0, Q0 = (1, 2, 5, 10), 11
+    print(f"Coins: {v0}")
+    print(f"Quantity: {Q0}\n")
 
     # Basic version
-    print('Basic versión (all solutions):')
-    has_solutions = False
-    for i0, sol in enumerate(coin_change_solve(coins, quantity)):
-        has_solutions = True
-        print(f'\tSolution {i0+1}: {sol}')
-    if not has_solutions:
-        print('\tThere are no solutions')
+    print("Basic versión (all solutions):")
+    sol0 = None
+    for sol0 in coin_change_solutions(v0, Q0):
+        print(f"\tSolution: {sol0}")
+    if sol0 is None:
+        print("\tThere are no solutions")
+
+    print('Basic versión (best solution from all solutions):')
+    print(f"\tBest solution: {coin_change_best_solution(v0, Q0)}")
 
     # Visited control version
-    print('Visited control version:')
-    try:
-        first_sol = next(coin_change_vc_solve(coins, quantity))
-        print(f'\tFirst solution: {first_sol}')
-    except StopIteration:
-        print('\tThere are no solutions')
-
-    # Optimization version
-    print('Optimization version:')
-    sols_opt = list(coin_change_opt_solve(coins, quantity))
-    if len(sols_opt) > 0:
-        print(f'\tBest solution: {sols_opt[-1]}')
-    else:
-        print('\tThere are no solutions')
+    print("Visited control version:")
+    sol0 = None
+    for sol0 in coin_change_vc_solutions(v0, Q0):
+        print(f"\tSolution: {sol0}")
+    if sol0 is None:
+        print("\tThere are no solutions")

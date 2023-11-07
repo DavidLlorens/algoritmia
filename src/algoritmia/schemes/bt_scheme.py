@@ -1,144 +1,126 @@
 """
-Version:  4.1 (29-sep-2022)
+Version:  5.0 (31-oct-2023)
+          4.1 (29-sep-2022)
           4.0 (23-oct-2021)
 
 @author: David Llorens (dllorens@uji.es)
-         (c) Universitat Jaume I 2022
+         (c) Universitat Jaume I 2023
 @license: GPL3
 """
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import Iterator
-from typing import TypeVar, Generic, Any, Union
+from collections import deque
+from collections.abc import Iterator, Callable
+from typing import TypeVar, Generic, Any, final, Optional
 
-infinity = float("infinity")
+from algoritmia.utils import infinity
 
-TDecision = TypeVar('TDecision', contravariant=True)
+# Tipos  --------------------------------------------------------------------------
+
+TDecision = TypeVar("TDecision")
+TExtra = TypeVar("TExtra")
+
+# ACERCA DEL TIPO Solution
+# - La implementación por defecto del metodo solution() devuelve la tupla
+#   de decisiones: tuple[TDecision, ...]
+# - Podemos sobreescribir solution() en la clase hija para devolver otra cosa.
 Solution = Any
+
+# ACERCA DEL TIPO State
+# - La implementación por defecto del metodo state() de DecisionSequence y de ScoredDecisionSequence
+#   devuelve la tupla de decisiones: tuple[TDecision, ...]
+# - Podemos sobreescribir state() en la clase hija para devolver otra cosa.
 State = Any
 
 
-# Esquema para BT básico --------------------------------------------------------------------------
+# La clase DecisionSequence -------------------------------------------------------
 
-class DecisionSequence(ABC, Generic[TDecision]):
-    __slots__ = ("_decisions", "_extra_fields")
+class DecisionSequence(ABC, Generic[TDecision, TExtra]):
+    def __init__(self, extra: Optional[TExtra] = None, parent: DecisionSequence = None, decision: TDecision = None):
+        self.parent = parent
+        self.decision = decision
+        self.extra = extra
+        self._len = 0 if parent is None else len(parent) + 1
 
-    def __init__(self, extra_fields=None, decisions: tuple[TDecision, ...] = ()):
-        self._decisions = decisions
-        self._extra_fields: Any = extra_fields
-
-    @property
-    def extra(self) -> Any:
-        return self._extra_fields
-
-    def __len__(self) -> int:  # len(objeto) devuelve el número de decisiones del objeto
-        return len(self._decisions)
-
-    def add_decision(self, d: TDecision, extra_fields=None) -> DecisionSequence:
-        return self.__class__(extra_fields, self._decisions + (d,))
-
-    def decisions(self) -> tuple[TDecision, ...]:
-        return self._decisions
-
-    def solution(self) -> Solution:
-        return self._decisions
+    # --- Métodos abstractos que hay que implementar en las clases hijas ---
 
     @abstractmethod
     def is_solution(self) -> bool:
         pass
 
     @abstractmethod
-    def successors(self) -> Iterator[DecisionSequence[TDecision]]:
+    def successors(self) -> Iterator[DecisionSequence]:
         pass
 
+    # --- Métodos que se pueden sobreescribir en las clases hijas: solution() y state() ---
 
-def bt_solve(initial_ds: DecisionSequence[TDecision]) -> Iterator[Solution]:
-    def bt(ds: DecisionSequence[TDecision]) -> Iterator[Solution]:
-        if ds.is_solution():
-            yield ds.solution()
-        for new_ds in ds.successors():
-            yield from bt(new_ds)
+    # Por defecto se devuelve la tupla de decisiones
+    def solution(self) -> Solution:
+        return self.decisions()
 
-    return bt(initial_ds)
+    # Debe devolver siempre un objeto inmutable
+    # Por defecto se devuelve la tupla de decisiones
+    def state(self) -> State:
+        return self.decisions()
+
+    # -- Métodos finales que NO se pueden sobreescribir en las clases hijas ---
+
+    @final
+    def add_decision(self, decision: TDecision, extra: TExtra = None) -> DecisionSequence:
+        return self.__class__(extra, self, decision)
+
+    @final
+    def decisions(self) -> tuple[TDecision, ...]:  # Es O(n)
+        ds = deque()
+        p = self
+        while p.parent is not None:
+            ds.appendleft(p.decision)
+            p = p.parent
+        return tuple(ds)
+
+    @final
+    def __len__(self) -> int:  # len(objeto) devuelve el número de decisiones del objeto
+        return self._len
+
+
+# Esquema para BT básico --------------------------------------------------------------------------
+
+def bt_solutions(ds: DecisionSequence[TDecision, TExtra]) -> Iterator[Solution]:
+    if ds.is_solution():
+        yield ds.solution()
+    for new_ds in ds.successors():
+        yield from bt_solutions(new_ds)
 
 
 #  Esquema para BT con control de visitados --------------------------------------------------------
 
-class StateDecisionSequence(DecisionSequence[TDecision]):
-    @abstractmethod
-    def successors(self) -> Iterator[StateDecisionSequence[TDecision]]:
-        pass
-
-    def state(self) -> State:
-        # The returned object must be of an inmutable type
-        return self._decisions
-
-
-def bt_vc_solve(initial_ds: StateDecisionSequence[TDecision]) -> Iterator[Solution]:
-    def bt(ds: StateDecisionSequence[TDecision]) -> Iterator[Solution]:
-        seen.add(ds.state())  # El método state debe devolver un objeto inmutable
+def bt_vc_solutions(initial_ds: DecisionSequence[TDecision, TExtra]) -> Iterator[Solution]:
+    def bt(ds: DecisionSequence) -> Iterator[Solution]:
         if ds.is_solution():
             yield ds.solution()
         for new_ds in ds.successors():
-            state = new_ds.state()
-            if state not in seen:
-                yield from bt(new_ds)
-
-    seen = set()
-    return bt(initial_ds)
-
-
-# Esquema para BT para optimización ----------------------------------------------------------------
-
-class ScoredDecisionSequence(StateDecisionSequence[TDecision]):
-    @abstractmethod
-    def successors(self) -> Iterator[ScoredDecisionSequence[TDecision]]:
-        pass
-
-    @abstractmethod
-    def score(self) -> Union[int, float]:
-        # result of applying the objective function to the partial solution
-        pass
-
-    # Sobrescribimos 'solution()'
-    def solution(self) -> Solution:
-        return self.score(), self.decisions()
-
-
-# Solver de minimización (p.e. para el problema del cambio)
-def bt_min_solve(initial_ds: ScoredDecisionSequence[TDecision]) -> Iterator[Solution]:
-    def bt(ds: ScoredDecisionSequence[TDecision]) -> Iterator[Solution]:
-        nonlocal bs
-        ds_score = ds.score()
-        best_seen[ds.state()] = ds_score
-        if ds.is_solution() and ds_score < bs:  # sólo muestra una solución si mejora la última mostrada
-            bs = ds_score
-            yield ds.solution()
-        for new_ds in ds.successors():
             new_state = new_ds.state()
-            if new_ds.score() < best_seen.get(new_state, infinity):
+            if new_state not in seen:
+                seen.add(new_state)
                 yield from bt(new_ds)
 
-    best_seen = {}
-    bs = infinity  # score of the best solution found
-    return bt(initial_ds)
+    seen = {initial_ds.state()}  # marcamos initial_ds como visto
+    return bt(initial_ds)  # Devuelve un iterador de soluciones
 
 
-# Solver de maximización (p.e. para el problema de la mochila)
-def bt_max_solve(initial_ds: ScoredDecisionSequence[TDecision]) -> Iterator[Solution]:
-    def bt(ds: ScoredDecisionSequence[TDecision]) -> Iterator[Solution]:
-        nonlocal bs
-        ds_score = ds.score()
-        best_seen[ds.state()] = ds_score
-        if ds.is_solution() and ds_score > bs:  # sólo muestra una solución si mejora la última mostrada
-            bs = ds_score
-            yield ds.solution()
-        for new_ds in ds.successors():
-            new_state = new_ds.state()
-            if new_ds.score() > best_seen.get(new_state, -infinity):
-                yield from bt(new_ds)
+#  Mejor solución  --------------------------------------------------------
 
-    best_seen = {}
-    bs = -infinity
-    return bt(initial_ds)
+
+Score = int | float
+ScoredSolution = tuple[Score, Solution]
+
+
+def min_solution(solutions: Iterator[Solution],
+                 f: Callable[[Solution], Score]) -> Optional[ScoredSolution]:
+    return min(((f(sol), sol) for sol in solutions), default=None)
+
+
+def max_solution(solutions: Iterator[Solution],
+                 f: Callable[[Solution], Score]) -> Optional[ScoredSolution]:
+    return max(((f(sol), sol) for sol in solutions), default=None)

@@ -2,7 +2,7 @@ from collections.abc import Iterator
 
 from algoritmia.datastructures.graphs import UndirectedGraph, TVertex
 
-from traverse import Traverse
+from algoritmia.algorithms.traverse import Traverse
 
 def spanning_forest(g: UndirectedGraph[TVertex], traverser: Traverse) -> Iterator[UndirectedGraph]:
     pending_vertices = set(g.V)

@@ -5,13 +5,13 @@ def binarysearch_tail_rec(v: list[int], elem: int) -> Optional[int]:
     def rec(start: int, end: int):
         if end - start == 0:
             return None
-        half = (start + end) // 2
-        if elem < v[half]:
-            return rec(start, half)
-        elif elem > v[half]:
-            return rec(half + 1, end)
-        else:  # elem == v[half]:
-            return half
+        mid = (start + end) // 2
+        if elem < v[mid]:
+            return rec(start, mid)
+        elif elem > v[mid]:
+            return rec(mid + 1, end)
+        else:  # elem == v[mid]:
+            return mid
 
     return rec(0, len(v))
 
@@ -19,13 +19,13 @@ def binarysearch_tail_rec(v: list[int], elem: int) -> Optional[int]:
 def binarysearch_iter(v: list[int], elem: int) -> Optional[int]:
     start, end = 0, len(v)
     while end - start > 0:
-        half = (start + end) // 2
-        if elem < v[half]:
-            end = half
-        elif elem > v[half]:
-            start = half + 1
-        else:  # elem == v[half]:
-            return half
+        mid = (start + end) // 2
+        if elem < v[mid]:
+            end = mid
+        elif elem > v[mid]:
+            start = mid + 1
+        else:  # elem == v[mid]:
+            return mid
 
 
 if __name__ == "__main__":
