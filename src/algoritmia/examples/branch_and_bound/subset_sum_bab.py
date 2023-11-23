@@ -27,10 +27,10 @@ def sumset_bab_solve(e: tuple[int, ...], s: int) -> Optional[ScoredSolution]:
             return self.extra.used_nums
 
         def calculate_opt_bound(self) -> Score:
-            return self.f() + 0 if self.extra.acc_sum == s else 1
+            return self.f() + 0 if self.extra.acc_sum == s else 1  # Mejorable
 
         def calculate_pes_bound(self) -> Score:
-            if self.extra.acc_sum == s:
+            if self.is_solution():
                 return self.f()
             return infinity  # Mejorable
 
@@ -40,10 +40,10 @@ def sumset_bab_solve(e: tuple[int, ...], s: int) -> Optional[ScoredSolution]:
         def successors(self) -> Iterator[SumSetDS]:
             if len(self) < len(e):
                 yield self.add_decision(0, self.extra)
-                if self.extra.acc_sum + e[len(self)] <= s:
-                    acc_sum2 = self.extra.acc_sum + e[len(self)]
-                    used_nums2 = self.extra.used_nums + 1
-                    yield self.add_decision(1, Extra(acc_sum2, used_nums2))
+                new_acc = self.extra.acc_sum + e[len(self)]
+                if new_acc <= s:
+                    new_used_nums = self.extra.used_nums + 1
+                    yield self.add_decision(1, Extra(new_acc, new_used_nums))
 
         # Sobreescribimos 'state()'
         def state(self) -> tuple[int, int]:

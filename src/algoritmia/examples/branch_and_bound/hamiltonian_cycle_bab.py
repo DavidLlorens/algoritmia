@@ -32,10 +32,18 @@ def hamiltoniancycle_bab_solve(g: UndirectedGraph[TVertex],
         weight: int = 0
 
     class HamiltonianCycleDS(BabDecisionSequence[TVertex, Extra]):
+        def f(self) -> float:
+            if len(self) < len(g.V): return self.extra.weight
+            if v_initial in g.succs(self.decision):
+                return self.extra.weight + wf(self.decision, v_initial)
+            return infinity
+
         def calculate_opt_bound(self) -> Score:
             return self.f() + 0  # Mejorable (arista de menor peso de cada vértice pendiente)
 
         def calculate_pes_bound(self) -> Score:
+            if self.is_solution():
+                return self.f()
             return infinity  # Mejorable
 
         def is_solution(self) -> bool:
@@ -48,12 +56,6 @@ def hamiltoniancycle_bab_solve(g: UndirectedGraph[TVertex],
                     if v not in ds_set:  # O(1), |V| veces
                         new_weight = self.extra.weight + wf(self.decision, v)
                         yield self.add_decision(v, Extra(new_weight))
-
-        def f(self) -> float:
-            if len(self) < len(g.V): return self.extra.weight
-            if v_initial in g.succs(self.decision):
-                return self.extra.weight + wf(self.decision, v_initial)
-            return infinity
 
         # Sobreescribimos 'state()'
         def state(self) -> tuple[TVertex, tuple[Vertex, ...]]:

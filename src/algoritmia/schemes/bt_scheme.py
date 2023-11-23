@@ -14,7 +14,6 @@ from collections import deque
 from collections.abc import Iterator, Callable
 from typing import TypeVar, Generic, Any, final, Optional
 
-from algoritmia.utils import infinity
 
 # Tipos  --------------------------------------------------------------------------
 
@@ -22,15 +21,23 @@ TDecision = TypeVar("TDecision")
 TExtra = TypeVar("TExtra")
 
 # ACERCA DEL TIPO Solution
-# - La implementación por defecto del metodo solution() devuelve la tupla
-#   de decisiones: tuple[TDecision, ...]
-# - Podemos sobreescribir solution() en la clase hija para devolver otra cosa.
+# La implementación por defecto devuelve la tupla de decisiones.
+# Podemos sobreescribir solution() en la clase hija para devolver otra cosa.
 Solution = Any
 
+# ACERCA DEL TIPO Score
+# Es el tipo devuelto por la función objetivo
+Score = int | float
+
+# ACERCA DEL TIPO ScoredSolution
+# Las funciones min_solution y max_solution devuelven Optional[ScoredSolution]:
+#   - Devuelven None si no hay solución.
+#   - Devuelven la tupla (Score, self.solution()) si hay solución.
+ScoredSolution = tuple[Score, Solution]
+
 # ACERCA DEL TIPO State
-# - La implementación por defecto del metodo state() de DecisionSequence y de ScoredDecisionSequence
-#   devuelve la tupla de decisiones: tuple[TDecision, ...]
-# - Podemos sobreescribir state() en la clase hija para devolver otra cosa.
+# La implementación por defecto devuelve la tupla de decisiones.
+# Podemos sobreescribir state() en la clase hija para devolver otra cosa.
 State = Any
 
 
@@ -109,11 +116,7 @@ def bt_vc_solutions(initial_ds: DecisionSequence[TDecision, TExtra]) -> Iterator
     return bt(initial_ds)  # Devuelve un iterador de soluciones
 
 
-#  Mejor solución  --------------------------------------------------------
-
-
-Score = int | float
-ScoredSolution = tuple[Score, Solution]
+#  Mejor solución --------------------------------------------------------
 
 
 def min_solution(solutions: Iterator[Solution],

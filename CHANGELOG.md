@@ -1,9 +1,13 @@
 # Changelog
+## [3.0.2] - 2023-11-22
+  - `algoritmia/schemes/bab_scheme.py`: Nueva implementación.
+  - `algoritmia/examples/branch_and_bound/*`: Ejemplos actualizados.
 ## [3.0.1] - 2023-11-08
   - Corrige la variable con el número de versión a 3.0.1.
   - La versión 3.0.0 tiene mal el número interno de version (2.2.0)
 ## [3.0.0] - 2023-11-07
-  - Cambios significativos (incompatibles con versiones anteriores) en los esquemas de *búsqueda con retroceso* (bt) y *ramificación y acotación* (bab):
+  - Cambios significativos (incompatibles con versiones anteriores) en los esquemas de *búsqueda con retroceso* (bt) 
+y *ramificación y acotación* (bab):
     - `algoritmia/schemes/bt_scheme.py`
     - `algoritmia/schemes/bab_scheme.py`
   - Actualizados los ejemplos de los dos esquemas a la nueva implementación: 

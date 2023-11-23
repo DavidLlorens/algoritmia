@@ -1,5 +1,6 @@
 """
-Version: 5.0 (31-oct-2023)
+Version: 5.1 (23-nov-2023)
+         5.0 (31-oct-2023)
          4.1 (29-sep-2022)
          4.0 (23-oct-2021)
 
@@ -12,40 +13,22 @@ from __future__ import annotations
 from abc import abstractmethod
 from collections.abc import Iterator
 from functools import total_ordering
-from typing import TypeVar, Any, final, Optional
+from typing import final, Optional
 
 from algoritmia.datastructures.priorityqueues import MaxHeap, MinHeap
-from algoritmia.schemes.bt_scheme import DecisionSequence
+from algoritmia.schemes.bt_scheme import DecisionSequence, TDecision, TExtra, Score, ScoredSolution
 from algoritmia.utils import infinity
 
-# Tipos  --------------------------------------------------------------------------
-
-TDecision = TypeVar("TDecision")
-TExtra = TypeVar("TExtra")
-
-# ACERCA DEL TIPO Score
-# - Es el tipo que devuelven las cotas
-Score = int | float
-
-# ACERCA DEL TIPO Solution
-# - La implementación por defecto del metodo solution() de BabDecisionSequence devuelve
-#   el f y la tupla de decisiones: tuple[Score, tuple[TDecision, ...]]
-# - Podemos sobreescribir solution() en la clase hija para devolver otra cosa.
-Solution = Any
-
-# ACERCA DEL TIPO State
-# - La implementación por defecto del metodo state() de BabDecisionSequence (por herencia de
-#   DecisionSequence) devuelve la tupla de decisiones: tuple[TDecision, ...]
-# - Podemos sobreescribir state() en la clase hija para devolver otra cosa.
-State = Any
-
+# ACERCA DEL TIPO ScoredSolution (importado de bt_scheme)
+# Las funciones bab_min_solve y bab_max_solve devuelven Optional[ScoredSolution]:
+#   - Devuelven None si no hay solución.
+#   - Devuelven la tupla (Score, self.solution()) si hay solución.
 
 # ACERCA DEL CÁLCULO EFICIENTE DE LAS COTAS
-# Dado que las cotas son inmutables sólo deberían calcularse una vez:
-# - Los métodos calculate_opt_bound() y calculate_pes_bound() se llaman sólo en el constructor)
+# Dado que las cotas son inmutables solo deberían calcularse una vez:
+# - Los métodos calculate_opt_bound() y calculate_pes_bound() se llaman sólo en el constructor
 #   y sus resultados se guardan en los atributos self._opt y self._pes.
 # - Los métodos opt() y pes() sólo devuelven el valor de estos atributos.
-
 
 # La clase BabDecisionSequence -------------------------------------------------------
 
@@ -57,29 +40,37 @@ class BabDecisionSequence(DecisionSequence[TDecision, TExtra]):
         self._pes = self.calculate_pes_bound()
         self._opt = self.calculate_opt_bound()
 
-    # --- Métodos abstractos que hay que implementar en las clases hijas ---
+    # --- Métodos abstractos ---
 
     @abstractmethod
     def f(self) -> Score:  # Puntuación de la función objetivo
         pass
 
     @abstractmethod
-    def calculate_opt_bound(self) -> Score:
+    def calculate_opt_bound(self) -> Score:  # Calcula y devuelve la cota optimista
         pass
 
     @abstractmethod
-    def calculate_pes_bound(self) -> Score:
+    def calculate_pes_bound(self) -> Score:  # Calcula y devuelve la cota pesimista
         pass
+
+    # --- Métodos abstractos heredados  ---
 
     @abstractmethod
-    def successors(self) -> Iterator[BabDecisionSequence]:  # Cambia el tipo devuelto
+    def successors(self) -> Iterator[BabDecisionSequence]:  # Ha cambiado el tipo devuelto
         pass
 
-    # --- Métodos que se puede sobreescribir en las clases hijas: solution() (y state(), que se hereda) ---
+    # @abstractmethod
+    # def is_solution(self) -> bool:
+    #     pass
 
-    # Por defecto se devuelve una tupla con el Score y las decisiones
-    def solution(self) -> Solution:
-        return self.f(), self.decisions()
+    # --- Métodos heredados que se puede sobreescribir en las clases hijas: solution() y state() ---
+
+    # def solution(self) -> Solution:
+    #    return self.decisions()
+
+    # def state(self) -> State:
+    #    return self.decisions()
 
     # -- Métodos finales que NO se pueden sobreescribir en las clases hijas ---
 
@@ -105,45 +96,35 @@ class BabDecisionSequence(DecisionSequence[TDecision, TExtra]):
 
 # Esquemas para BaB --------------------------------------------------------------------------
 
-def bab_min_solve(initial_ds: BabDecisionSequence) -> Optional[Solution]:
-    best_solution, best_f = None, infinity                            # máx: -inf
+def bab_min_solve(initial_ds: BabDecisionSequence) -> Optional[ScoredSolution]:
     bps = initial_ds.pes()
-    heap = MinHeap([initial_ds])                                      # máx: MaxHeap()
+    heap = MinHeap([initial_ds])                                    # máx: MaxHeap
     best_seen = {initial_ds.state(): initial_ds.f()}
     while len(heap) > 0:
-        top_ds = heap.extract_opt()
-        if best_f <= top_ds.opt():                                    # máx: >=
-            return best_solution
-        if top_ds.is_solution():
-            best_f = top_ds.f()
-            best_solution = top_ds.solution()
-        for new_ds in top_ds.successors():
-            if new_ds.opt() <= bps:                                  # máx: >=
-                bps = min(bps, new_ds.pes())                         # máx: max
+        best_ds = heap.extract_opt()
+        if best_ds.is_solution():
+            return best_ds.f(), best_ds.solution()
+        for new_ds in best_ds.successors():
+            if new_ds.opt() <= bps:                                 # máx: >=
+                bps = min(bps, new_ds.pes())                        # máx: max
                 new_state = new_ds.state()
-                if new_ds.f() < best_seen.get(new_state, infinity):  # máx: >, -infintiy
+                if new_ds.f() < best_seen.get(new_state, infinity):  # máx: >, -inf
                     best_seen[new_state] = new_ds.f()
                     heap.add(new_ds)
-    return best_solution
 
 
-def bab_max_solve(initial_ds: BabDecisionSequence) -> Optional[Solution]:
-    best_solution, best_f = None, -infinity                           # mín: inf
+def bab_max_solve(initial_ds: BabDecisionSequence) -> Optional[ScoredSolution]:
     bps = initial_ds.pes()
-    heap = MaxHeap([initial_ds])                                      # mín: MinHeap()
+    heap = MaxHeap([initial_ds])                                     # mín: MinHeap
     best_seen = {initial_ds.state(): initial_ds.f()}
     while len(heap) > 0:
-        top_ds = heap.extract_opt()
-        if best_f >= top_ds.opt():                                    # mín: <=
-            return best_solution
-        if top_ds.is_solution():
-            best_f = top_ds.f()
-            best_solution = top_ds.solution()
-        for new_ds in top_ds.successors():
-            if new_ds.opt() >= bps:                                   # mín: <=
-                bps = max(bps, new_ds.pes())                          # mín: min
+        best_ds = heap.extract_opt()
+        if best_ds.is_solution():
+            return best_ds.f(), best_ds.solution()
+        for new_ds in best_ds.successors():
+            if new_ds.opt() >= bps:                                  # mín: <=
+                bps = max(bps, new_ds.pes())                         # mín: min
                 new_state = new_ds.state()
-                if new_ds.f() > best_seen.get(new_state, -infinity):  # mín: <, infintiy
+                if new_ds.f() > best_seen.get(new_state, -infinity):  # mín: <, inf
                     best_seen[new_state] = new_ds.f()
                     heap.add(new_ds)
-    return best_solution

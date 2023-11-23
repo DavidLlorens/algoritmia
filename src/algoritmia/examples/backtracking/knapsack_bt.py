@@ -21,7 +21,6 @@ def knapsack_solutions(weights: list[int],
     @dataclass
     class Extra:
         weight: int = 0
-        value: int = 0
 
     class KnapsackDS(DecisionSequence[Decision, Extra]):
         def is_solution(self) -> bool:
@@ -30,15 +29,14 @@ def knapsack_solutions(weights: list[int],
         def successors(self) -> Iterator[KnapsackDS]:
             n = len(self)
             if n < len(values):
-                if weights[n] <= capacity - self.extra.weight:
-                    new_weight = self.extra.weight + weights[n]
-                    new_value = self.extra.value + values[n]
-                    yield self.add_decision(1, Extra(new_weight, new_value))
+                new_weight = self.extra.weight + weights[n]
+                if new_weight <= capacity:
+                    yield self.add_decision(1, Extra(new_weight))
                 yield self.add_decision(0, self.extra)
 
-        # Podríamos sobreescribir 'solution()' para devolver también el valor y el peso de la mochila:
+        # Podríamos sobreescribir 'solution()' para devolver también el peso de la mochila:
         # def solution(self) -> Solution:
-        #    return self.extra.value, self.extra.weight, self.decisions()
+        #    return self.decisions(), self.extra.weight
 
     initial_ds = KnapsackDS(Extra())
     return bt_solutions(initial_ds)
@@ -65,7 +63,6 @@ def knapsack_vc_solutions(weights: list[int],
     @dataclass
     class Extra:
         weight: int = 0
-        value: int = 0
 
     class KnapsackDS(DecisionSequence[Decision, Extra]):
         def is_solution(self) -> bool:
@@ -74,14 +71,13 @@ def knapsack_vc_solutions(weights: list[int],
         def successors(self) -> Iterator[KnapsackDS]:
             n = len(self)
             if n < len(values):
-                if weights[n] <= capacity - self.extra.weight:
-                    new_weight = self.extra.weight + weights[n]
-                    new_value = self.extra.value + values[n]
-                    yield self.add_decision(1, Extra(new_weight, new_value))
+                new_weight = self.extra.weight + weights[n]
+                if new_weight <= capacity:
+                    yield self.add_decision(1, Extra(new_weight))
                 yield self.add_decision(0, self.extra)
 
         def state(self):
-            return len(self), self.extra.weight, self.extra.value
+            return len(self), self.extra.weight
 
         # Podríamos sobreescribir 'solution()' para devolver también el valor y el peso de la mochila:
         # def solution(self) -> Solution:

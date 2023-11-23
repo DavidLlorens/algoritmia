@@ -24,17 +24,23 @@ def coin_change_bab_solve(v: tuple[int, ...], Q: int) -> Optional[ScoredSolution
     @dataclass
     class Extra:
         pending: int
+        used_coins: int
 
     class CoinChangeDS(BabDecisionSequence[Decision, Extra]):
         def f(self) -> int:
-            return sum(self.decisions())
+            return self.extra.used_coins
 
         def calculate_opt_bound(self) -> Score:
-            if len(self) == len(v):
-                return self.f()
-            return self.f() + ceil(self.extra.pending / max(v[len(self):]))
+            s = self.f()
+            if self.extra.pending > 0:
+                if len(self) == len(v):
+                    return infinity
+                s += ceil(self.extra.pending / max(v[len(self):]))
+            return s
 
         def calculate_pes_bound(self) -> Score:
+            if self.is_solution():
+                return self.f()
             return infinity  # Mejorable
 
         def is_solution(self) -> bool:
@@ -44,13 +50,14 @@ def coin_change_bab_solve(v: tuple[int, ...], Q: int) -> Optional[ScoredSolution
             n = len(self)
             if n < len(v):
                 for num_coins in range(self.extra.pending // v[n] + 1):
-                    pending2 = self.extra.pending - num_coins * v[n]
-                    yield self.add_decision(num_coins, Extra(pending2))
+                    new_pending = self.extra.pending - num_coins * v[n]
+                    new_used_coins = self.extra.used_coins + num_coins
+                    yield self.add_decision(num_coins, Extra(new_pending, new_used_coins))
 
         def state(self) -> tuple[int, int]:
             return len(self), self.extra.pending
 
-    initial_ds = CoinChangeDS(Extra(Q))
+    initial_ds = CoinChangeDS(Extra(Q, 0))
     return bab_min_solve(initial_ds)
 
 

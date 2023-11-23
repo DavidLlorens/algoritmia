@@ -51,8 +51,8 @@ def knapsack_bab_solve_naif(weights: list[int],
         def successors(self) -> Iterator[KnapsackBabDS]:
             n = len(self)
             if n < len(values):
-                if weights[n] + self.extra.weight <= capacity:
-                    new_weight = self.extra.weight + weights[n]
+                new_weight = self.extra.weight + weights[n]
+                if new_weight <= capacity:
                     new_value = self.extra.value + values[n]
                     yield self.add_decision(1, Extra(new_weight, new_value))
                 yield self.add_decision(0, self.extra)
@@ -79,6 +79,9 @@ def knapsack_bab_solve(weights: list[int],
         value: int = 0
 
     class KnapsackBabDS(BabDecisionSequence):
+        def f(self) -> int:
+            return self.extra.value
+
         # OPTIMISTA: resolver mochila fraccionaria para los objetos que quedan (tema Voraces)
         def calculate_opt_bound(self) -> int:
             value = self.extra.value
@@ -91,7 +94,7 @@ def knapsack_bab_solve(weights: list[int],
                     break
             return value
 
-        # PESISMISTA: modificación del optimista para que no fraccione
+        # PESIMISTA: modificación del optimista para que no fraccione
         def calculate_pes_bound(self) -> int:
             value = self.extra.value
             weight = self.extra.weight
@@ -101,17 +104,14 @@ def knapsack_bab_solve(weights: list[int],
                     value += values[i]
             return value
 
-        def f(self) -> int:
-            return self.extra.value
-
         def is_solution(self) -> bool:
             return len(self) == len(values)
 
         def successors(self) -> Iterator[KnapsackBabDS]:
             n = len(self)
             if n < len(values):
-                if weights[n] + self.extra.weight <= capacity:
-                    new_weight = self.extra.weight + weights[n]
+                new_weight = self.extra.weight + weights[n]
+                if new_weight <= capacity:
                     new_value = self.extra.value + values[n]
                     yield self.add_decision(1, Extra(new_weight, new_value))
                 yield self.add_decision(0, self.extra)
