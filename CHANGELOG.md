@@ -1,4 +1,7 @@
 # Changelog
+## [3.0.3] - 2023-11-23
+  - `algoritmia/schemes/bab_scheme.py`: Implementación simplificada. Cambia `f()` por `opt()`.
+  - `algoritmia/examples/branch_and_bound/*`: Ejemplos actualizados.
 ## [3.0.2] - 2023-11-22
   - `algoritmia/schemes/bab_scheme.py`: Nueva implementación.
   - `algoritmia/examples/branch_and_bound/*`: Ejemplos actualizados.

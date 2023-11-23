@@ -11,8 +11,11 @@ from algoritmia.utils import infinity
 # Tipos  --------------------------------------------------------------------------
 
 Decision = int
+Solution = tuple[Decision, ...]
+
+# 'bab_min_solve' devuelve Optional[ScoredSolution]
 Score = int
-ScoredSolution = tuple[Score, tuple[Decision, ...]]
+ScoredSolution = tuple[Score, Solution]
 
 # --------------------------------------------------------------------------------
 
@@ -23,15 +26,14 @@ def sumset_bab_solve(e: tuple[int, ...], s: int) -> Optional[ScoredSolution]:
         used_nums: int = 0
 
     class SumSetDS(BabDecisionSequence[Decision, Extra]):
-        def f(self) -> Score:
-            return self.extra.used_nums
-
         def calculate_opt_bound(self) -> Score:
-            return self.f() + 0 if self.extra.acc_sum == s else 1  # Mejorable
+            if self.extra.acc_sum == s:
+                return self.extra.used_nums
+            return self.extra.used_nums + 1  # Mejorable
 
         def calculate_pes_bound(self) -> Score:
-            if self.is_solution():
-                return self.f()
+            if self.extra.acc_sum == s:
+                return self.extra.used_nums
             return infinity  # Mejorable
 
         def is_solution(self) -> bool:

@@ -11,11 +11,11 @@ from algoritmia.utils import infinity
 # Tipos  --------------------------------------------------------------------------
 
 Decision = int  # Número de monedas del tipo actual
-Score = int  # Total de monedas utilizado
+Solution = tuple[Decision, ...]
 
-# 'bt_solutions' y 'bt_vc_solutions' devuelven un Iterator del tipo devuelto por el método 'solution' de
-# la clase 'DecisionSequence', cuya implementación por defecto devuelve una tupla con las decisiones:
-ScoredSolution = tuple[Score, tuple[Decision, ...]]
+# 'bab_min_solve' devuelve Optional[ScoredSolution]
+Score = int  # Total de monedas utilizado
+ScoredSolution = tuple[Score, Solution]
 
 
 # --------------------------------------------------------------------------------
@@ -27,11 +27,8 @@ def coin_change_bab_solve(v: tuple[int, ...], Q: int) -> Optional[ScoredSolution
         used_coins: int
 
     class CoinChangeDS(BabDecisionSequence[Decision, Extra]):
-        def f(self) -> int:
-            return self.extra.used_coins
-
         def calculate_opt_bound(self) -> Score:
-            s = self.f()
+            s = self.extra.used_coins
             if self.extra.pending > 0:
                 if len(self) == len(v):
                     return infinity
@@ -40,7 +37,7 @@ def coin_change_bab_solve(v: tuple[int, ...], Q: int) -> Optional[ScoredSolution
 
         def calculate_pes_bound(self) -> Score:
             if self.is_solution():
-                return self.f()
+                return self.extra.used_coins
             return infinity  # Mejorable
 
         def is_solution(self) -> bool:

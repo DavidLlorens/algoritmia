@@ -11,16 +11,11 @@ from algoritmia.utils import infinity
 # Tipos  --------------------------------------------------------------------------
 
 Decision = TVertex
-Score = float
-
-# 'bt_solutions' y 'bt_vc_solutions' devuelven un Iterator del tipo devuelto por el método 'solution' de
-# la clase 'DecisionSequence', cuya implementación por defecto devuelve una tupla con las decisiones:
 Solution = tuple[Decision, ...]
 
-# 'bt_min_solve' y 'bt_max_solve' devuelven un Iterator del tipo devuelto por el método 'solution' de
-# la clase 'ScoredDecisionSequence', cuya implementación por defecto devuelve una tupla de dos elementos:
-# el Score y una tupla con las decisones:
-ScoredSolution = tuple[Score, tuple[Decision, ...]]
+# 'bab_min_solve' devuelve Optional[ScoredSolution]
+Score = float
+ScoredSolution = tuple[Score, Solution]
 
 
 # --------------------------------------------------------------------------------
@@ -32,18 +27,16 @@ def hamiltoniancycle_bab_solve(g: UndirectedGraph[TVertex],
         weight: int = 0
 
     class HamiltonianCycleDS(BabDecisionSequence[TVertex, Extra]):
-        def f(self) -> float:
-            if len(self) < len(g.V): return self.extra.weight
-            if v_initial in g.succs(self.decision):
-                return self.extra.weight + wf(self.decision, v_initial)
-            return infinity
-
         def calculate_opt_bound(self) -> Score:
-            return self.f() + 0  # Mejorable (arista de menor peso de cada vértice pendiente)
+            if self.is_solution():
+                return self.extra.weight + wf(self.decision, v_initial)
+            if len(self) < len(g.V):
+                return self.extra.weight + 0  # Mejorable (arista de menor peso de cada vértice pendiente)
+            return infinity
 
         def calculate_pes_bound(self) -> Score:
             if self.is_solution():
-                return self.f()
+                return self.extra.weight + wf(self.decision, v_initial)
             return infinity  # Mejorable
 
         def is_solution(self) -> bool:

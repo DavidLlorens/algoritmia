@@ -11,17 +11,15 @@ from algoritmia.schemes.bt_scheme import State
 # Tipos  --------------------------------------------------------------------------
 
 Decision = int  # 0 o 1 (coger o no un objeto)
-Score = int  # Valor de la mochila (suma del valor de los objetos que contiene)
-
-# 'bab_max_solve' devuelve un Iterator del tipo devuelto por el método 'solution' de
-# la clase 'BoundedDecisionSequence', cuya implementación por defecto devuelve una tupla de dos elementos:
-# el Score (el valor del contenido de la mochila) y una tupla con las decisones:
-Solution = tuple[Score, tuple[Decision, ...]]
-
-
-# Podriamos sobreescribir  el método 'solution()' en KnapsackBabDS para que devolviera también el peso.
+Solution = tuple[Decision, ...]
+# Podriamos sobrescribir el método 'solution()' en KnapsackBabDS para que devolviera también el peso.
 # En ese caso el tipo de 'Solution' sería:
-# Solution = tuple[Score, int, tuple[Decision, ...]]  # (value, weight, decisions)
+# Solution = tuple[int, tuple[Decision, ...]]  # (weight, decisions)
+
+# 'bab_max_solve' devuelve Optional[ScoredSolution]
+Score = int  # Valor de la mochila (suma del valor de los objetos que contiene)
+ScoredSolution = tuple[Score, Solution]
+
 
 # Versión naif (cotas poco informadas) --------------------------------------------------------------------------
 
@@ -34,16 +32,13 @@ def knapsack_bab_solve_naif(weights: list[int],
         value: int = 0
 
     class KnapsackBabDS(BabDecisionSequence):
-        def f(self) -> int:
-            return self.extra.value
-
-        # OPTIMISTA: Coge TODOS los objetos pendientes
+        # OPTIMISTA: Coge TODOS los objetos pendientes (cota poco informada)
         def calculate_opt_bound(self) -> Score:
-            return self.f() + sum(values[len(self):])
+            return self.extra.value + sum(values[len(self):])
 
-        # PESIMISTA: No coge NINGUNO de los objetos pendientes
+        # PESIMISTA: No coge NINGUNO de los objetos pendientes (cota poco informada)
         def calculate_pes_bound(self) -> Score:
-            return self.f() + 0
+            return self.extra.value + 0
 
         def is_solution(self) -> bool:
             return len(self) == len(values)
@@ -62,7 +57,7 @@ def knapsack_bab_solve_naif(weights: list[int],
 
         # Podríamos sobreescribir 'solution()' para devolver también el peso:
         # def solution(self) -> Solution:
-        #    return self.extra.value, self.extra.weight, self.decisions()
+        #    return self.extra.weight, self.decisions()
 
     initial_ds = KnapsackBabDS(Extra())
     return bab_max_solve(initial_ds)
@@ -79,9 +74,6 @@ def knapsack_bab_solve(weights: list[int],
         value: int = 0
 
     class KnapsackBabDS(BabDecisionSequence):
-        def f(self) -> int:
-            return self.extra.value
-
         # OPTIMISTA: resolver mochila fraccionaria para los objetos que quedan (tema Voraces)
         def calculate_opt_bound(self) -> int:
             value = self.extra.value

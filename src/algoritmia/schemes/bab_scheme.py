@@ -43,10 +43,6 @@ class BabDecisionSequence(DecisionSequence[TDecision, TExtra]):
     # --- Métodos abstractos ---
 
     @abstractmethod
-    def f(self) -> Score:  # Puntuación de la función objetivo
-        pass
-
-    @abstractmethod
     def calculate_opt_bound(self) -> Score:  # Calcula y devuelve la cota optimista
         pass
 
@@ -99,32 +95,32 @@ class BabDecisionSequence(DecisionSequence[TDecision, TExtra]):
 def bab_min_solve(initial_ds: BabDecisionSequence) -> Optional[ScoredSolution]:
     bps = initial_ds.pes()
     heap = MinHeap([initial_ds])                                    # máx: MaxHeap
-    best_seen = {initial_ds.state(): initial_ds.f()}
+    best_seen = {initial_ds.state(): initial_ds.opt()}
     while len(heap) > 0:
         best_ds = heap.extract_opt()
         if best_ds.is_solution():
-            return best_ds.f(), best_ds.solution()
+            return best_ds.opt(), best_ds.solution()
         for new_ds in best_ds.successors():
             if new_ds.opt() <= bps:                                 # máx: >=
                 bps = min(bps, new_ds.pes())                        # máx: max
                 new_state = new_ds.state()
-                if new_ds.f() < best_seen.get(new_state, infinity):  # máx: >, -inf
-                    best_seen[new_state] = new_ds.f()
+                if new_ds.opt() < best_seen.get(new_state, infinity):  # máx: >, -inf
+                    best_seen[new_state] = new_ds.opt()
                     heap.add(new_ds)
 
 
 def bab_max_solve(initial_ds: BabDecisionSequence) -> Optional[ScoredSolution]:
     bps = initial_ds.pes()
     heap = MaxHeap([initial_ds])                                     # mín: MinHeap
-    best_seen = {initial_ds.state(): initial_ds.f()}
+    best_seen = {initial_ds.state(): initial_ds.opt()}
     while len(heap) > 0:
         best_ds = heap.extract_opt()
         if best_ds.is_solution():
-            return best_ds.f(), best_ds.solution()
+            return best_ds.opt(), best_ds.solution()
         for new_ds in best_ds.successors():
             if new_ds.opt() >= bps:                                  # mín: <=
                 bps = max(bps, new_ds.pes())                         # mín: min
                 new_state = new_ds.state()
-                if new_ds.f() > best_seen.get(new_state, -infinity):  # mín: <, inf
-                    best_seen[new_state] = new_ds.f()
+                if new_ds.opt() > best_seen.get(new_state, -infinity):  # mín: <, inf
+                    best_seen[new_state] = new_ds.opt()
                     heap.add(new_ds)
