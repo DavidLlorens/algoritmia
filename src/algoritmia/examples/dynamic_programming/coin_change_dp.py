@@ -1,41 +1,51 @@
-from typing import Union
+#
+# Problema del cambio
+#  - La solución óptima es la que utiliza menos monedas
+#
 
 from algoritmia.utils import infinity
 
 Quantity = int  # La cantidad a devolver
+
 Decision = int  # Un número de de monedas
-Score = Union[int, float]  # La puntuación es el número de monedas utilizadas o, si no hay solución, +infinito
+Solution = list[Decision]
 
-LParams = tuple[int, Quantity]
-Solution = tuple[Score, list[Decision]]
+Score = int | float  # La puntuación es el número de monedas utilizadas o, si no hay solución, +infinito
+ScoredSolution = tuple[Score, Solution]
+
+SParams = tuple[Quantity, int]
 
 
-def solve(q: Quantity, v: list[int]) -> Solution:
-    def L(n: int, q: Quantity) -> Score:
-        if n == 0:
-            return 0 if q == 0 else infinity
-        if (n, q) not in mem:
-            res: list[tuple[Score, LParams, Decision]] = []
+def solve(Q: Quantity, v: list[int]) -> ScoredSolution:
+    def S(q: Quantity, n: int) -> Score:
+        # Casos base
+        if n == 0 and q == 0: return 0
+        if n == 0 and q > 0: return infinity
+
+        # Recursividad con memoización
+        if (q, n) not in mem:
+            mem[q, n] = infinity, (-1, -1), -1
             for d in range(q // v[n - 1] + 1):
-                c_score = L(n - 1, q - d * v[n - 1]) + d
-                previous = (n - 1, q - d * v[n - 1])
-                res.append((c_score, previous, d))
-            mem[n, q] = min(res)
-        return mem[n, q][0]
+                q_prev, n_prev = q - d * v[n - 1], n - 1
+                current_score = S(q_prev, n_prev) + d
+                if current_score < mem[q, n][0]:  # Minimización
+                    mem[q, n] = current_score, (q_prev, n_prev), d
+        return mem[q, n][0]
 
-    mem: dict[LParams, tuple[Score, LParams, Decision]] = {}
-    score = L(len(v), q)
-    n = len(v)
-    sol = []
-    while n > 0:
-        _, (n, q), d = mem[n, q]
-        sol.append(d)
-    sol.reverse()
-    return score, sol
+    mem: dict[SParams, tuple[Score, SParams, Decision]] = {}
+    score = S(Q, len(v))
+    # Recuperación del camino
+    decisions = []
+    if score != infinity:
+        q, n = Q, len(v)
+        while n > 0:
+            _, (q, n), d = mem[q, n]
+            decisions.append(d)
+        decisions.reverse()
+    return score, decisions
 
 
 if __name__ == '__main__':
-    v: list[int] = [1, 2, 5, 10]
-    q: Quantity = 11
-    print("Instance:", q, v)
-    print("Solution:", solve(q, v))
+    Q0, v0 = 11, [1, 2, 5, 10]
+    print("Instance:", Q0, v0)
+    print("Scored Solution:", solve(Q0, v0))

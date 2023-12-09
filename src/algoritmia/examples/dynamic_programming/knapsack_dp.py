@@ -3,71 +3,79 @@ from random import seed, randint
 Capacity = int
 Weight = int
 Value = int
-Score = int
-LParams = tuple[int, Capacity]
 
 Decision = int  # 0 o 1
+Solution = list[Decision]
+
+Score = int
+ScoredSolution = tuple[Score, Solution]
+
+SParams = tuple[Capacity, int]
 
 
-def solve(c: Capacity,
-          w: list[Weight],
-          v: list[Value]) -> tuple[Score, list[Decision]]:
-    def L(n: int, c: Capacity) -> Score:
+# Una solucion son len(v) valores (cada uno puede ser 0 o 1)
+# C.E. = O(C N)
+# C.T. = O(C N)
+def solve(C: Capacity, w: list[Weight], v: list[Value]) -> ScoredSolution:
+    def S(c: Capacity, n: int) -> Score:
+        # Caso base
         if n == 0:
             return 0
-        if (n, c) not in mem:
-            c_score: Score = L(n - 1, c)
-            parent: LParams = n - 1, c
-            decision: Decision = 0
-            mem[n, c] = (c_score, parent, decision)
+
+        # Recursividad con memoización
+        if (c, n) not in mem:
+            # No coger el objeto
+            c_prev, n_prev = c, n - 1
+            mem[c, n] = (S(c_prev, n_prev), (c_prev, n_prev), 0)
+            # Coger el objeto (si cabe)
             if w[n - 1] <= c:
-                c_score = L(n - 1, c - w[n - 1]) + v[n - 1]
-                parent = n - 1, c - w[n - 1]
-                decision = 1
-                mem[n, c] = max(mem[n, c], (c_score, parent, decision))
-        return mem[n, c][0]
+                c_prev, n_prev = c - w[n - 1], n - 1
+                mem[c, n] = max(mem[c, n],
+                                (S(c_prev, n_prev) + v[n - 1], (c_prev, n_prev), 1))
+        return mem[c, n][0]
 
-    mem: dict[LParams, tuple[Score, LParams, Decision]] = {}
-    score = L(len(v), c)
-    n = len(v)
-    sol = []
+    mem: dict[SParams, tuple[Score, SParams, Decision]] = {}
+    score = S(C, len(v))
+    # Recuperación del camino
+    c, n = C, len(v)
+    decisions = []
     while n > 0:
-        _, (n, c), d = mem[n, c]
-        sol.append(d)
-    sol.reverse()
-    return score, sol
+        _, (c, n), d = mem[c, n]
+        decisions.append(d)
+    decisions.reverse()
+    return score, decisions
 
 
-Decision = int  # Indice de objeto
-
-
-def solve2(c: Capacity,
-           w: list[Weight],
-           v: list[Value]) -> tuple[Score, list[Decision]]:
-    def L(n: int, c: Capacity) -> Score:
+# Una solucion son K valores (los índices de los objetos que metemos en la mochila)
+# C.E. = O(C N)
+# C.T. = O(C N^2)
+def solve2(C: Capacity, w: list[Weight], v: list[Value]) -> ScoredSolution:
+    def S(c: Capacity, n: int) -> Score:
+        # Caso base
         if n == 0:
             return 0
-        if (n, c) not in mem:
-            res = []
-            for d in range(n):
-                if w[d] <= c:
-                    res.append((L(d, c - w[d]) + v[d], (d, c - w[d]), d))
-            if len(res) == 0:
-                mem[n, c] = 0, (0, c), -1  # -1 cuando no quepa ningun objeto
-            else:
-                mem[n, c] = max(res)
-        return mem[n, c][0]
 
-    mem: dict[LParams, tuple[Score, LParams, Decision]] = {}
-    score = L(len(v), c)
-    n = len(v)
-    sol = []
+        # Recursividad con memoización
+        if (c, n) not in mem:
+            mem[c, n] = 0, (c, 0), -1  # S no cabe ningún objeto más, quedará c espacio libre
+            for d in range(n):
+                c_prev, n_prev = c - w[d], d
+                if w[d] <= c:
+                    mem[c, n] = max(mem[c, n],
+                                    (S(c_prev, n_prev) + v[d], (c_prev, n_prev), d))
+        return mem[c, n][0]
+
+    mem: dict[SParams, tuple[Score, SParams, Decision]] = {}
+    score = S(C, len(v))
+    # Recuperación del camino
+    c, n = C, len(v)
+    decisions = []
     while n > 0:
-        _, (n, c), d = mem[n, c]
-        if d == -1: break  # No cabe ningún objeto
-        sol.append(d)
-    sol.reverse()
-    return score, sol
+        _, (c, n), d = mem[c, n]
+        if d != -1:
+            decisions.append(d)
+    decisions.reverse()
+    return score, decisions
 
 
 def sorted_by_dec_ratio(w_old, v_old):
@@ -87,10 +95,10 @@ def create_knapsack_problem(num_objects):
 
 
 if __name__ == '__main__':
-    w, v, c = [10, 5, 6, 2, 6], [10, 2, 3, 4, 2], 1  # Solution: value = 8,weight = 9,decisions = (1, 0, 1, 1, 0))
-    # w, v, c = create_knapsack_problem(20)  # Solution: value = 1118, weight = 344, decisions = (1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0)
-    # w, v, c = create_knapsack_problem(35)  # Solution: value = 1830, weight = 543, decisions = (1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    w0, v0, C0 = [4, 5, 3, 2, 6], [3, 2, 2, 3, 2], 9  # Solution: value = 8,weight = 9,decisions = (1, 0, 1, 1, 0))
+    # w0, v0, C0 = create_knapsack_problem(20)  # Solution: value = 1118, weight = 344, decisions = (1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0)
+    # w0, v0, C0 = create_knapsack_problem(35)  # Solution: value = 1830, weight = 543, decisions = (1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
-    print("Instance:", c, w, v)
-    print("Solution1:", solve(c, w, v))
-    print("Solution2:", solve2(c, w, v))
+    print("Instance:", C0, w0, v0)
+    print("Scored Solution:", solve(C0, w0, v0))
+    print("Scored Solution (alternative X):", solve2(C0, w0, v0))

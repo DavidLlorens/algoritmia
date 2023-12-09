@@ -1,17 +1,19 @@
 from enum import Enum
 
-LParams = tuple[int, int]
-Score = int
 Decision = str
-Vertex = tuple[int, int]
+Solution = list[Decision]
 
+Score = int
+ScoredSolution = tuple[Score, Solution]
+
+SParams = tuple[int, int]  # (m, n)
 
 class RecMode(Enum):
     Classic = 0
     Optimized = 1
 
 
-def edit_distance(mode: RecMode, s: str, t: str) -> tuple[Score, list[Decision]]:
+def edit_distance(mode: RecMode, s: str, t: str) -> ScoredSolution:
     def D_classic(m: int, n: int) -> Score:
         if m == 0 and n == 0:
             return 0
@@ -44,7 +46,7 @@ def edit_distance(mode: RecMode, s: str, t: str) -> tuple[Score, list[Decision]]
                                     (D_optimized(m - 1, n - 1) + 1, (m - 1, n - 1), 'S'))
         return mem[m, n][0]
 
-    mem: dict[LParams, tuple[Score, LParams, Decision]] = {}
+    mem: dict[SParams, tuple[Score, SParams, Decision]] = {}
     if mode == RecMode.Classic:
         score = D_classic(len(s), len(t))
     else:

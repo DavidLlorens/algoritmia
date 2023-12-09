@@ -1,4 +1,6 @@
 # Changelog
+## [3.0.4] - 2023-12-09
+  - `algoritmia/examples/dynamic_programming/*`: Ejemplos actualizados
 ## [3.0.3] - 2023-11-23
   - `algoritmia/schemes/bab_scheme.py`: Implementación simplificada. Cambia `f()` por `opt()`.
   - `algoritmia/examples/branch_and_bound/*`: Ejemplos actualizados.
