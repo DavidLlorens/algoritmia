@@ -4,8 +4,7 @@ from algoritmia.datastructures.graphs import UndirectedGraph
 from algoritmia.datastructures.mergefindsets import MergeFindSet
 from algoritmia.viewers.labyrinth_viewer import LabyrinthViewer
 
-Vertex = tuple[int, int]
-Edge = tuple[Vertex, Vertex]
+type Vertex = tuple[int, int]
 
 
 def create_labyrinth_mfset(num_rows: int, num_cols: int, extra_corridors: int = 0) -> UndirectedGraph[Vertex]:
@@ -45,12 +44,12 @@ def create_labyrinth_mfset(num_rows: int, num_cols: int, extra_corridors: int = 
 if __name__ == '__main__':
     random.seed(42)
 
-    cell_size = 60
-    num_rows, num_cols = 6, 8
+    cell_size0 = 60
+    num_rows0, num_cols0 = 6, 8
 
-    g = create_labyrinth_mfset(num_rows, num_cols, extra_corridors=0) # 3
+    g0 = create_labyrinth_mfset(num_rows0, num_cols0, extra_corridors=0)  # 3
 
-    lv = LabyrinthViewer(g, margin=10,
-                         canvas_width=num_cols * cell_size + 20,
-                         canvas_height=num_rows * cell_size + 20)
-    lv.run()
+    lv0 = LabyrinthViewer(g0, margin=10,
+                          canvas_width=num_cols0 * cell_size0 + 20,
+                          canvas_height=num_rows0 * cell_size0 + 20)
+    lv0.run()

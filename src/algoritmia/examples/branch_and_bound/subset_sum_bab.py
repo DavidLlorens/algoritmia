@@ -1,9 +1,7 @@
-from __future__ import annotations
-
 from collections.abc import Iterator
 from dataclasses import dataclass
 from random import random, seed
-from typing import Optional
+from typing import Optional, Self
 
 from algoritmia.schemes.bab_scheme import BabDecisionSequence, bab_min_solve
 from algoritmia.utils import infinity
@@ -16,6 +14,7 @@ Solution = tuple[Decision, ...]
 # 'bab_min_solve' devuelve Optional[ScoredSolution]
 Score = int
 ScoredSolution = tuple[Score, Solution]
+
 
 # --------------------------------------------------------------------------------
 
@@ -39,7 +38,7 @@ def sumset_bab_solve(e: tuple[int, ...], s: int) -> Optional[ScoredSolution]:
         def is_solution(self) -> bool:
             return len(self) == len(e) and self.extra.acc_sum == s
 
-        def successors(self) -> Iterator[SumSetDS]:
+        def successors(self) -> Iterator[Self]:
             if len(self) < len(e):
                 yield self.add_decision(0, self.extra)
                 new_acc = self.extra.acc_sum + e[len(self)]

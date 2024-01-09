@@ -6,14 +6,13 @@
 
 from algoritmia.utils import infinity
 
+type Decision = int  # Un número de de monedas
+type Solution = list[Decision]
 
-Decision = int  # Un número de de monedas
-Solution = list[Decision]
+type Score = int | float  # La puntuación es el número de monedas utilizadas o, si no hay solución, infinity
+type ScoredSolution = tuple[Score, Solution]
 
-Score = int | float  # La puntuación es el número de monedas utilizadas o, si no hay solución, infinity
-ScoredSolution = tuple[Score, Solution]
-
-SParams = tuple[int, int]  # Una tupla con los parámetros de S: (q, n)
+type SParams = tuple[int, int]  # Una tupla con los parámetros de S: (q, n)
 
 
 def coin_change_no_mem(v: list[int], w: list[int], Q: int) -> Score:
@@ -121,10 +120,10 @@ def coin_change_iter(v: list[int], w: list[int], Q: int) -> ScoredSolution:
 
 
 def coin_change_iter_score(v: list[int], w: list[int], Q: int) -> Score:
-    previous: list[Score] = [0] * (Q + 1)
-    current: list[Score] = [0] + [infinity] * Q
+    previous: list[Score] = [infinity] * (Q + 1)  # n = -1 (reserva memoria)
+    current: list[Score] = [0] + [infinity] * Q   # n = 0
     for n in range(1, len(v) + 1):
-        previous, current = current, previous
+        current, previous = previous, current
         for q in range(0, Q + 1):
             current[q] = infinity
             for d in range(q // v[n - 1] + 1):

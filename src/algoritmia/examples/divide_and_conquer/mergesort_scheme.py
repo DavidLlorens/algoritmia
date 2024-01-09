@@ -1,6 +1,5 @@
-from __future__ import annotations
-
 from collections.abc import Iterator
+from typing import Self
 
 from algoritmia.schemes.dac_scheme import IDivideAndConquerProblem, div_solve
 
@@ -15,7 +14,7 @@ class MergesortProblem(IDivideAndConquerProblem):
     def trivial_solution(self) -> list[int]:
         return self.v
 
-    def divide(self) -> Iterator[MergesortProblem]:
+    def divide(self) -> Iterator[Self]:
         mid = len(self.v) // 2
         yield MergesortProblem(self.v[:mid])
         yield MergesortProblem(self.v[mid:])
@@ -26,7 +25,7 @@ class MergesortProblem(IDivideAndConquerProblem):
         i, j, k = 0, 0, 0
         while i < len(left) and j < len(right):
             if left[i] < right[j]:
-                c[k] = left[i];  i += 1
+                c[k] = left[i]; i += 1
             else:
                 c[k] = right[j]; j += 1
             k += 1

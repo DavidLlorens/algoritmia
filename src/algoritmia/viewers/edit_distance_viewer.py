@@ -1,11 +1,12 @@
 import tkinter
 from enum import Enum
-from math import sin, cos, pi, sqrt
-from typing import Optional, Union
+from typing import Optional
 
 from easypaint import EasyPaint
+from math import sin, cos, pi, sqrt
 
 from algoritmia.datastructures.graphs import Digraph
+from algoritmia.utils import infinity
 
 # TECLAS
 # - 'return', 'escape': Terminar la ejecución del programa
@@ -13,12 +14,10 @@ from algoritmia.datastructures.graphs import Digraph
 # - 't': Cambiar el contenido de los nodos (3 posibilidades)
 # - 'a': Cambiar las aristas (Grafo de dependencias y Backpointers)
 
-Num = Union[int, float]
-Vertex = tuple[Num, Num]
-Score = int
-Decision = str
-
-infinity = float('infinity')
+type Num = int | float
+type Vertex = tuple[Num, Num]
+type Score = int
+type Decision = str
 
 
 class RecMode(Enum):
@@ -49,45 +48,45 @@ def run(s: str, t: str, sol: list[Decision]) -> str:
     return ''.join(res)
 
 
-Trellis = dict[Vertex, tuple[str, Score, Decision]]
+type Trellis = dict[Vertex, tuple[str, Score, Decision]]
 
 
 def edit_distance(mode: RecMode, s: str, t: str) -> tuple[Digraph, Trellis, list[Vertex]]:
-    LParams = tuple[int, int]
+    type SParams = tuple[int, int]  # (m, n)
 
-    def D_clasic(m: int, n: int) -> Score:
+    def S_clasic(m: int, n: int) -> Score:
         if m == 0 and n == 0:
             return 0
         if (m, n) not in mem:
             if n == 0:
-                mem[m, n] = D_clasic(m - 1, n) + 1, (m - 1, n), 'D'
+                mem[m, n] = S_clasic(m - 1, n) + 1, (m - 1, n), 'D'
             elif m == 0:
-                mem[m, n] = D_clasic(m, n - 1) + 1, (m, n - 1), 'I'
+                mem[m, n] = S_clasic(m, n - 1) + 1, (m, n - 1), 'I'
             else:
                 c, d = (0, '-') if s[m - 1] == t[n - 1] else (1, 'S')
-                mem[m, n] = min((D_clasic(m - 1, n) + 1, (m - 1, n), 'D'),
-                                (D_clasic(m, n - 1) + 1, (m, n - 1), 'I'),
-                                (D_clasic(m - 1, n - 1) + c, (m - 1, n - 1), d))
+                mem[m, n] = min((S_clasic(m - 1, n) + 1, (m - 1, n), 'D'),
+                                (S_clasic(m, n - 1) + 1, (m, n - 1), 'I'),
+                                (S_clasic(m - 1, n - 1) + c, (m - 1, n - 1), d))
         return mem[m, n][0]
 
-    def D_opt(m: int, n: int) -> Score:
+    def S_opt(m: int, n: int) -> Score:
         if m == 0 and n == 0:
             return 0
         if (m, n) not in mem:
             if n == 0:
-                mem[m, n] = D_clasic(m - 1, n) + 1, (m - 1, n), 'D'
+                mem[m, n] = S_opt(m - 1, n) + 1, (m - 1, n), 'D'
             elif m == 0:
-                mem[m, n] = D_clasic(m, n - 1) + 1, (m, n - 1), 'I'
+                mem[m, n] = S_opt(m, n - 1) + 1, (m, n - 1), 'I'
             else:
                 if s[m - 1] == t[n - 1]:
-                    mem[m, n] = D_clasic(m - 1, n - 1), (m - 1, n - 1), '-'
+                    mem[m, n] = S_opt(m - 1, n - 1), (m - 1, n - 1), '-'
                 else:
-                    mem[m, n] = min((D_clasic(m - 1, n) + 1, (m - 1, n), 'D'),
-                                    (D_clasic(m, n - 1) + 1, (m, n - 1), 'I'),
-                                    (D_clasic(m - 1, n - 1) + 1, (m - 1, n - 1), 'S'))
+                    mem[m, n] = min((S_opt(m - 1, n) + 1, (m - 1, n), 'D'),
+                                    (S_opt(m, n - 1) + 1, (m, n - 1), 'I'),
+                                    (S_opt(m - 1, n - 1) + 1, (m - 1, n - 1), 'S'))
         return mem[m, n][0]
 
-    def path_from(m, n) -> tuple[list[Decision], list[Vertex]]:
+    def path_from(m: int, n: int) -> tuple[list[Decision], list[Vertex]]:
         sol = []
         path = [(m, n)]
         while (m, n) != (0, 0):
@@ -97,11 +96,11 @@ def edit_distance(mode: RecMode, s: str, t: str) -> tuple[Digraph, Trellis, list
         sol.reverse()
         return sol, path
 
-    mem: dict[LParams, tuple[Score, LParams, Decision]] = {}
+    mem: dict[SParams, tuple[Score, SParams, Decision]] = {}
     if mode == RecMode.Classic:
-        D_clasic(len(s), len(t))
+        S_clasic(len(s), len(t))
     else:
-        D_opt(len(s), len(t))
+        S_opt(len(s), len(t))
 
     sol, path = path_from(len(s), len(t))
 

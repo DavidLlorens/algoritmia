@@ -1,17 +1,14 @@
 from abc import abstractmethod, ABC
 from collections.abc import Iterable, Sized
-from typing import TypeVar, Generic
 
 from algoritmia.datastructures.linkedlists import LinkedList
-
-T = TypeVar('T')
 
 
 # Fifo() utiliza una lista LinkedList para tener coste O(1) en el pop()
 # Lifo() utiliza una lista normal de Python
 
 
-class IQueue(ABC, Sized, Generic[T]):
+class IQueue[T](ABC, Sized):
     def __init__(self, mylist: list):
         self._list = mylist
 
@@ -31,7 +28,7 @@ class IQueue(ABC, Sized, Generic[T]):
         return f'{self.__class__.__name__}({list(self._list)})'
 
 
-class Fifo(IQueue):
+class Fifo[T](IQueue[T]):
     def __init__(self, data: Iterable[T] = ()):
         super().__init__(LinkedList(data))
 
@@ -47,7 +44,7 @@ class Fifo(IQueue):
         return self._list[0]
 
 
-class Lifo(IQueue):
+class Lifo[T](IQueue[T]):
     def __init__(self, data: Iterable[T] = ()):
         super().__init__(list(data))
 

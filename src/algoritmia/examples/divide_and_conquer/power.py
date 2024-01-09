@@ -1,4 +1,4 @@
-def power_naif(a: float, n: int):
+def power_naif(a: float, n: int) -> float:
     if n == 0:
         return 1
     elif n == 1:
@@ -9,7 +9,7 @@ def power_naif(a: float, n: int):
         return power_naif(a, n // 2) * power_naif(a, n // 2 + 1)
 
 
-def power(a: float, n: int):
+def power(a: float, n: int) -> float:
     if n == 0:
         return 1
     elif n == 1:

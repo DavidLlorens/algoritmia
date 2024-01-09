@@ -25,15 +25,15 @@ Dos modos de funcionamiento según parámetro del constructor (vertexmode):
 """
 
 import tkinter
-from math import sin, cos, pi, sqrt
-from typing import Optional, Union
+from typing import Optional
 
 from easypaint import EasyPaint
+from math import sin, cos, pi, sqrt
 
 from algoritmia.datastructures.graphs import IGraph, UndirectedGraph, Digraph
 
-Num = Union[int, float]
-Vertex = tuple[Num, Num]
+type Num = int | float
+type Vertex = tuple[Num, Num]
 
 
 # -------------------------------------------------------------------------------------

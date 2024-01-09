@@ -1,17 +1,15 @@
-from __future__ import annotations
-
 from collections.abc import Iterator
 from dataclasses import dataclass
 from random import random, seed
-from typing import Optional
+from typing import Optional, Self
 
 from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solutions, bt_vc_solutions, min_solution
 
 # Tipos  --------------------------------------------------------------------------
 
-Decision = int
-Score = int
-Solution = tuple[Decision, ...]
+type Decision = int
+type Score = int
+type Solution = tuple[Decision, ...]
 
 
 # --------------------------------------------------------------------------------
@@ -25,7 +23,7 @@ def subsetsum_solutions(e: tuple[int, ...], s: int) -> Iterator[Solution]:
         def is_solution(self) -> bool:
             return len(self) == len(e) and self.extra.acc_sum == s
 
-        def successors(self) -> Iterator[SumSetDS]:
+        def successors(self) -> Iterator[Self]:
             if len(self) < len(e):
                 yield self.add_decision(0, self.extra)
                 if self.extra.acc_sum + e[len(self)] <= s:
@@ -57,7 +55,7 @@ def subsetsum_vc_solutions(e: tuple[int, ...], s: int) -> Iterator[Solution]:
         def is_solution(self) -> bool:
             return len(self) == len(e) and self.extra.acc_sum == s
 
-        def successors(self) -> Iterator[SumSetDS]:
+        def successors(self) -> Iterator[Self]:
             if len(self) < len(e):
                 if self.extra.acc_sum + e[len(self)] <= s:
                     acc_sum2 = self.extra.acc_sum + e[len(self)]

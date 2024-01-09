@@ -1,11 +1,11 @@
 from abc import abstractmethod
 from collections.abc import Sequence, Iterable, Iterator
-from typing import Union, Optional
+from typing import Optional
 
-from algoritmia.datastructures.prioritymaps import IPriorityMap, K, T
+from algoritmia.datastructures.prioritymaps import IPriorityMap
 
 
-class IDoubleEndedPriorityDict(IPriorityMap[K, T]):
+class IDoubleEndedPriorityDict[K, T](IPriorityMap[K, T]):
     @abstractmethod
     def worst(self) -> K: pass
 
@@ -22,8 +22,8 @@ class IDoubleEndedPriorityDict(IPriorityMap[K, T]):
     def extract_worst_item(self) -> tuple[K, T]: pass
 
 
-class MinMaxIntervalHeapMap(IDoubleEndedPriorityDict[K, T]):
-    def __init__(self, data: Union[Iterable[tuple[K, T]], dict[K, T]] = (), capacity: int = 0):
+class MinMaxIntervalHeapMap[K, T](IDoubleEndedPriorityDict[K, T]):
+    def __init__(self, data: Iterable[tuple[K, T]] | dict[K, T] = (), capacity: int = 0):
         super().__init__()
         if isinstance(data, dict):
             data = data.items()

@@ -1,4 +1,4 @@
-from algoritmia.datastructures.graphs import UndirectedGraph, WeightingFunction, TVertex, TEdge
+from algoritmia.datastructures.graphs import UndirectedGraph, WeightingFunction, Edge
 from algoritmia.datastructures.mergefindsets import MergeFindSet
 from algoritmia.datastructures.prioritymaps import MinHeapMap
 from algoritmia.utils import argmin
@@ -7,10 +7,10 @@ from algoritmia.utils import argmin
 # MST para grafos no diriguidos: kruslkal y prim
 # Para grafos diriguidos ver algoritmo de Chu-Liu/Edmonds
 
-def kruskal(g: UndirectedGraph[TVertex],
-            d: WeightingFunction[TVertex]) -> UndirectedGraph[TVertex]:
-    edges: list[TEdge] = []
-    forest: MergeFindSet[TVertex] = MergeFindSet((v,) for v in g.V)
+def kruskal[T](g: UndirectedGraph[T],
+               d: WeightingFunction[T]) -> UndirectedGraph[T]:
+    edges: list[Edge[T]] = []
+    forest: MergeFindSet[T] = MergeFindSet((v,) for v in g.V)
     n = 0
     for (u, v) in sorted(g.E, key=lambda e: d(e)):
         if forest.find(u) != forest.find(v):
@@ -22,15 +22,14 @@ def kruskal(g: UndirectedGraph[TVertex],
     return UndirectedGraph(E=edges)
 
 
-# Use bp: dict[TVertex, TVertex]
-def prim_dic(g: UndirectedGraph[TVertex],
-             d: WeightingFunction[TVertex]) -> UndirectedGraph[TVertex]:
-    edges: list[TEdge] = []
-    fixed: set[TVertex] = set()
+def prim_dic[T](g: UndirectedGraph[T],
+                d: WeightingFunction[T]) -> UndirectedGraph[T]:
+    edges: list[Edge[T]] = []
+    fixed: set[T] = set()
     for u in g.V:
         if u not in fixed:
             fixed.add(u)
-            bp = dict((v, u) for v in g.succs(u))
+            bp: dict[T, T] = dict((v, u) for v in g.succs(u))
             while len(bp) > 0:
                 (v, u) = argmin(bp.items(), d)
                 del bp[v]
@@ -44,10 +43,10 @@ def prim_dic(g: UndirectedGraph[TVertex],
 
 
 # Uses MinHeapMap[Vertex, tuple[Weight, Vertex]]
-def prim(g: UndirectedGraph[TVertex],
-         d: WeightingFunction[TVertex]) -> UndirectedGraph[TVertex]:
-    edges: list[TEdge] = []
-    fixed: set[TVertex] = set()
+def prim[T](g: UndirectedGraph[T],
+            d: WeightingFunction[T]) -> UndirectedGraph[T]:
+    edges: list[Edge[T]] = []
+    fixed: set[T] = set()
     for u in g.V:
         if u not in fixed:
             fixed.add(u)

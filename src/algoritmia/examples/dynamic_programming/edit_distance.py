@@ -1,12 +1,13 @@
 from enum import Enum
 
-Decision = str
-Solution = list[Decision]
+type Decision = str
+type Solution = list[Decision]
 
-Score = int
-ScoredSolution = tuple[Score, Solution]
+type Score = int
+type ScoredSolution = tuple[Score, Solution]
 
-SParams = tuple[int, int]  # (m, n)
+type SParams = tuple[int, int]  # (m, n)
+
 
 class RecMode(Enum):
     Classic = 0
@@ -65,9 +66,9 @@ def edit_distance(mode: RecMode, s: str, t: str) -> ScoredSolution:
 # ------------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    for mode in [RecMode.Classic, RecMode.Optimized]:
-        my_source, my_target = 'costa', 'casa'
-        print(f'Edit distance fom "{my_source}" to "{my_target}":')
-        print(f'\tMode: {mode}')
-        res_score, res_decisions = edit_distance(mode, my_source, my_target)
-        print(f'\tScore: {res_score}\n\tDecisions: {res_decisions}')
+    for mode0 in [RecMode.Classic, RecMode.Optimized]:
+        my_source0, my_target0 = 'costa', 'casa'
+        print(f'Edit distance fom "{my_source0}" to "{my_target0}":')
+        print(f'\tMode: {mode0}')
+        res_score0, res_decisions0 = edit_distance(mode0, my_source0, my_target0)
+        print(f'\tScore: {res_score0}\n\tDecisions: {res_decisions0}\n')

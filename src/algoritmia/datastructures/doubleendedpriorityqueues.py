@@ -1,13 +1,10 @@
 from abc import abstractmethod
 from collections.abc import Iterator, Collection
-from typing import TypeVar
 
 from algoritmia.datastructures.priorityqueues import IPriorityQueue
 
-T = TypeVar('T')
 
-
-class IDoubleEndedPriorityQueue(IPriorityQueue[T]):
+class IDoubleEndedPriorityQueue[T](IPriorityQueue[T]):
     @abstractmethod
     def worst(self) -> T: pass
 
@@ -15,7 +12,7 @@ class IDoubleEndedPriorityQueue(IPriorityQueue[T]):
     def extract_worst(self) -> T: pass
 
 
-class IntervalHeap(IDoubleEndedPriorityQueue):
+class IntervalHeap[T](IDoubleEndedPriorityQueue[T]):
     def __init__(self, data: Collection[T] = (), capacity: int = 0):
         capacity = max(capacity, len(data))
         self._heap = list(data) + [None] * (capacity - len(data))

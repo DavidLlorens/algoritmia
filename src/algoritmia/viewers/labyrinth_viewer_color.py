@@ -8,9 +8,8 @@ Se anima el color de los vértices según apareren en la lista marked_cells (en 
 from algoritmia.datastructures.graphs import UndirectedGraph
 from algoritmia.viewers.labyrinth_viewer import LabyrinthViewer
 
-Vertex = tuple[int, int]
-Edge = tuple[Vertex, Vertex]
-Path = list[Vertex]
+type Vertex = tuple[int, int]
+type Path = list[Vertex]
 
 
 class LabyrinthViewerColor(LabyrinthViewer):

@@ -1,4 +1,6 @@
 # Changelog
+## [3.1.0] - 2023-12-10
+  - Utiliza la sintaxis de Python 3.12
 ## [3.0.4] - 2023-12-09
   - `algoritmia/examples/dynamic_programming/*`: Ejemplos actualizados
 ## [3.0.3] - 2023-11-23

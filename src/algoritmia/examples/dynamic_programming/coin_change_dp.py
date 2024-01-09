@@ -5,15 +5,15 @@
 
 from algoritmia.utils import infinity
 
-Quantity = int  # La cantidad a devolver
+type Quantity = int  # La cantidad a devolver
 
-Decision = int  # Un número de de monedas
-Solution = list[Decision]
+type Decision = int  # Un número de de monedas
+type Solution = list[Decision]
 
-Score = int | float  # La puntuación es el número de monedas utilizadas o, si no hay solución, +infinito
-ScoredSolution = tuple[Score, Solution]
+type Score = int | float  # La puntuación es el número de monedas utilizadas o, si no hay solución, +infinito
+type ScoredSolution = tuple[Score, Solution]
 
-SParams = tuple[Quantity, int]
+type SParams = tuple[Quantity, int]
 
 
 def solve(Q: Quantity, v: list[int]) -> ScoredSolution:
@@ -47,5 +47,8 @@ def solve(Q: Quantity, v: list[int]) -> ScoredSolution:
 
 if __name__ == '__main__':
     Q0, v0 = 11, [1, 2, 5, 10]
-    print("Instance:", Q0, v0)
+    print("Instance:")
+    print(f"  Q: {Q0}")
+    print(f"  v: {v0}\n")
+
     print("Scored Solution:", solve(Q0, v0))

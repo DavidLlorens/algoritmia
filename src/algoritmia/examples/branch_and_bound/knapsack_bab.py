@@ -1,9 +1,7 @@
-from __future__ import annotations
-
 from collections.abc import Iterator
 from dataclasses import dataclass
 from random import seed, randint
-from typing import Optional
+from typing import Optional, Self
 
 from algoritmia.schemes.bab_scheme import BabDecisionSequence, bab_max_solve
 from algoritmia.schemes.bt_scheme import State
@@ -43,7 +41,7 @@ def knapsack_bab_solve_naif(weights: list[int],
         def is_solution(self) -> bool:
             return len(self) == len(values)
 
-        def successors(self) -> Iterator[KnapsackBabDS]:
+        def successors(self) -> Iterator[Self]:
             n = len(self)
             if n < len(values):
                 new_weight = self.extra.weight + weights[n]
@@ -65,6 +63,8 @@ def knapsack_bab_solve_naif(weights: list[int],
 
 # Versión con cotas informadas --------------------------------------------------------------------------
 c = 0
+
+
 def knapsack_bab_solve(weights: list[int],
                        values: list[int],
                        capacity: int) -> Optional[Solution]:
@@ -99,7 +99,7 @@ def knapsack_bab_solve(weights: list[int],
         def is_solution(self) -> bool:
             return len(self) == len(values)
 
-        def successors(self) -> Iterator[KnapsackBabDS]:
+        def successors(self) -> Iterator[Self]:
             n = len(self)
             if n < len(values):
                 new_weight = self.extra.weight + weights[n]
@@ -154,7 +154,7 @@ if __name__ == "__main__":
     i3 = create_knapsack_problem(35)
 
     for W, V, C in [i1, i2, i3]:
-        print("-"*80)
+        print("-" * 80)
         print(f"Instancia:\n  Pesos = {W}\n  Valores = {V}\n  Capacidad = {C}\n")
         print(f"knapsack_bab_solve:\n  {knapsack_bab_solve(W, V, C)}")
-    print("-"*80)
+    print("-" * 80)

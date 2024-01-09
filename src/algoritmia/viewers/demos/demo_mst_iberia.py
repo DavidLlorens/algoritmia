@@ -1,4 +1,4 @@
-from algoritmia.algorithms.mst import kruskal, prim
+from algoritmia.algorithms.mst import prim
 from algoritmia.data.iberia import iberia2d, km2d
 from algoritmia.viewers.graph2d_mst_viewer import Graph2dMstViewer
 

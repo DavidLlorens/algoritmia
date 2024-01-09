@@ -2,14 +2,13 @@ import colorsys
 import random
 import sys
 
+from algoritmia.algorithms.traverse import traverse_bf, traverse_df
 from algoritmia.datastructures.graphs import UndirectedGraph
 from algoritmia.datastructures.mergefindsets import MergeFindSet
 from algoritmia.datastructures.queues import Fifo
 from algoritmia.viewers.labyrinth_viewer_color import LabyrinthViewerColor
-from algoritmia.algorithms.traverse import traverse_bf, traverse_df
 
-Vertex = tuple[int, int]
-Edge = tuple[Vertex, Vertex]
+type Vertex = tuple[int, int]
 
 
 def create_labyrinth_nowalls(num_rows: int, num_cols: int) -> UndirectedGraph[Vertex]:
@@ -108,21 +107,21 @@ if __name__ == '__main__':
     random.seed(1)
     sys.setrecursionlimit(10000)
 
-    cell_size = 13
-    num_rows, num_cols = 60, 80
+    cell_size0 = 13
+    num_rows0, num_cols0 = 60, 80
 
     # Tipo: 1 - MFSet random, 2 - Anchura en lab sin paredes, 3 - Profundidad en lab sin paredes
-    tipo = 1
-    g = create_laberinth(num_rows, num_cols, tipo)
-    lv = LabyrinthViewerColor(g,
-                              canvas_width=num_cols * cell_size + 20,
-                              canvas_height=num_rows * cell_size + 20, margin=10,
-                              wall_width=4)
+    tipo0 = 1
+    g0 = create_laberinth(num_rows0, num_cols0, tipo0)
+    lv0 = LabyrinthViewerColor(g0,
+                               canvas_width=num_cols0 * cell_size0 + 20,
+                               canvas_height=num_rows0 * cell_size0 + 20, margin=10,
+                               wall_width=4)
 
-    start = (0, 0)  # (num_rows//2, num_cols//2)
-    matriz_dist = matriz_distancias_anchura(g, start)
-    maxvalue = max(matriz_dist.values())
-    for (v, k) in sorted([(v, k) for (k, v) in matriz_dist.items()]):
-        lv.add_marked_cell(k, int2col(v, maxvalue))
+    start0 = (0, 0)  # (num_rows//2, num_cols//2)
+    matriz_dist0 = matriz_distancias_anchura(g0, start0)
+    maxvalue0 = max(matriz_dist0.values())
+    for (v0, k0) in sorted([(v0, k0) for (k0, v0) in matriz_dist0.items()]):
+        lv0.add_marked_cell(k0, int2col(v0, maxvalue0))
 
-    lv.run()
+    lv0.run()

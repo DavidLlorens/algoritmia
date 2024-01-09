@@ -1,12 +1,9 @@
 from abc import abstractmethod, ABC
 from collections.abc import Callable, Iterator, Sequence, Sized
 from itertools import chain, repeat
-from typing import Generic, TypeVar
-
-T = TypeVar('T')
 
 
-class IPriorityQueue(ABC, Sized, Generic[T]):
+class IPriorityQueue[T](ABC, Sized):
     @abstractmethod
     def add(self, item: T): pass
 
@@ -17,7 +14,7 @@ class IPriorityQueue(ABC, Sized, Generic[T]):
     def extract_opt(self) -> T: pass
 
 
-class MinHeap(IPriorityQueue[T]):
+class MinHeap[T](IPriorityQueue[T]):
     _opt: Callable[[T, T], T] = min
 
     def __init__(self, data: Sequence[T] = (), capacity: int = 0):
@@ -84,5 +81,5 @@ class MinHeap(IPriorityQueue[T]):
         return '{}({!r})'.format(self.__class__.__name__, self._heap[1:self._size + 1])
 
 
-class MaxHeap(MinHeap):
+class MaxHeap[T](MinHeap[T]):
     _opt = max

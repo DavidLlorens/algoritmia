@@ -1,4 +1,5 @@
-Interval = tuple[int, int]  # (start, end)  both are >=0
+type Interval = tuple[int, int]  # (start, end)  both are >=0
+
 
 # Devuelve una lista con el máximo de actividades posibles sin solapes
 def select(activities: list[Interval]) -> list[Interval]:

@@ -3,8 +3,8 @@ from typing import Optional
 from algoritmia.datastructures.graphs import UndirectedGraph
 from algoritmia.datastructures.queues import Fifo
 
-Vertex = tuple[int, int]
-Edge = tuple[Vertex, Vertex]
+type Vertex = tuple[int, int]
+
 
 def find_treasure_breadthfirst(g: UndirectedGraph[Vertex],
                                v_start: Vertex,
@@ -29,8 +29,8 @@ def find_treasure_depthfirst(g: UndirectedGraph[Vertex],
                              v_treasure: Vertex) -> Optional[Vertex]:
     def explorar_desde(v: Vertex) -> Optional[Vertex]:
         seen.add(v)
-        if v == v_treasure:     # preorder
-            return v            # preorder
+        if v == v_treasure:  # preorder
+            return v  # preorder
         for suc in g.succs(v):
             if suc not in seen:
                 res = explorar_desde(suc)
@@ -45,9 +45,9 @@ def find_treasure_depthfirst(g: UndirectedGraph[Vertex],
 
 # Main program -------------------------------------------------------------------------
 
-corridors: list[Edge] = [((0, 0), (0, 1)), ((0, 2), (0, 3)), ((1, 0), (1, 1)), ((0, 1), (0, 2)),
-                         ((2, 0), (1, 0)), ((2, 1), (2, 2)), ((2, 2), (2, 3)), ((0, 1), (1, 1)),
-                         ((0, 2), (1, 2)), ((0, 3), (1, 3)), ((1, 1), (2, 1)), ((1, 2), (2, 2))]
+corridors = [((0, 0), (0, 1)), ((0, 2), (0, 3)), ((1, 0), (1, 1)), ((0, 1), (0, 2)),
+             ((2, 0), (1, 0)), ((2, 1), (2, 2)), ((2, 2), (2, 3)), ((0, 1), (1, 1)),
+             ((0, 2), (1, 2)), ((0, 3), (1, 3)), ((1, 1), (2, 1)), ((1, 2), (2, 2))]
 labyrinth = UndirectedGraph(E=corridors)
 
 pos_start = (0, 0)

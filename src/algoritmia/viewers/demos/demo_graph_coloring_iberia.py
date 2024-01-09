@@ -1,8 +1,8 @@
 from algoritmia.examples.greedy.graph_coloring_greedy import coloring_solve
 from algoritmia.viewers.graph2d_viewer import Graph2dViewer
 
-Vertex = tuple[int, int]
-Edge = tuple[Vertex, Vertex]
+type Vertex = tuple[int, int]
+
 
 if __name__ == '__main__':
     from algoritmia.data.iberia import iberia2d

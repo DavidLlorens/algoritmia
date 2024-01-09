@@ -29,12 +29,12 @@ def coin_change_solve(v: tuple[int, ...], Q: int) -> Optional[list[int]]:
 if __name__ == '__main__':
     print("coin_change_solve_naif:")
     print(coin_change_solve_naif((1, 2, 5, 10), 6))  # Mal: [6, 0, 0, 0]
-    print(coin_change_solve_naif((2, 5, 10), 7))     # Mal: None
-    print(coin_change_solve_naif((1, 9, 15), 19))    # Mal: [19, 0, 0]
-    print(coin_change_solve_naif((2, 9, 15), 10))    # Mal: [5, 0, 0]
+    print(coin_change_solve_naif((2, 5, 10), 7))  # Mal: None
+    print(coin_change_solve_naif((1, 9, 15), 19))  # Mal: [19, 0, 0]
+    print(coin_change_solve_naif((2, 9, 15), 10))  # Mal: [5, 0, 0]
     print()
     print("coin_change_solutions:")
     print(coin_change_solve((1, 2, 5, 10), 6))  # Ok: [1, 0, 1, 0]
-    print(coin_change_solve((2, 5, 10), 7))     # Ok: [1, 1, 0]]
-    print(coin_change_solve((1, 9, 15), 19))    # Mal: [4, 0, 1]
-    print(coin_change_solve((2, 9, 15), 10))    # Mal: None
+    print(coin_change_solve((2, 5, 10), 7))  # Ok: [1, 1, 0]]
+    print(coin_change_solve((1, 9, 15), 19))  # Mal: [4, 0, 1]
+    print(coin_change_solve((2, 9, 15), 10))  # Mal: None

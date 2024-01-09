@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from typing import Optional
+from typing import Optional, Self
 
 from algoritmia.schemes.dac_scheme import IDecreaseAndConquerProblem, tail_dec_solve, iter_dec_solve
 
@@ -17,7 +15,7 @@ class BinarySearchProblem(IDecreaseAndConquerProblem):
             return None
         return self.start
 
-    def decrease(self) -> BinarySearchProblem:
+    def decrease(self) -> Self:
         mid = (self.start + self.end) // 2
         if self.elem < self.v[mid]:
             return BinarySearchProblem(self.v, self.elem, self.start, mid)

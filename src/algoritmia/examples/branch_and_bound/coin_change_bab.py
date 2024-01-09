@@ -1,21 +1,20 @@
-from __future__ import annotations
-
 from collections.abc import Iterator
 from dataclasses import dataclass
+from typing import Optional, Self
+
 from math import ceil
-from typing import Optional
 
 from algoritmia.schemes.bab_scheme import BabDecisionSequence, bab_min_solve
 from algoritmia.utils import infinity
 
 # Tipos  --------------------------------------------------------------------------
 
-Decision = int  # Número de monedas del tipo actual
-Solution = tuple[Decision, ...]
+type Decision = int  # Número de monedas del tipo actual
+type Solution = tuple[Decision, ...]
 
 # 'bab_min_solve' devuelve Optional[ScoredSolution]
-Score = int  # Total de monedas utilizado
-ScoredSolution = tuple[Score, Solution]
+type Score = int  # Total de monedas utilizado
+type ScoredSolution = tuple[Score, Solution]
 
 
 # --------------------------------------------------------------------------------
@@ -43,7 +42,7 @@ def coin_change_bab_solve(v: tuple[int, ...], Q: int) -> Optional[ScoredSolution
         def is_solution(self) -> bool:
             return len(self) == len(v) and self.extra.pending == 0
 
-        def successors(self) -> Iterator[CoinChangeDS]:
+        def successors(self) -> Iterator[Self]:
             n = len(self)
             if n < len(v):
                 for num_coins in range(self.extra.pending // v[n] + 1):

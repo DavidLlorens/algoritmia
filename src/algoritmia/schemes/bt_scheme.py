@@ -1,5 +1,6 @@
 """
-Version:  5.0 (31-oct-2023)
+Version:  5.2 (01-dic-2023)
+          5.0 (31-oct-2023)
           4.1 (29-sep-2022)
           4.0 (23-oct-2021)
 
@@ -7,44 +8,38 @@ Version:  5.0 (31-oct-2023)
          (c) Universitat Jaume I 2023
 @license: GPL3
 """
-from __future__ import annotations
-
 from abc import ABC, abstractmethod
 from collections import deque
 from collections.abc import Iterator, Callable
-from typing import TypeVar, Generic, Any, final, Optional
-
+from typing import Any, final, Optional, Self
 
 # Tipos  --------------------------------------------------------------------------
-
-TDecision = TypeVar("TDecision")
-TExtra = TypeVar("TExtra")
 
 # ACERCA DEL TIPO Solution
 # La implementación por defecto devuelve la tupla de decisiones.
 # Podemos sobreescribir solution() en la clase hija para devolver otra cosa.
-Solution = Any
+type Solution = Any
 
 # ACERCA DEL TIPO Score
 # Es el tipo devuelto por la función objetivo
-Score = int | float
+type Score = int | float
 
 # ACERCA DEL TIPO ScoredSolution
 # Las funciones min_solution y max_solution devuelven Optional[ScoredSolution]:
 #   - Devuelven None si no hay solución.
 #   - Devuelven la tupla (Score, self.solution()) si hay solución.
-ScoredSolution = tuple[Score, Solution]
+type ScoredSolution = tuple[Score, Solution]
 
 # ACERCA DEL TIPO State
 # La implementación por defecto devuelve la tupla de decisiones.
 # Podemos sobreescribir state() en la clase hija para devolver otra cosa.
-State = Any
+type State = Any
 
 
 # La clase DecisionSequence -------------------------------------------------------
 
-class DecisionSequence(ABC, Generic[TDecision, TExtra]):
-    def __init__(self, extra: Optional[TExtra] = None, parent: DecisionSequence = None, decision: TDecision = None):
+class DecisionSequence[TDecision, TExtra](ABC):
+    def __init__(self, extra: Optional[TExtra] = None, parent: Self = None, decision: TDecision = None):
         self.parent = parent
         self.decision = decision
         self.extra = extra
@@ -57,7 +52,7 @@ class DecisionSequence(ABC, Generic[TDecision, TExtra]):
         pass
 
     @abstractmethod
-    def successors(self) -> Iterator[DecisionSequence]:
+    def successors(self) -> Iterator[Self]:
         pass
 
     # --- Métodos que se pueden sobreescribir en las clases hijas: solution() y state() ---
@@ -74,7 +69,7 @@ class DecisionSequence(ABC, Generic[TDecision, TExtra]):
     # -- Métodos finales que NO se pueden sobreescribir en las clases hijas ---
 
     @final
-    def add_decision(self, decision: TDecision, extra: TExtra = None) -> DecisionSequence:
+    def add_decision(self, decision: TDecision, extra: TExtra = None) -> Self:
         return self.__class__(extra, self, decision)
 
     @final
@@ -93,7 +88,7 @@ class DecisionSequence(ABC, Generic[TDecision, TExtra]):
 
 # Esquema para BT básico --------------------------------------------------------------------------
 
-def bt_solutions(ds: DecisionSequence[TDecision, TExtra]) -> Iterator[Solution]:
+def bt_solutions(ds: DecisionSequence) -> Iterator[Solution]:
     if ds.is_solution():
         yield ds.solution()
     for new_ds in ds.successors():
@@ -102,7 +97,7 @@ def bt_solutions(ds: DecisionSequence[TDecision, TExtra]) -> Iterator[Solution]:
 
 #  Esquema para BT con control de visitados --------------------------------------------------------
 
-def bt_vc_solutions(initial_ds: DecisionSequence[TDecision, TExtra]) -> Iterator[Solution]:
+def bt_vc_solutions(initial_ds: DecisionSequence) -> Iterator[Solution]:
     def bt(ds: DecisionSequence) -> Iterator[Solution]:
         if ds.is_solution():
             yield ds.solution()

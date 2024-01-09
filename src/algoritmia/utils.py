@@ -1,20 +1,17 @@
 from collections.abc import Callable, Iterable
-from typing import Optional, TypeVar
+from typing import Optional
 
-infinity = float("+inf")
-
-T = TypeVar('T')
-S = TypeVar('S')
+infinity = float("infinity")
 
 
-def argmin(iterable: Iterable[T], fn: Callable[[T], S], ifempty: Optional[T] = None) -> Optional[T]:
+def argmin[T, S](iterable: Iterable[T], fn: Callable[[T], S], ifempty: Optional[T] = None) -> Optional[T]:
     try:
         return min((fn(x), x) for x in iterable)[1]
     except ValueError:
         return ifempty
 
 
-def argmax(iterable: Iterable[T], fn: Callable[[T], S], ifempty: Optional[T] = None) -> Optional[T]:
+def argmax[T, S](iterable: Iterable[T], fn: Callable[[T], S], ifempty: Optional[T] = None) -> Optional[T]:
     try:
         return max((fn(x), x) for x in iterable)[1]
     except ValueError:

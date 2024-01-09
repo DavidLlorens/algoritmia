@@ -6,13 +6,13 @@ Visor de grafos de dependencias y trellis de programación dinámica
 """
 
 import tkinter
-from math import sin, cos, pi, sqrt, atan2
-from typing import Optional, Union
+from typing import Optional, Self
 
 from easypaint import EasyPaint
+from math import sin, cos, pi, sqrt, atan2
 
-Num = Union[int, float]
-Label = str
+type Num = int | float
+type Label = str
 
 
 class NodeStyle:
@@ -29,7 +29,7 @@ class NodeStyle:
     def __hash__(self) -> int:
         return hash(self._key)
 
-    def __eq__(self, other: 'NodeStyle') -> bool:
+    def __eq__(self, other: Self) -> bool:
         if not isinstance(other, NodeStyle):
             return False
         return self._key() == other._key()
@@ -45,9 +45,9 @@ class EdgeStyle(NodeStyle):
         return super()._key(), self.pos
 
 
-Pos = tuple[Num, Num]
-Node = tuple[Pos, Label, NodeStyle]
-Edge = tuple[Node, Node, Label, NodeStyle]
+type Pos = tuple[Num, Num]
+type Node = tuple[Pos, Label, NodeStyle]
+type Edge = tuple[Node, Node, Label, NodeStyle]
 
 
 # -------------------------------------------------------------------------------------
@@ -91,6 +91,13 @@ class DPViewer(EasyPaint):
                  titles=None,
                  swap: bool = False):
         super().__init__()
+        self.easypaint_configure(size=(canvas_width, canvas_height),
+                                 title='Graph Viewer' if titles is None else titles[0],
+                                 background=background)
+        if swap:
+            self.coordinates = (0, self.size[1], self.size[0], 0)
+            #self.coordinates = (0, 0, self.size[0], self.size[1])
+
         self.node_size = node_size
         self.margin = margin
         self.ledges = ledges
@@ -111,12 +118,6 @@ class DPViewer(EasyPaint):
 
         self.min_y = min(p[1] for (p, _, _) in self.nodes)
         self.max_y = max(p[1] for (p, _, _) in self.nodes)
-
-        self.title = 'Graph Viewer' if titles is None else titles[0]
-        self.background = background
-        self.size = canvas_width, canvas_height
-        if self.swap:
-            self.coordinates = (0, self.size[1], self.size[0], 0)
 
         w, h = self.size
         w -= self.margin
@@ -285,5 +286,5 @@ if __name__ == '__main__':
 
     viewer = DPViewer([edges, edges2], [nodes, nodes],
                       titles=["Grafo A (pulsa 'Space')", "Grafo B (pulsa 'Space')"],
-                      canvas_width=400, canvas_height=300)
+                      canvas_width=400, canvas_height=300, swap=True)
     viewer.run()

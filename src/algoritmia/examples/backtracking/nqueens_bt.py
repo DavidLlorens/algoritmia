@@ -1,16 +1,15 @@
-from __future__ import annotations
-
 from collections.abc import Iterator
+from typing import Self
 
 from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solutions
 
 # Tipos  --------------------------------------------------------------------------
 
-Decision = int  # Número de fila donde colocar la reina
+type Decision = int  # Número de fila donde colocar la reina
 
 # 'bt_solutions' devuelve un Iterator del tipo devuelto por el método 'solution' de
 # la clase 'DecisionSequence', cuya implementación por defecto devuelve una tupla con las decisiones:
-Solution = tuple[Decision, ...]
+type Solution = tuple[Decision, ...]
 
 
 # --------------------------------------------------------------------------------
@@ -21,7 +20,7 @@ def nqueens_solutions(board_size: int) -> Iterator[Solution]:
         def is_solution(self) -> bool:
             return len(self) == board_size
 
-        def successors(self) -> Iterator[NQueensDS]:
+        def successors(self) -> Iterator[Self]:
             n = len(self)  # Número de decisiones ya tomadas (reinas colocadas)
             if n < board_size:  # Si quedan decisiones por tomar (reinas por colocar)
                 for row in range(board_size):

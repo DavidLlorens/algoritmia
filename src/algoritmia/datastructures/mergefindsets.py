@@ -1,11 +1,8 @@
 from abc import abstractmethod, ABC
-from collections.abc import Iterable, Iterator, Sized, Collection
-from typing import TypeVar, Generic
-
-T = TypeVar('T')
+from collections.abc import Iterable, Iterator, Collection, Sized
 
 
-class IMergeFindSet(ABC, Generic[T], Iterable, Sized):
+class IMergeFindSet[T](ABC, Sized, Iterable):
     @abstractmethod
     def add(self, x: T): pass
 
@@ -16,7 +13,7 @@ class IMergeFindSet(ABC, Generic[T], Iterable, Sized):
     def merge(self, x: T, y: T): pass
 
 
-class MergeFindSet(IMergeFindSet[T]):
+class MergeFindSet[T](IMergeFindSet[T]):
     def __init__(self, sets: Iterable[Collection[T]] = ()):
         self._parent: dict[T, T] = {}
         self._rank: dict[T, int] = {}

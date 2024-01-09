@@ -1,17 +1,17 @@
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
-from typing import Generic, TypeVar, Optional
+from typing import Optional
+
 
 # Lista enlazada con puntero a cabeza y cola.
 # Cumple la interfaz list de Python.
-# Costes: l.append(e), l.pop(), l.insert(0, e), del l[0] => O(1)
+# Costes: l.append(e), l.pop(), l.insert(0, e), del l[0], len(l) => O(1)
+#         l[index], l.remove(elem), l.reverse(), elem in l => O(n)
 
-T = TypeVar('T')
 
-
-class LinkedList(list[T]):
+class LinkedList[T](list[T]):
     @dataclass
-    class Node(Generic[T]):
+    class Node[T]:
         value: T
         prev: Optional['LinkedList.Node[T]']
         next: Optional['LinkedList.Node[T]']

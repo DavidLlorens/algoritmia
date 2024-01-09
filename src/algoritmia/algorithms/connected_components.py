@@ -1,12 +1,12 @@
 from collections.abc import Iterator
 
 from algoritmia.algorithms.traverse import Traverse
-from algoritmia.datastructures.graphs import UndirectedGraph, TVertex
+from algoritmia.datastructures.graphs import UndirectedGraph
 
-CC = set[TVertex]  # Connected Component
+type CC[T] = set[T]  # Connected Component
 
-def connected_components(g: UndirectedGraph[TVertex],
-                         traverse: Traverse) -> Iterator[CC]:
+def connected_components[T](g: UndirectedGraph[T],
+                            traverse: Traverse[T]) -> Iterator[CC]:
     pending_vertices = set(g.V)
     while len(pending_vertices) > 0:
         u = pending_vertices.pop()
@@ -17,12 +17,10 @@ def connected_components(g: UndirectedGraph[TVertex],
 
 if __name__ == '__main__':
     from traverse import traverse_bf, traverse_df
-    Vertex = tuple[int, int]
-    Edge = tuple[Vertex, Vertex]
 
-    edges: list[Edge] = [((0, 0), (0, 1)), ((0, 2), (0, 3)), ((1, 0), (1, 1)),
-                         ((2, 2), (2, 3)), ((0, 1), (1, 1)), ((0, 2), (1, 2)),
-                         ((1, 2), (2, 2)), ((2, 0), (2, 1)), ((0, 3), (1, 3))]
+    edges = [((0, 0), (0, 1)), ((0, 2), (0, 3)), ((1, 0), (1, 1)),
+             ((2, 2), (2, 3)), ((0, 1), (1, 1)), ((0, 2), (1, 2)),
+             ((1, 2), (2, 2)), ((2, 0), (2, 1)), ((0, 3), (1, 3))]
 
     my_graph = UndirectedGraph(E=edges)
 

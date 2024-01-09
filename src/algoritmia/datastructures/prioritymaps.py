@@ -1,14 +1,12 @@
 from abc import abstractmethod, ABC
 from collections.abc import Callable, Iterable, Iterator, Sequence
-from itertools import chain, repeat
+from itertools import repeat
+from typing import Optional
+
 from math import log, sqrt
-from typing import Generic, TypeVar, Union, Optional
-
-K = TypeVar('K')
-T = TypeVar('T')
 
 
-class IPriorityMap(ABC, dict[K, T]):
+class IPriorityMap[K, T](ABC, dict[K, T]):
     @abstractmethod
     def opt(self) -> K: pass
 
@@ -27,10 +25,10 @@ class IPriorityMap(ABC, dict[K, T]):
 
 # -------------------------------------------------------------------------
 
-class MinHeapMap(IPriorityMap[K, T]):
+class MinHeapMap[K, T](IPriorityMap[K, T]):
     _opt: Callable[[T, T], T] = min
 
-    def __init__(self, data: Union[Iterable[tuple[K, T]], dict[K, T]] = (), capacity: int = 0):
+    def __init__(self, data: Iterable[tuple[K, T]] | dict[K, T] = (), capacity: int = 0):
         super().__init__()
         # self._opt = opt
         self._index = {}
@@ -41,8 +39,9 @@ class MinHeapMap(IPriorityMap[K, T]):
         for (i, (key, _)) in enumerate(data):
             self._index[key] = i + 1
         self._size = len(data)
-        self._heap: list[Optional[tuple[T, K]]] = list(chain((None,), ((v, k) for (k, v) in data),
-                                                             repeat(None, max(0, capacity - self._size))))
+        self._heap: list[Optional[tuple[T, K]]] = [None]
+        self._heap.extend((v, k) for (k, v) in data)
+        self._heap.extend(repeat(None, max(0, capacity - self._size)))
         for i in range(self._size // 2, 0, -1):
             self._heapify(i)
 
@@ -181,7 +180,7 @@ class MaxHeapMap(MinHeapMap):
 
 # -------------------------------------------------------------------------
 
-class FibNode(Generic[K, T]):
+class FibNode[K, T]:
     def __init__(self, key: K, value: T):
         self.parent = self.child = None
         self.left = self.right = self
@@ -191,7 +190,7 @@ class FibNode(Generic[K, T]):
         self.mark = False
 
 
-class MinFibonacciHeap(IPriorityMap[K, T]):
+class MinFibonacciHeap[K, T](IPriorityMap[K, T]):
     _opt: Callable[[T, T], T] = min
 
     def __init__(self, data: Iterable[tuple[K, T]] = ()):

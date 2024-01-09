@@ -1,12 +1,12 @@
 from enum import Enum
-from typing import Optional, Union
+from typing import Optional
 
 from easypaint import EasyPaint
 
 from algoritmia.datastructures.graphs import UndirectedGraph
 
-Num = Union[int, float]
-Vertex = tuple[Num, Num]
+type Num = int | float
+type Vertex = tuple[Num, Num]
 
 
 class Mode(Enum):

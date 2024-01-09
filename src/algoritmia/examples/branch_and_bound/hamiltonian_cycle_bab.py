@@ -1,32 +1,31 @@
-from __future__ import annotations
-
 from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Self
 
-from algoritmia.datastructures.graphs import UndirectedGraph, TVertex, WeightingFunction
+from algoritmia.datastructures.graphs import UndirectedGraph, WeightingFunction
 from algoritmia.schemes.bab_scheme import BabDecisionSequence, bab_min_solve
 from algoritmia.utils import infinity
 
 # Tipos  --------------------------------------------------------------------------
 
-Decision = TVertex
-Solution = tuple[Decision, ...]
+# En este problema, una decisión es un vértice, por lo tanto, su tipo es T (el genérico del grafo)
+# Decision = T
+type Solution[T] = tuple[T, ...]
 
 # 'bab_min_solve' devuelve Optional[ScoredSolution]
-Score = float
-ScoredSolution = tuple[Score, Solution]
+type Score = float
+type ScoredSolution[T] = tuple[Score, Solution[T]]
 
 
 # --------------------------------------------------------------------------------
 
-def hamiltoniancycle_bab_solve(g: UndirectedGraph[TVertex],
-                               wf: WeightingFunction[TVertex]) -> Optional[ScoredSolution]:
+def hamiltoniancycle_bab_solve[T](g: UndirectedGraph[T],
+                                  wf: WeightingFunction[T]) -> Optional[ScoredSolution[T]]:
     @dataclass
     class Extra:
         weight: int = 0
 
-    class HamiltonianCycleDS(BabDecisionSequence[TVertex, Extra]):
+    class HamiltonianCycleDS(BabDecisionSequence[T, Extra]):
         def calculate_opt_bound(self) -> Score:
             if self.is_solution():
                 return self.extra.weight + wf(self.decision, v_initial)
@@ -42,7 +41,7 @@ def hamiltoniancycle_bab_solve(g: UndirectedGraph[TVertex],
         def is_solution(self) -> bool:
             return len(self) == len(g.V) and v_initial in g.succs(self.decision)
 
-        def successors(self) -> Iterator[HamiltonianCycleDS]:
+        def successors(self) -> Iterator[Self]:
             if len(self) < len(g.V):
                 ds_set = set(self.decisions())  # O(|V|)
                 for v in g.succs(self.decision):
@@ -51,7 +50,7 @@ def hamiltoniancycle_bab_solve(g: UndirectedGraph[TVertex],
                         yield self.add_decision(v, Extra(new_weight))
 
         # Sobreescribimos 'state()'
-        def state(self) -> tuple[TVertex, tuple[Vertex, ...]]:
+        def state(self) -> tuple[T, tuple[T, ...]]:
             return self.decision, tuple(sorted(self.decisions()))  # O(|V|)
 
     initial_ds = HamiltonianCycleDS(Extra(0))
@@ -62,11 +61,15 @@ def hamiltoniancycle_bab_solve(g: UndirectedGraph[TVertex],
 
 # Programa principal ---------------------------
 if __name__ == "__main__":
-    Vertex = int
-    Edge = tuple[Vertex, Vertex]
-    edges: list[Edge] = [(0, 2), (0, 3), (0, 9), (1, 3), (1, 4), (1, 8), (2, 3), (2, 5), (3, 4),
-                         (3, 6), (4, 7), (5, 6), (5, 8), (6, 7), (6, 8), (6, 9)]
+    # En este ejemplo, los vértices son de tipo int
+
+    # Por lo tanto, las aristas son tuple[int, int]
+    edges = [(0, 2), (0, 3), (0, 9), (1, 3), (1, 4), (1, 8), (2, 3), (2, 5),
+             (3, 4), (3, 6), (4, 7), (5, 6), (5, 8), (6, 7), (6, 8), (6, 9)]
+
+    # Y el grafo, g0, es de tipo UndirectedGraph[int]
     g0 = UndirectedGraph(E=edges)
+
     d0 = dict(((u2, v2), abs(u2 - v2)) for (u2, v2) in g0.E)
     wf0 = WeightingFunction(d0, symmetrical=True)
 

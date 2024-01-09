@@ -1,17 +1,17 @@
 """
-Version: 4.0 (23-oct-2021)
+
+Version: 5.2 (01-dic-2023)
+         4.0 (23-oct-2021)
 
 @author: David Llorens (dllorens@uji.es)
          (c) Universitat Jaume I 2021
 @license: GPL3
 """
-from __future__ import annotations
-
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
-from typing import Any
+from typing import Any, Self
 
-Solution = Any
+type Solution = Any
 
 
 # Divide and conquer -----------------------------------------------------------
@@ -25,7 +25,7 @@ class IDivideAndConquerProblem(ABC):
     def trivial_solution(self) -> Solution: pass
 
     @abstractmethod
-    def divide(self) -> Iterator[IDivideAndConquerProblem]: pass
+    def divide(self) -> Iterator[Self]: pass
 
     @abstractmethod
     def combine(self, solutions: Iterator[Solution]) -> Solution: pass
@@ -50,7 +50,7 @@ class IDecreaseAndConquerProblem(ABC):
     def trivial_solution(self) -> Solution: pass
 
     @abstractmethod
-    def decrease(self) -> IDecreaseAndConquerProblem: pass
+    def decrease(self) -> Self: pass
 
     def process(self, s: Solution) -> Solution:
         return s

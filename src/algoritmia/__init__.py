@@ -1,2 +1,2 @@
-TVERSION = (3, 0, 4)
+TVERSION = (3, 1, 0)
 VERSION = '.'.join([str(e) for e in TVERSION])

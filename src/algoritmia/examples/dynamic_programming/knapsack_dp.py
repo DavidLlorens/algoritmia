@@ -1,16 +1,16 @@
 from random import seed, randint
 
-Capacity = int
-Weight = int
-Value = int
+type Capacity = int
+type Weight = int
+type Value = int
 
-Decision = int  # 0 o 1
-Solution = list[Decision]
+type Decision = int  # 0 o 1
+type Solution = list[Decision]
 
-Score = int
-ScoredSolution = tuple[Score, Solution]
+type Score = int
+type ScoredSolution = tuple[Score, Solution]
 
-SParams = tuple[Capacity, int]
+type SParams = tuple[Capacity, int]
 
 
 # Una solucion son len(v) valores (cada uno puede ser 0 o 1)

@@ -1,28 +1,27 @@
-from __future__ import annotations
-
 from collections.abc import Iterator
-from typing import Optional
+from typing import Optional, Self
 
-from algoritmia.datastructures.graphs import UndirectedGraph, TVertex, WeightingFunction, IGraph
+from algoritmia.datastructures.graphs import UndirectedGraph, WeightingFunction, IGraph
 from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solutions, min_solution
 
 # Tipos  --------------------------------------------------------------------------
 
-Decision = TVertex
+# En este problema, una decisión es un vértice, por lo tanto, su tipo es T (el genérico del grafo)
+# Decision = T
 
 # 'bt_solutions' y 'bt_vc_solutions' devuelven un Iterator del tipo devuelto por el método 'solution' de
 # la clase 'DecisionSequence', cuya implementación por defecto devuelve una tupla con las decisiones:
-Solution = tuple[Decision, ...]
+type Solution[T] = tuple[T, ...]
 
 
 # --------------------------------------------------------------------------------
 
-def hamiltoniancycle_solutions(g: IGraph[TVertex]) -> Iterator[Solution]:
+def hamiltoniancycle_solutions[T](g: IGraph[T]) -> Iterator[Solution]:
     class HamiltonianCycleDS(DecisionSequence):
         def is_solution(self) -> bool:
             return len(self) == len(g.V) and v_initial in g.succs(self.decision)
 
-        def successors(self) -> Iterator[HamiltonianCycleDS]:
+        def successors(self) -> Iterator[Self]:
             if len(self) < len(g.V):
                 ds_set = set(self.decisions())  # O(|V|)
                 for v in g.succs(self.decision):
@@ -39,8 +38,8 @@ Score = int | float  # La longitud (suma de pesos) del ciclo
 ScoredSolution = tuple[Score, Solution]
 
 
-def hamiltoniancycle_best_solution(g: IGraph[TVertex],
-                                   wf: WeightingFunction[TVertex]) -> Optional[ScoredSolution]:
+def hamiltoniancycle_best_solution[T](g: IGraph[T],
+                                      wf: WeightingFunction[T]) -> Optional[ScoredSolution]:
     def f(sol: Solution) -> Score:
         return sum(wf(sol[i - 1], sol[i]) for i in range(len(sol)))
 
@@ -50,10 +49,8 @@ def hamiltoniancycle_best_solution(g: IGraph[TVertex],
 # Programa principal --------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    Vertex = int
-    Edge = tuple[Vertex, Vertex]
-    edges: list[Edge] = [(0, 2), (0, 3), (0, 9), (1, 3), (1, 4), (1, 8), (2, 3), (2, 5), (3, 4),
-                         (3, 6), (4, 7), (5, 6), (5, 8), (6, 7), (6, 8), (6, 9)]
+    edges = [(0, 2), (0, 3), (0, 9), (1, 3), (1, 4), (1, 8), (2, 3), (2, 5), (3, 4),
+             (3, 6), (4, 7), (5, 6), (5, 8), (6, 7), (6, 8), (6, 9)]
     g0 = UndirectedGraph(E=edges)
     d0 = dict(((u2, v2), abs(u2 - v2)) for (u2, v2) in g0.E)
     wf0 = WeightingFunction(d0, symmetrical=True)

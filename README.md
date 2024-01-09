@@ -1,6 +1,6 @@
 # Biblioteca *algoritmia*
 
-Implementada en Python 3. Necesita Python 3.10 o superior.
+Implementada en Python 3. Necesita Python 3.12 o superior.
 
 Utilizada en dos asignaturas de la Universitat Jaume I de Castelló:
 * EI1022: Grado en Ingeniería Informática.

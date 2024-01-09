@@ -29,8 +29,7 @@ from easypaint import EasyPaint
 
 from algoritmia.datastructures.graphs import UndirectedGraph
 
-Vertex = tuple[int, int]
-Edge = tuple[Vertex, Vertex]
+type Vertex = tuple[int, int]
 
 
 class LabyrinthViewer(EasyPaint):

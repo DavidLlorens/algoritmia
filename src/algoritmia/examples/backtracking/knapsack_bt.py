@@ -1,17 +1,16 @@
-from __future__ import annotations
-
 from collections.abc import Iterator
 from dataclasses import dataclass
 from random import seed, randint
-from typing import Optional
+from typing import Optional, Self
 
 from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solutions, bt_vc_solutions, max_solution
 
 # Tipos  --------------------------------------------------------------------------
 
-Decision = int  # 0 o 1
-Score = int  # El valor de la mochila
-Solution = tuple[Decision, ...]
+type Decision = int  # 0 o 1
+type Score = int  # El valor de la mochila
+type Solution = tuple[Decision, ...]
+
 
 # Esquema básico  --------------------------------------------------------------------------
 
@@ -26,7 +25,7 @@ def knapsack_solutions(weights: list[int],
         def is_solution(self) -> bool:
             return len(self) == len(values)
 
-        def successors(self) -> Iterator[KnapsackDS]:
+        def successors(self) -> Iterator[Self]:
             n = len(self)
             if n < len(values):
                 new_weight = self.extra.weight + weights[n]
@@ -49,7 +48,7 @@ def knapsack_best_solution(weights: list[int],
                            values: list[int],
                            capacity: int) -> Optional[ScoredSolution]:
     def f(solution: Solution) -> int:
-        return sum(d*values[i] for i, d in enumerate(solution))
+        return sum(d * values[i] for i, d in enumerate(solution))
 
     all_solutions: Iterator[Solution] = knapsack_solutions(weights, values, capacity)
     return max_solution(all_solutions, f)
@@ -68,7 +67,7 @@ def knapsack_vc_solutions(weights: list[int],
         def is_solution(self) -> bool:
             return len(self) == len(values)
 
-        def successors(self) -> Iterator[KnapsackDS]:
+        def successors(self) -> Iterator[Self]:
             n = len(self)
             if n < len(values):
                 new_weight = self.extra.weight + weights[n]
@@ -119,7 +118,7 @@ if __name__ == "__main__":
     i2 = create_knapsack_problem(20)
 
     for W, V, C in [i1, i2]:
-        print("-"*80)
+        print("-" * 80)
         print(f"Instancia:\n  Pesos = {W}\n  Valores = {V}\n  Capacidad = {C}\n")
         print(f"knapsack_solutions    - Number of solutions: {len(list(knapsack_solutions(W, V, C)))}")
         print(f"knapsack_solutions    - Best solution: {knapsack_best_solution(W, V, C)}")

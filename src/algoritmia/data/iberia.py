@@ -1,9 +1,35 @@
+#
+# Grafo ponderado de ciudades (sin coordenadas):
+#    iberia:       UndirectedGraph[str]
+#    km:           WeightingFunction[str]
+#
+# Grafo ponderado de ciudades (con coordenadas):
+#    iberia2d:     UndirectedGraph[tuple[float, float]]
+#    km2d:         WeightingFunction[tuple[float, float]]
+#
+#  Diccionarios auxiliares:
+#    coords2d:     Diccionario de ciudades a coordenadas
+#    coords2d_inv: Diccionario de coordenadas a ciudades
+#
+
 from algoritmia.datastructures.graphs import UndirectedGraph, WeightingFunction
 
-cities = []
-coords = {}
-roads = []
-km = {}
+type City = str
+type Pos2D = tuple[float, float]
+
+coords2d: dict[City, Pos2D] = {}  # Diccionario de ciudades a coordenadas
+coords2d_inv: dict[Pos2D, City] = {}  # Diccionario de coordenadas a ciudades
+
+_roads: dict[tuple[City, City], float] = {}
+_roads2d: dict[tuple[Pos2D, Pos2D], float] = {}
+
+
+# Cambia el eje y de las coordenadas para que aumente de sur a norte
+def fix_y(pair: Pos2D) -> Pos2D:
+    return pair[0], -pair[1]
+
+
+# Rellena coords2d y coords2d_inv -------------------------------------------------------------------------------
 
 for _line in """A Coruña:-334.340:-296.380
 Aara:51.100:357.700
@@ -383,9 +409,11 @@ Zuera:208.780:-144.540
 Écija:-119.720:270.100
 Évora:-327.040:160.600
 Úbeda:35.040:229.220""".split('\n'):
-    _city, _x, _y = _line.strip().split(':')
-    cities.append(_city)
-    coords[_city] = (float(_x), float(_y))
+    city, x, y = _line.strip().split(':')
+    coords2d[city] = fix_y((float(x), float(y)))
+    coords2d_inv[fix_y((float(x), float(y)))] = city
+
+# Rellena _roads y _roads2d -------------------------------------------------------------------------------
 
 for _line in """A Coruña:Carballo:22.286
 A Coruña:Pontedeume:20.904
@@ -985,22 +1013,16 @@ Zuera:Huesca:42.641
 Évora:Beja:55.480
 Évora:Grândula:59.931
 Úbeda:Linares:25.871""".split('\n'):
-    _cityA, _cityB, _aux = _line.strip().split(':')
-    roads.append((_cityA, _cityB))
-    km[_cityA, _cityB] = float(_aux)
+    cityA, cityB, distance = _line.strip().split(':')
+    _roads[cityA, cityB] = float(distance)
+    _roads2d[coords2d[cityA], coords2d[cityB]] = float(distance)
 
-iberia = UndirectedGraph(V=cities, E=roads)
-km = WeightingFunction(km, symmetrical=True)
+# Grafo ponderado de ciudades (str)
+# Si necesitas las coordenadas de las ciudades utiliza coords2d, de tipo dict[City, Pos2D]
+iberia = UndirectedGraph[City](E=_roads.keys())
+km = WeightingFunction[City](_roads, symmetrical=True)
 
-
-def p(pair):
-    return pair[0], -pair[1]
-
-
-coords2d = dict((c, p(coords[c])) for c in cities)
-coords2d_inv = dict((p(coords[c]), c) for c in cities)
-cities2d = [p(coords[c]) for c in cities]
-roads2d = [(p(coords[c1]), p(coords[c2])) for (c1, c2) in roads]
-iberia2d = UndirectedGraph(V=cities2d, E=roads2d)
-km2d = WeightingFunction([((p(coords[c1]), p(coords[c2])), d) for ((c1, c2), d) in km.items()],
-                         symmetrical=True)
+# Grafo ponderado de coordenadas de ciudades (tuple[float, float])
+# Si necesitas los nombres de las ciudades utiliza coords2d_inv, de tipo dict[Pos2D, City]
+iberia2d = UndirectedGraph[Pos2D](E=_roads2d.keys())
+km2d = WeightingFunction[Pos2D](_roads2d, symmetrical=True)

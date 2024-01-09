@@ -20,8 +20,8 @@ class KDNode(KDTree):
 
     def pretty(self, level: int = 0) -> str:
         return "       " * level + f"KDNode({self.axis}, {self.split_value},\n" + \
-               self.child1.pretty(level + 1) + ",\n" + self.child2.pretty(level + 1) + "\n" + \
-               "       " * level + ")"
+            self.child1.pretty(level + 1) + ",\n" + self.child2.pretty(level + 1) + "\n" + \
+            "       " * level + ")"
 
 
 class KDLeaf(KDTree):
