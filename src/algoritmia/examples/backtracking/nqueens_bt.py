@@ -16,7 +16,7 @@ type Solution = tuple[Decision, ...]
 
 
 def nqueens_solutions(board_size: int) -> Iterator[Solution]:
-    class NQueensDS(DecisionSequence):
+    class NQueensDS(DecisionSequence[Decision, None]):  # Como no hay Extra -> ponemos None
         def is_solution(self) -> bool:
             return len(self) == board_size
 

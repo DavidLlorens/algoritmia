@@ -1,16 +1,17 @@
 """
-Version:  5.2 (01-dic-2023)
+Version:  5.3 (09-ene-2024)
+          5.2 (01-dic-2023)
           5.0 (31-oct-2023)
           4.1 (29-sep-2022)
           4.0 (23-oct-2021)
 
 @author: David Llorens (dllorens@uji.es)
-         (c) Universitat Jaume I 2023
+         (c) Universitat Jaume I 2024
 @license: GPL3
 """
 from abc import ABC, abstractmethod
 from collections import deque
-from collections.abc import Iterator, Callable
+from collections.abc import Iterator, Callable, Sized
 from typing import Any, final, Optional, Self
 
 # Tipos  --------------------------------------------------------------------------
@@ -38,11 +39,14 @@ type State = Any
 
 # La clase DecisionSequence -------------------------------------------------------
 
-class DecisionSequence[TDecision, TExtra](ABC):
-    def __init__(self, extra: Optional[TExtra] = None, parent: Self = None, decision: TDecision = None):
+class DecisionSequence[TDecision, TExtra](ABC, Sized):
+    def __init__(self,
+                 extra: Optional[TExtra] = None,
+                 parent: Optional[Self] = None,
+                 decision: Optional[TDecision] = None):
+        self.extra = extra
         self.parent = parent
         self.decision = decision
-        self.extra = extra
         self._len = 0 if parent is None else len(parent) + 1
 
     # --- Métodos abstractos que hay que implementar en las clases hijas ---
@@ -58,6 +62,7 @@ class DecisionSequence[TDecision, TExtra](ABC):
     # --- Métodos que se pueden sobreescribir en las clases hijas: solution() y state() ---
 
     # Por defecto se devuelve la tupla de decisiones
+    # El esquema solo llama a esta función si self.is_solution() es True
     def solution(self) -> Solution:
         return self.decisions()
 

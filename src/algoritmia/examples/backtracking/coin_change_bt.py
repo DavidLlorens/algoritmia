@@ -16,8 +16,8 @@ type Solution = tuple[Decision, ...]
 
 # --------------------------------------------------------------------------------
 
-def coin_change_solve_naif(v: tuple[int, ...], Q: int) -> Iterator[Solution]:
-    class CoinChangeDS(DecisionSequence):
+def coin_change_solutions_naif(v: tuple[int, ...], Q: int) -> Iterator[Solution]:
+    class CoinChangeDS(DecisionSequence[Decision, None]):
         def is_solution(self) -> bool:
             pending = calc_pending(self)  # O(n)
             return len(self) == len(v) and pending == 0
@@ -44,7 +44,7 @@ def coin_change_solutions(v: tuple[int, ...], Q: int) -> Iterator[Solution]:
     class Extra:
         pending: int
 
-    class CoinChangeDS(DecisionSequence):
+    class CoinChangeDS(DecisionSequence[Decision, Extra]):
         def is_solution(self) -> bool:
             return len(self) == len(v) and self.extra.pending == 0
 
@@ -77,7 +77,7 @@ def coin_change_vc_solutions(v: tuple[int, ...], Q: int) -> Iterator[Solution]:
     class Extra:
         pending: int
 
-    class CoinChangeDS(DecisionSequence):
+    class CoinChangeDS(DecisionSequence[Decision, Extra]):
         def is_solution(self) -> bool:
             return len(self) == len(v) and self.extra.pending == 0
 
@@ -103,6 +103,14 @@ if __name__ == "__main__":
     print(f"Coins: {v0}")
     print(f"Quantity: {Q0}\n")
 
+    # Naif version
+    print("Basic versión (all solutions):")
+    sol0 = None
+    for sol0 in coin_change_solutions_naif(v0, Q0):
+        print(f"\tSolution: {sol0}")
+    if sol0 is None:
+        print("\tThere are no solutions")
+
     # Basic version
     print("Basic versión (all solutions):")
     sol0 = None
@@ -121,3 +129,4 @@ if __name__ == "__main__":
         print(f"\tSolution: {sol0}")
     if sol0 is None:
         print("\tThere are no solutions")
+

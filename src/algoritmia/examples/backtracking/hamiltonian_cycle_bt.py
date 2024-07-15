@@ -17,7 +17,7 @@ type Solution[T] = tuple[T, ...]
 # --------------------------------------------------------------------------------
 
 def hamiltoniancycle_solutions[T](g: IGraph[T]) -> Iterator[Solution]:
-    class HamiltonianCycleDS(DecisionSequence):
+    class HamiltonianCycleDS(DecisionSequence[T, None]):  # Como no hay Extra -> ponemos None
         def is_solution(self) -> bool:
             return len(self) == len(g.V) and v_initial in g.succs(self.decision)
 

@@ -96,7 +96,7 @@ class DPViewer(EasyPaint):
                                  background=background)
         if swap:
             self.coordinates = (0, self.size[1], self.size[0], 0)
-            #self.coordinates = (0, 0, self.size[0], self.size[1])
+            # self.coordinates = (0, 0, self.size[0], self.size[1])
 
         self.node_size = node_size
         self.margin = margin

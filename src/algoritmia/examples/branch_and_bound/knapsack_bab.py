@@ -29,7 +29,7 @@ def knapsack_bab_solve_naif(weights: list[int],
         weight: int = 0
         value: int = 0
 
-    class KnapsackBabDS(BabDecisionSequence):
+    class KnapsackBabDS(BabDecisionSequence[Decision, Extra]):
         # OPTIMISTA: Coge TODOS los objetos pendientes (cota poco informada)
         def calculate_opt_bound(self) -> Score:
             return self.extra.value + sum(values[len(self):])
@@ -73,7 +73,7 @@ def knapsack_bab_solve(weights: list[int],
         weight: int = 0
         value: int = 0
 
-    class KnapsackBabDS(BabDecisionSequence):
+    class KnapsackBabDS(BabDecisionSequence[Decision, Extra]):
         # OPTIMISTA: resolver mochila fraccionaria para los objetos que quedan (tema Voraces)
         def calculate_opt_bound(self) -> int:
             value = self.extra.value
