@@ -1,4 +1,6 @@
 # Changelog
+## [3.1.1] - 2024-09-03
+  - `algoritmia/examples/divide_and_conquer/mergesort.py`: Bug corregido
 ## [3.1.0] - 2023-12-10
   - Utiliza la sintaxis de Python 3.12
 ## [3.0.4] - 2023-12-09

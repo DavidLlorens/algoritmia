@@ -1,4 +1,7 @@
-type Solution = list[int]def mergesort_basic(v: list[int]) -> list[int]:
+type Solution = list[int]
+
+
+def mergesort_basic(v: list[int]) -> list[int]:
     def merge(left: list[int], right: list[int]) -> list[int]:
         c = [0] * (len(left) + len(right))
         i, j, k = 0, 0, 0

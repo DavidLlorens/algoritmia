@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "algoritmia"
-version = "3.1.0"
+version = "3.1.1"
 description = "A library of algorithms and data structures. Used in course EI1022/MT122 (Universitat Jaume I de Castelló)"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -30,6 +30,7 @@ maintainers = [
 [project.urls]
 homepage = "https://github.com/DavidLlorens/algoritmia"
 changelog = "https://github.com/DavidLlorens/algoritmia/blob/main/CHANGELOG.md"
+Source = "https://github.com/DavidLlorens/algoritmia"
 
 #[project.optional-dependencies]
 #pdf = ["ReportLab>=1.2", "RXP"]
