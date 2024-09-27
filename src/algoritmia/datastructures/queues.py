@@ -1,16 +1,14 @@
 from abc import abstractmethod, ABC
 from collections.abc import Iterable, Sized
+from collections import deque
 
-from algoritmia.datastructures.linkedlists import LinkedList
-
-
-# Fifo() utiliza una lista LinkedList para tener coste O(1) en el pop()
-# Lifo() utiliza una lista normal de Python
+# Fifo() utiliza una 'deque' de Python para tener coste O(1) en el pop()
+# Lifo() utiliza una 'list' de Python
 
 
 class IQueue[T](ABC, Sized):
-    def __init__(self, mylist: list):
-        self._list = mylist
+    def __init__(self, data: deque[T] | list[T] = ()):
+        self._list = data
 
     @abstractmethod
     def push(self, item: T): pass
@@ -30,15 +28,13 @@ class IQueue[T](ABC, Sized):
 
 class Fifo[T](IQueue[T]):
     def __init__(self, data: Iterable[T] = ()):
-        super().__init__(LinkedList(data))
+        super().__init__(deque(data))
 
     def push(self, item: T):
         self._list.append(item)
 
     def pop(self) -> T:
-        v = self._list[0]
-        del self._list[0]
-        return v
+        return self._list.popleft()
 
     def top(self) -> T:
         return self._list[0]
@@ -62,6 +58,8 @@ if __name__ == '__main__':
     for q in [Fifo(), Lifo()]:
         for i in range(3):
             q.push(i)
-        print(q)
+        print("q:", q)
+        print("q.top():", q.top())
+        print("len(q):", len(q))
         for i in range(3):
-            print(q.pop())
+            print("q.pop():", q.pop())

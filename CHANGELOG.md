@@ -1,4 +1,7 @@
 # Changelog
+## [3.1.2] - 2024-09-27
+  - `algoritmia/datastructures/queues.py`: Por eficiencia, Fifo ahora utiliza deque.
+  - `algoritmia/viewers/labyrinth_viewer.py`: Nueva versión 1.8. 
 ## [3.1.1] - 2024-09-03
   - `algoritmia/examples/divide_and_conquer/mergesort.py`: Bug corregido
 ## [3.1.0] - 2023-12-10

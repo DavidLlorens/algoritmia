@@ -1,4 +1,5 @@
 """
+2024-09-20: Version 1.8 # Deja cambiar el title, restaura las celdas marcadas al volver al modo laberinto
 2021-09-14: Version 1.7 # cambia las teclas: "esc" o "return" para cerrar
 2021-09-13: Version 1.6 # corrige bug de no dibujar path
 2020-10-26: Version 1.5 # Añade vista dual laberinto/grafo
@@ -35,15 +36,17 @@ type Vertex = tuple[int, int]
 class LabyrinthViewer(EasyPaint):
     def __init__(self,
                  lab: UndirectedGraph[Vertex],
-                 canvas_width: int = 400,
-                 canvas_height: int = 400,
+                 size: tuple[int, int] | str = (400, 400),
                  margin: int = 10,
-                 wall_width: int = 2):
+                 wall_width: int = 2,
+                 title: str = "Labyrinth Viewer - Press 'SPACE', 'g' or 'l'"):
         EasyPaint.__init__(self)
 
         self.visible_l = True
         self.visible_g = False
         self.wall_width = wall_width
+        self.title = title
+        self.r_size = size
 
         # check 'lab' type
         if not isinstance(lab, UndirectedGraph) or \
@@ -57,12 +60,7 @@ class LabyrinthViewer(EasyPaint):
         self.margin = margin
         self.max_col = max(p[1] for p in self.g.V)
         self.max_row = max(p[0] for p in self.g.V)
-        self.canvas_width = canvas_width
-        self.canvas_height = canvas_height
-        self.cell_size = min(float((canvas_width - margin * 2) / (self.max_col + 1)),
-                             float((canvas_height - margin * 2) / (self.max_row + 1)))
-        self.mw = self.canvas_width - self.cell_size * (self.max_col + 1)
-        self.mh = self.canvas_height - self.cell_size * (self.max_row + 1)
+
         self.ip = self.op = None
 
     def set_input_point(self, pos: Vertex):
@@ -120,6 +118,15 @@ class LabyrinthViewer(EasyPaint):
         for path, color, offset in self.paths:
             self._draw_path(path, color, offset)
 
+        # Draw marked cells
+        # primero dibuja las que rellenan
+        for cell, color in self.marked_cells:
+            cx = self.mw / 2 + cell[1] * self.cell_size + self.cell_size / 2
+            cy = self.mh / 2 + cell[0] * self.cell_size + self.cell_size / 2
+            tt = self.create_filled_rectangle(cx - self.cell_size / 2 + 1, cy - self.cell_size / 2 + 1,
+                                              cx + self.cell_size / 2, cy + self.cell_size / 2, color, color)
+            self.tag_lower(tt)
+
     def draw_graph(self):
         mw = self.mw
         mh = self.mh
@@ -161,20 +168,27 @@ class LabyrinthViewer(EasyPaint):
                 self.draw_graph()
 
     def main(self):
-        self.easypaint_configure(title="Labyrinth Viewer - Press 'SPACE', 'g' or 'l'",
-                                 background='white',
-                                 size=(self.canvas_width, self.canvas_height),
-                                 coordinates=(0, self.canvas_height, self.canvas_width, 0))
-        self.draw_lab()
+        if self.r_size == 'FIT' or self.r_size == 'FULL':
+            self.cell_size = 100
+            self.canvas_height = (self.max_row + 1) * self.cell_size + 2 * self.margin
+            self.canvas_width = (self.max_col + 1) * self.cell_size + 2 * self.margin
+        else:  # self.r_size = (width, height)
+            self.canvas_width, self.canvas_height = self.r_size
+            self.cell_size = min(float((self.canvas_width - self.margin * 2) / (self.max_col + 1)),
+                                 float((self.canvas_height - self.margin * 2) / (self.max_row + 1)))
 
-        # Draw marked cells
-        # primero dibuja las que rellenan
-        for cell, color in self.marked_cells:
-            cx = self.mw / 2 + cell[1] * self.cell_size + self.cell_size / 2
-            cy = self.mh / 2 + cell[0] * self.cell_size + self.cell_size / 2
-            tt = self.create_filled_rectangle(cx - self.cell_size / 2 + 1, cy - self.cell_size / 2 + 1,
-                                              cx + self.cell_size / 2, cy + self.cell_size / 2, color, color)
-            self.tag_lower(tt)
+        self.easypaint_configure(title=self.title,
+                                 background='white',
+                                 size=self.r_size,
+                                 coordinates=(0, self.canvas_height, self.canvas_width, 0))
+
+        if self.r_size == 'FIT':
+            self.size = 'FIT'  # necesario por bug en EasyPaint
+
+        self.mw = self.canvas_width - self.cell_size * (self.max_col + 1)
+        self.mh = self.canvas_height - self.cell_size * (self.max_row + 1)
+
+        self.draw_lab()
 
 
 if __name__ == '__main__':
@@ -191,8 +205,12 @@ if __name__ == '__main__':
     # Laberinto en forma de grafo no dirigido
     graph: UndirectedGraph[Vertex] = UndirectedGraph(E=e)
 
-    # Obligatorio: Crea un LabyrinthViewer pasándole el grafo del laberinto
-    lv = LabyrinthViewer(graph, canvas_width=600, canvas_height=400, margin=10)
+    # Crea un LabyrinthViewer pasándole el grafo del laberinto
+
+    # Descomenta una línea:
+    lv = LabyrinthViewer(graph, size='FIT', margin=10)
+    # lv = LabyrinthViewer(graph, size='FULL', margin=10)
+    # lv = LabyrinthViewer(graph, size=(400, 400), margin=10)
 
     # Opcional: Muestra el símbolo 'I' en la celda de entrada al laberinto
     lv.set_input_point((0, 0))
