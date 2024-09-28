@@ -1,4 +1,5 @@
 """
+2024-09-28: Version 1.9 # Restaura funcionalidad de versión 1.7
 2024-09-20: Version 1.8 # Deja cambiar el title, restaura las celdas marcadas al volver al modo laberinto
 2021-09-14: Version 1.7 # cambia las teclas: "esc" o "return" para cerrar
 2021-09-13: Version 1.6 # corrige bug de no dibujar path
@@ -36,7 +37,8 @@ type Vertex = tuple[int, int]
 class LabyrinthViewer(EasyPaint):
     def __init__(self,
                  lab: UndirectedGraph[Vertex],
-                 size: tuple[int, int] | str = (400, 400),
+                 canvas_width: int = 400,
+                 canvas_height: int = 400,
                  margin: int = 10,
                  wall_width: int = 2,
                  title: str = "Labyrinth Viewer - Press 'SPACE', 'g' or 'l'"):
@@ -46,7 +48,7 @@ class LabyrinthViewer(EasyPaint):
         self.visible_g = False
         self.wall_width = wall_width
         self.title = title
-        self.r_size = size
+        self.canvas_width, self.canvas_height = canvas_width, canvas_height
 
         # check 'lab' type
         if not isinstance(lab, UndirectedGraph) or \
@@ -168,22 +170,13 @@ class LabyrinthViewer(EasyPaint):
                 self.draw_graph()
 
     def main(self):
-        if self.r_size == 'FIT' or self.r_size == 'FULL':
-            self.cell_size = 100
-            self.canvas_height = (self.max_row + 1) * self.cell_size + 2 * self.margin
-            self.canvas_width = (self.max_col + 1) * self.cell_size + 2 * self.margin
-        else:  # self.r_size = (width, height)
-            self.canvas_width, self.canvas_height = self.r_size
-            self.cell_size = min(float((self.canvas_width - self.margin * 2) / (self.max_col + 1)),
-                                 float((self.canvas_height - self.margin * 2) / (self.max_row + 1)))
+        self.cell_size = min(int((self.canvas_width - self.margin * 2) / (self.max_col + 1)),
+                             int((self.canvas_height - self.margin * 2) / (self.max_row + 1)))
 
         self.easypaint_configure(title=self.title,
                                  background='white',
-                                 size=self.r_size,
+                                 size=(self.canvas_width, self.canvas_height),
                                  coordinates=(0, self.canvas_height, self.canvas_width, 0))
-
-        if self.r_size == 'FIT':
-            self.size = 'FIT'  # necesario por bug en EasyPaint
 
         self.mw = self.canvas_width - self.cell_size * (self.max_col + 1)
         self.mh = self.canvas_height - self.cell_size * (self.max_row + 1)
@@ -192,6 +185,10 @@ class LabyrinthViewer(EasyPaint):
 
 
 if __name__ == '__main__':
+    # Tamaño del laberinto
+    max_canvas_width, max_canvas_height = 800, 600
+    margin = 10
+
     e = [((4, 7), (4, 6)), ((4, 7), (4, 8)), ((1, 3), (0, 3)), ((1, 3), (1, 4)), ((4, 8), (4, 9)), ((3, 0), (2, 0)),
          ((3, 0), (4, 0)), ((2, 8), (2, 7)), ((2, 8), (1, 8)), ((2, 1), (2, 0)), ((2, 1), (2, 2)), ((0, 0), (1, 0)),
          ((1, 6), (1, 5)), ((1, 6), (2, 6)), ((3, 7), (3, 8)), ((3, 7), (3, 6)), ((2, 5), (1, 5)), ((2, 5), (2, 4)),
@@ -206,11 +203,17 @@ if __name__ == '__main__':
     graph: UndirectedGraph[Vertex] = UndirectedGraph(E=e)
 
     # Crea un LabyrinthViewer pasándole el grafo del laberinto
+    num_rows = max(max(r1, r2) for (r1, c1), (r2, c2) in e) + 1
+    num_cols = max(max(c1, c2) for (r1, c1), (r2, c2) in e) + 1
+    cell_size = min(int((max_canvas_width - margin * 2) / num_cols),
+                    int((max_canvas_height - margin * 2) / num_rows))
+    canvas_width = cell_size * num_cols + margin*2
+    canvas_height = cell_size * num_rows + margin*2
 
     # Descomenta una línea:
-    lv = LabyrinthViewer(graph, size='FIT', margin=10)
-    # lv = LabyrinthViewer(graph, size='FULL', margin=10)
-    # lv = LabyrinthViewer(graph, size=(400, 400), margin=10)
+    lv = LabyrinthViewer(graph, margin=margin,
+                         canvas_width=canvas_width,
+                         canvas_height=canvas_height)
 
     # Opcional: Muestra el símbolo 'I' en la celda de entrada al laberinto
     lv.set_input_point((0, 0))
