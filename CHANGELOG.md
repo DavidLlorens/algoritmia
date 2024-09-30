@@ -1,5 +1,7 @@
 # Changelog
 ## [3.1.3] - 2024-09-28
+  - `algoritmia/viewers/labyrinth_viewer_color.py`: Nueva versión 1.9. Restaura funcionalidad de la 1.7.
+## [3.1.3] - 2024-09-28
   - `algoritmia/viewers/labyrinth_viewer.py`: Nueva versión 1.9. Restaura funcionalidad de la 1.7.
 ## [3.1.2] - 2024-09-27
   - `algoritmia/datastructures/queues.py`: Por eficiencia, Fifo ahora utiliza deque.

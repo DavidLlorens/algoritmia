@@ -1,5 +1,6 @@
 """
-2021-10-22: Versión 1
+2024-09-30: Versión 2.0 - Por cambios en LabyrinthViewer
+2021-10-22: Versión 1.0 - Versión inicial
 @author: David Llorens (dllorens@uji.es)
 
 Hereda de la clase LabyrinthViewer para añadir animación de color.
@@ -16,18 +17,21 @@ class LabyrinthViewerColor(LabyrinthViewer):
     def __init__(self,
                  lab: UndirectedGraph[Vertex],
                  canvas_width: int = 400, canvas_height: int = 400,
-                 margin: int = 10, wall_width: int = 2):
+                 margin: int = 10, wall_width: int = 2, delay_ms: int = 0,
+                 vertex_painted_per_iteration: int = 1):
         LabyrinthViewer.__init__(self, lab, canvas_width, canvas_height, margin, wall_width)
         self.state = 0
-        self.vertex_painted_per_iteration = 20
+        self.vertex_painted_per_iteration = vertex_painted_per_iteration
         self.tt = None
+        self.marked_cells2 = []
+        self.delay_ms = delay_ms
 
     def on_key_press(self, keysym):
         if keysym != 'Return': return
         if self.state == 0:
             self.state = 1
             self.erase(self.tt)
-            self.after(0, lambda: self.anim(0, len(self.marked_cells)))
+            self.after(0, lambda: self.anim(0, len(self.marked_cells2)))
         elif self.state == 1:
             self.close()
 
@@ -36,7 +40,7 @@ class LabyrinthViewerColor(LabyrinthViewer):
         mh = self.mh
         i = pos
         while i < min(max_pos, pos + self.vertex_painted_per_iteration):
-            cell, color = self.marked_cells[i]
+            cell, color = self.marked_cells2[i]
             cx = mw / 2 + cell[1] * self.cell_size + self.cell_size / 2
             cy = mh / 2 + cell[0] * self.cell_size + self.cell_size / 2
             tt = self.create_filled_rectangle(cx - self.cell_size / 2, cy - self.cell_size / 2,
@@ -46,14 +50,15 @@ class LabyrinthViewerColor(LabyrinthViewer):
             i += 1
         self.update()
         if i < max_pos:
-            self.after(0, lambda: self.anim(i, len(self.marked_cells)))
+            self.after(self.delay_ms, lambda: self.anim(i, len(self.marked_cells2)))
+            self.update()
+
+    def add_marked_cell(self, cell, color='red'):
+        self.marked_cells2.append((cell, color))
 
     def main(self):
-        self.easypaint_configure(title='Labyrinth Viewer (colored cells)',
-                                 background='white',
-                                 size=(self.canvas_width, self.canvas_height),
-                                 coordinates=(0, self.canvas_height, self.canvas_width, 0))
-        self.draw_lab()
+        self.title = 'Labyrinth Viewer (colored cells)'
+        super().main()
         w, h = self.center
         self.tt = self.create_text(w, h, "Press 'Return' to colorize", 14, "C", "red")
 
@@ -105,7 +110,10 @@ if __name__ == '__main__':
 
     lv = LabyrinthViewerColor(g0,
                               canvas_width=num_cols * cell_size + margin0 * 2,
-                              canvas_height=num_rows * cell_size + margin0 * 2, margin=margin0)
+                              canvas_height=num_rows * cell_size + margin0 * 2,
+                              margin=margin0,
+                              delay_ms=300,
+                              vertex_painted_per_iteration=1)
 
     start = (0, 0)  # (num_rows//2, num_cols//2)
     matriz_dist = matriz_distancias_anchura(g0, start)
