@@ -16,21 +16,6 @@ from typing import Any, final, Optional, Self
 
 # Tipos  --------------------------------------------------------------------------
 
-# ACERCA DEL TIPO Solution
-# La implementación por defecto devuelve la tupla de decisiones.
-# Podemos sobreescribir solution() en la clase hija para devolver otra cosa.
-type Solution = Any
-
-# ACERCA DEL TIPO Score
-# Es el tipo devuelto por la función objetivo
-type Score = int | float
-
-# ACERCA DEL TIPO ScoredSolution
-# Las funciones min_solution y max_solution devuelven Optional[ScoredSolution]:
-#   - Devuelven None si no hay solución.
-#   - Devuelven la tupla (Score, self.solution()) si hay solución.
-type ScoredSolution = tuple[Score, Solution]
-
 # ACERCA DEL TIPO State
 # La implementación por defecto devuelve la tupla de decisiones.
 # Podemos sobreescribir state() en la clase hija para devolver otra cosa.
@@ -63,7 +48,7 @@ class DecisionSequence[TDecision, TExtra](ABC, Sized):
 
     # Por defecto se devuelve la tupla de decisiones
     # El esquema solo llama a esta función si self.is_solution() es True
-    def solution(self) -> Solution:
+    def solution[Solution](self) -> Solution:
         return self.decisions()
 
     # Debe devolver siempre un objeto inmutable
@@ -93,7 +78,7 @@ class DecisionSequence[TDecision, TExtra](ABC, Sized):
 
 # Esquema para BT básico --------------------------------------------------------------------------
 
-def bt_solutions(ds: DecisionSequence) -> Iterator[Solution]:
+def bt_solutions[Solution](ds: DecisionSequence) -> Iterator[Solution]:
     if ds.is_solution():
         yield ds.solution()
     for new_ds in ds.successors():
@@ -102,7 +87,7 @@ def bt_solutions(ds: DecisionSequence) -> Iterator[Solution]:
 
 #  Esquema para BT con control de visitados --------------------------------------------------------
 
-def bt_vc_solutions(initial_ds: DecisionSequence) -> Iterator[Solution]:
+def bt_vc_solutions[Solution](initial_ds: DecisionSequence) -> Iterator[Solution]:
     def bt(ds: DecisionSequence) -> Iterator[Solution]:
         if ds.is_solution():
             yield ds.solution()
@@ -119,11 +104,11 @@ def bt_vc_solutions(initial_ds: DecisionSequence) -> Iterator[Solution]:
 #  Mejor solución --------------------------------------------------------
 
 
-def min_solution(solutions: Iterator[Solution],
-                 f: Callable[[Solution], Score]) -> Optional[ScoredSolution]:
+def min_solution[Solution, Score](solutions: Iterator[Solution],
+                                  f: Callable[[Solution], Score]) -> Optional[tuple[Score, Solution]]:
     return min(((f(sol), sol) for sol in solutions), default=None)
 
 
-def max_solution(solutions: Iterator[Solution],
-                 f: Callable[[Solution], Score]) -> Optional[ScoredSolution]:
+def max_solution[Solution, Score](solutions: Iterator[Solution],
+                                  f: Callable[[Solution], Score]) -> Optional[tuple[Score, Solution]]:
     return max(((f(sol), sol) for sol in solutions), default=None)
