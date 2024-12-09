@@ -50,9 +50,9 @@ class DecisionSequence[TDecision, TExtra](ABC, Sized):
     # --- Métodos que se pueden sobreescribir en las clases hijas: solution() y state() ---
 
     # Debe devolver siempre un objeto inmutable
-    # Por defecto se devuelve la tupla de decisiones
+    # Por defecto se devuelve el contenido de _decisions
     def state(self) -> State:
-        return self.decisions()
+        return self._decisions
 
     # -- Métodos finales que NO se pueden sobreescribir en las clases hijas ---
 
