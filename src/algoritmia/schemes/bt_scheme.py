@@ -21,17 +21,17 @@ from typing import Any, final, Optional, Self
 # Podemos sobreescribir state() en la clase hija para devolver otra cosa.
 type State = Any
 
-# El tipo para guardar las secuencias de decisiones en forma de árbol para
-# ahorrar espacio. Cada nodo es una tupla con la decisión y el padre. La raíz
-# tiene la tupla vacía.
-type DecisionTree[TDecision] = tuple[()] | tuple[TDecision, DecisionTree[TDecision]]
+# El tipo para guardar las secuencias de decisiones como caminos en el árbol
+# de todas las posibles secuencias. Dos secuencias que compartan un prefijo comparten
+# la memoria correspondiente a ese prefijo.
+type DecisionPath[TDecision] = tuple[()] | tuple[TDecision, DecisionPath[TDecision]]
 
 # La clase DecisionSequence -------------------------------------------------------
 
 class DecisionSequence[TDecision, TExtra](ABC, Sized):
     def __init__(self,
                  extra: Optional[TExtra] = None,
-                 decisions: DecisionTree[TDecision] = (),
+                 decisions: DecisionPath[TDecision] = (),
                  length: int = 0):
         self.extra = extra
         self._decisions = decisions
