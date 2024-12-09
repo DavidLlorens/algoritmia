@@ -22,7 +22,7 @@ class TestBT_SOLUTIONS(unittest.TestCase):
 
         board_size = 4
         initial_ds = NQueensDS()
-        solutions = tuple(bt_solutions(initial_ds))
+        solutions = tuple(s.decisions() for s in bt_solutions(initial_ds))
         self.assertEqual(((1, 3, 0, 2), (2, 0, 3, 1)), solutions)
 
     def test_coinchange_min_solution(self):
@@ -43,7 +43,7 @@ class TestBT_SOLUTIONS(unittest.TestCase):
 
         v, Q = (1, 2, 5, 10), 4
         initial_ds = CoinChangeDS(Extra(Q))
-        solutions = bt_solutions(initial_ds)
+        solutions = (s.decisions() for s in bt_solutions(initial_ds))
         solution = min_solution(solutions, sum)
         self.assertEqual((2, (0, 2, 0, 0)), solution)
 
