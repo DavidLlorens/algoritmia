@@ -14,7 +14,7 @@ from functools import total_ordering
 from typing import final, Optional, Self
 
 from algoritmia.datastructures.priorityqueues import MaxHeap, MinHeap
-from algoritmia.schemes.bt_scheme import DecisionSequence
+from algoritmia.schemes.bt_scheme import DecisionSequence, DecisionTree
 from algoritmia.utils import infinity
 
 
@@ -36,7 +36,7 @@ from algoritmia.utils import infinity
 class BabDecisionSequence[TDecision, TExtra, TScore](DecisionSequence[TDecision, TExtra]):
     def __init__(self,
                  extra: Optional[TExtra] = None,
-                 decisions: tuple[TDecision, ...] = (),
+                 decisions: DecisionTree[TDecision] = (),
                  length: int = 0):
         DecisionSequence.__init__(self, extra, decisions, length)
         self._pes = self.calculate_pes_bound()
