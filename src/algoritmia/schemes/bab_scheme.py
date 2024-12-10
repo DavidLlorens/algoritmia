@@ -14,7 +14,7 @@ from functools import total_ordering
 from typing import final, Optional, Self
 
 from algoritmia.datastructures.priorityqueues import MaxHeap, MinHeap
-from algoritmia.schemes.bt_scheme import DecisionSequence, Score, ScoredSolution
+from algoritmia.schemes.bt_scheme import DecisionSequence, DecisionPath
 from algoritmia.utils import infinity
 
 
@@ -33,20 +33,23 @@ from algoritmia.utils import infinity
 
 
 @total_ordering  # Implementando < y ==, el resto de operadores de comparación se generan automáticamente
-class BabDecisionSequence[TDecision, TExtra](DecisionSequence[TDecision, TExtra]):
-    def __init__(self, extra: Optional[TExtra] = None, parent: Self = None, decision: TDecision = None):
-        DecisionSequence.__init__(self, extra, parent, decision)
+class BabDecisionSequence[TDecision, TExtra, TScore](DecisionSequence[TDecision, TExtra]):
+    def __init__(self,
+                 extra: Optional[TExtra] = None,
+                 decisions: DecisionPath[TDecision] = (),
+                 length: int = 0):
+        DecisionSequence.__init__(self, extra, decisions, length)
         self._pes = self.calculate_pes_bound()
         self._opt = self.calculate_opt_bound()
 
     # --- Métodos abstractos nuevos ---
 
     @abstractmethod
-    def calculate_opt_bound(self) -> Score:  # Calcula y devuelve la cota optimista
+    def calculate_opt_bound(self) -> TScore:  # Calcula y devuelve la cota optimista
         pass
 
     @abstractmethod
-    def calculate_pes_bound(self) -> Score:  # Calcula y devuelve la cota pesimista
+    def calculate_pes_bound(self) -> TScore:  # Calcula y devuelve la cota pesimista
         pass
 
     # --- Métodos abstractos heredados  ---
@@ -71,12 +74,12 @@ class BabDecisionSequence[TDecision, TExtra](DecisionSequence[TDecision, TExtra]
 
     # Cota optimista. Para las soluciones su valor debe coincidir con la puntuación real
     @final
-    def opt(self) -> Score:
+    def opt(self) -> TScore:
         return self._opt
 
     # Cota pesimista. Para las soluciones su valor debe coincidir con la puntuación real
     @final
-    def pes(self) -> Score:
+    def pes(self) -> TScore:
         return self._pes
 
     # Comparar dos BabDecisionSequence es comparar sus cotas optimistas
@@ -91,14 +94,15 @@ class BabDecisionSequence[TDecision, TExtra](DecisionSequence[TDecision, TExtra]
 
 # Esquemas para BaB --------------------------------------------------------------------------
 
-def bab_min_solve(initial_ds: BabDecisionSequence) -> Optional[ScoredSolution]:
+def bab_min_solve[TDecision, TExtra, TScore](initial_ds: BabDecisionSequence[TDecision, TExtra, TScore])\
+        -> Optional[tuple[TScore, BabDecisionSequence[TDecision, TExtra, TScore]]]:
     bps = initial_ds.pes()
     heap = MinHeap([initial_ds])  # máx: MaxHeap
     best_seen = {initial_ds.state(): initial_ds.opt()}
     while len(heap) > 0:
         best_ds = heap.extract_opt()
         if best_ds.is_solution():
-            return best_ds.opt(), best_ds.solution()
+            return best_ds.opt(), best_ds
         for new_ds in best_ds.successors():
             if new_ds.opt() <= bps:  # máx: >=
                 bps = min(bps, new_ds.pes())  # máx: max
@@ -108,14 +112,15 @@ def bab_min_solve(initial_ds: BabDecisionSequence) -> Optional[ScoredSolution]:
                     heap.add(new_ds)
 
 
-def bab_max_solve(initial_ds: BabDecisionSequence) -> Optional[ScoredSolution]:
+def bab_max_solve[TDecision, TExtra, TScore](initial_ds: BabDecisionSequence[TDecision, TExtra, TScore])\
+        -> Optional[tuple[TScore, BabDecisionSequence[TDecision, TExtra, TScore]]]:
     bps = initial_ds.pes()
     heap = MaxHeap([initial_ds])  # mín: MinHeap
     best_seen = {initial_ds.state(): initial_ds.opt()}
     while len(heap) > 0:
         best_ds = heap.extract_opt()
         if best_ds.is_solution():
-            return best_ds.opt(), best_ds.solution()
+            return best_ds.opt(), best_ds
         for new_ds in best_ds.successors():
             if new_ds.opt() >= bps:  # mín: <=
                 bps = max(bps, new_ds.pes())  # mín: min
