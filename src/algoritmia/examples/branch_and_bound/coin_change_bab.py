@@ -25,7 +25,7 @@ def coin_change_bab_solve(v: tuple[int, ...], Q: int) -> Optional[ScoredSolution
         pending: int
         used_coins: int
 
-    class CoinChangeDS(BabDecisionSequence[Decision, Extra]):
+    class CoinChangeDS(BabDecisionSequence[Decision, Extra, Score]):
         def calculate_opt_bound(self) -> Score:
             s = self.extra.used_coins
             if self.extra.pending > 0:
@@ -54,7 +54,10 @@ def coin_change_bab_solve(v: tuple[int, ...], Q: int) -> Optional[ScoredSolution
             return len(self), self.extra.pending
 
     initial_ds = CoinChangeDS(Extra(Q, 0))
-    return bab_min_solve(initial_ds)
+    result = bab_min_solve(initial_ds)
+    if result is None: return None
+    score, ds_sol = result
+    return score, ds_sol.decisions()
 
 
 # Programa principal --------------------------------------------------------------------------------

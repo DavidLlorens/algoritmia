@@ -1,25 +1,26 @@
-from collections.abc import Iterator
+from collections.abc import Iterable
 from typing import Self
 
 from algoritmia.schemes.dac_scheme import IDivideAndConquerProblem, div_solve
 
+type Solution = list[int]
 
-class MergesortProblem(IDivideAndConquerProblem):
+class MergesortProblem(IDivideAndConquerProblem[Solution]):
     def __init__(self, v: list[int]):
         self.v = v
 
     def is_simple(self) -> bool:
         return len(self.v) <= 1
 
-    def trivial_solution(self) -> list[int]:
+    def trivial_solution(self) -> Solution:
         return self.v
 
-    def divide(self) -> Iterator[Self]:
+    def divide(self) -> Iterable[Self]:
         mid = len(self.v) // 2
         yield MergesortProblem(self.v[:mid])
         yield MergesortProblem(self.v[mid:])
 
-    def combine(self, sols: Iterator[list[int]]) -> list[int]:
+    def combine(self, sols: Iterable[Solution]) -> Solution:
         left, right = sols
         c = [0] * (len(left) + len(right))  # Vector auxiliar
         i, j, k = 0, 0, 0

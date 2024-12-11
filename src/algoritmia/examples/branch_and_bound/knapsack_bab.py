@@ -23,13 +23,13 @@ ScoredSolution = tuple[Score, Solution]
 
 def knapsack_bab_solve_naif(weights: list[int],
                             values: list[int],
-                            capacity: int) -> Optional[Solution]:
+                            capacity: int) -> ScoredSolution:
     @dataclass
     class Extra:
         weight: int = 0
         value: int = 0
 
-    class KnapsackBabDS(BabDecisionSequence[Decision, Extra]):
+    class KnapsackBabDS(BabDecisionSequence[Decision, Extra, Score]):
         # OPTIMISTA: Coge TODOS los objetos pendientes (cota poco informada)
         def calculate_opt_bound(self) -> Score:
             return self.extra.value + sum(values[len(self):])
@@ -53,12 +53,9 @@ def knapsack_bab_solve_naif(weights: list[int],
         def state(self) -> State:
             return len(self), self.extra.weight
 
-        # Podríamos sobreescribir 'solution()' para devolver también el peso:
-        # def solution(self) -> Solution:
-        #    return self.extra.weight, self.decisions()
-
     initial_ds = KnapsackBabDS(Extra())
-    return bab_max_solve(initial_ds)
+    score, ds_sol = bab_max_solve(initial_ds)
+    return score, ds_sol.decisions()
 
 
 # Versión con cotas informadas --------------------------------------------------------------------------
@@ -67,13 +64,13 @@ c = 0
 
 def knapsack_bab_solve(weights: list[int],
                        values: list[int],
-                       capacity: int) -> Optional[Solution]:
+                       capacity: int) -> ScoredSolution:
     @dataclass
     class Extra:
         weight: int = 0
         value: int = 0
 
-    class KnapsackBabDS(BabDecisionSequence[Decision, Extra]):
+    class KnapsackBabDS(BabDecisionSequence[Decision, Extra, Score]):
         # OPTIMISTA: resolver mochila fraccionaria para los objetos que quedan (tema Voraces)
         def calculate_opt_bound(self) -> int:
             value = self.extra.value
@@ -111,12 +108,9 @@ def knapsack_bab_solve(weights: list[int],
         def state(self) -> State:
             return len(self), self.extra.weight
 
-        # Podríamos sobreescribir 'solution()' para devolver también el peso:
-        # def solution(self) -> Solution:
-        #    return self.extra.value, self.extra.weight, self.decisions()
-
-    initial_ps = KnapsackBabDS(Extra())
-    return bab_max_solve(initial_ps)
+    initial_ds = KnapsackBabDS(Extra())
+    score, ds_sol = bab_max_solve(initial_ds)
+    return score, ds_sol.decisions()
 
 
 # Funciones auxiliares para crear instancias  ----------------------------------------------

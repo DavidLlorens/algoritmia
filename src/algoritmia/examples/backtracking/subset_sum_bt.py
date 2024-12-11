@@ -7,10 +7,16 @@ from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solutions, bt_vc_s
 
 # Tipos  --------------------------------------------------------------------------
 
-type Decision = int
-type Score = int
+type Decision = int     # El número elegido
+type Score = int        # Cuántos números hemos elegido
+
+# Queremos que una solución sea la secuencia de decisiones (números) en forma de tupla:
 type Solution = tuple[Decision, ...]
 
+# - 'bt_solutions' y 'bt_vc_solutions' devuelven un Iterator con las DecisionSequence que
+#   llegan a una solución.
+# - Pero un objeto DecisionSequence no es una tupla de decisiones: debemos utilizar el método
+#   'decisions()' de la clase DecisionSequence para obtener la tupla.
 
 # --------------------------------------------------------------------------------
 
@@ -31,10 +37,11 @@ def subsetsum_solutions(e: tuple[int, ...], s: int) -> Iterator[Solution]:
                     yield self.add_decision(1, Extra(acc_sum2))
 
     initial_ds = SumSetDS(Extra(0))
-    return bt_solutions(initial_ds)
+    for ds_sol in bt_solutions(initial_ds):
+        yield ds_sol.decisions()  # Extraemos las decisiones del objeto ds_sol y las devolvemos
 
 
-ScoredSolution = tuple[int, Solution]
+type ScoredSolution = tuple[int, Solution]
 
 
 def subsetsum_best_solution(e: tuple[int, ...], s: int) -> Optional[ScoredSolution]:
@@ -67,8 +74,8 @@ def subsetsum_vc_solutions(e: tuple[int, ...], s: int) -> Iterator[Solution]:
             return len(self), self.extra.acc_sum
 
     initial_ds = SumSetDS(Extra(0))
-    return bt_vc_solutions(initial_ds)
-
+    for ds_sol in bt_vc_solutions(initial_ds):
+        yield ds_sol.decisions()  # Extraemos las decisiones del objeto ds_sol y las devolvemos
 
 # --------------------------------------------------------------------------------
 

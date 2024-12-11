@@ -1,4 +1,15 @@
 # Changelog
+## [4.0.0-beta1] - 2024-12-05
+  - `algoritmia/schemes/bt_scheme.py`. Cambios incompatibles con la versión anterior.
+    - `algoritmia/examples/backtracking`. Ejemplos actualizados.
+  - `algoritmia/schemes/bab_scheme.py`. Cambios incompatibles con la versión anterior.
+    - `algoritmia/examples/branch_and_bound`. Ejemplos actualizados.
+  - `algoritmia/schemes/dac_scheme.py`. Añade tipo genérico TSolution y cambiar Iterator por Iterable.
+    - `algoritmia/examples/divide_and_conquer`. Ejemplos actualizados.
+  - `algoritmia/examples/dynamic_programming`. Cambios en la relación entre los tipos `Result` y `Solution`:
+    - Si siempre hay solución: `type Result = tuple[Score, Solution]`
+    - Si no siempre hay solución: `type Result = tuple[Score, Solution] | None`
+
 ## [3.1.3] - 2024-09-28
   - `algoritmia/viewers/labyrinth_viewer_color.py`: Nueva versión 1.9. Restaura funcionalidad de la 1.7.
 ## [3.1.3] - 2024-09-28

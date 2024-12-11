@@ -2,15 +2,16 @@ from typing import Optional, Self
 
 from algoritmia.schemes.dac_scheme import IDecreaseAndConquerProblem, tail_dec_solve, iter_dec_solve
 
+type Solution = Optional[int]
 
-class BinarySearchProblem(IDecreaseAndConquerProblem):
+class BinarySearchProblem(IDecreaseAndConquerProblem[Solution]):
     def __init__(self, v: list[int], elem: int, start: int, end: int):
         self.v, self.elem, self.start, self.end = v, elem, start, end
 
     def is_simple(self) -> bool:
         return self.end - self.start <= 1
 
-    def trivial_solution(self) -> Optional[int]:
+    def trivial_solution(self) -> Solution:
         if self.start == self.end or self.elem != self.v[self.start]:
             return None
         return self.start

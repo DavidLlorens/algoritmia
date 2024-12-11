@@ -7,10 +7,13 @@ from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solutions
 
 type Decision = int  # Número de fila donde colocar la reina
 
-# 'bt_solutions' devuelve un Iterator del tipo devuelto por el método 'solution' de
-# la clase 'DecisionSequence', cuya implementación por defecto devuelve una tupla con las decisiones:
+# Queremos que una solución sea la secuencia de decisiones (números de fila) en forma de tupla:
 type Solution = tuple[Decision, ...]
 
+# - 'bt_solutions' y 'bt_vc_solutions' devuelven un Iterator con las DecisionSequence que
+#   llegan a una solución.
+# - Pero un objeto DecisionSequence no es una tupla de decisiones: debemos utilizar el método
+#   'decisions()' de la clase DecisionSequence para obtener la tupla.
 
 # --------------------------------------------------------------------------------
 
@@ -29,14 +32,15 @@ def nqueens_solutions(board_size: int) -> Iterator[Solution]:
                         yield self.add_decision(row)
 
     initial_ds = NQueensDS()
-    return bt_solutions(initial_ds)
+    for ds_sol in bt_solutions(initial_ds):
+        yield ds_sol.decisions()  # Extraemos las decisiones del objeto ds_sol y las devolvemos
 
 
 # Programa principal -----------------------------------
 if __name__ == "__main__":
-    board_size0 = 4
+    board_size0 = 8
 
-    print('n-queens solutions for n=4:')
+    print(f'n-queens solutions for n={board_size0}:')
     has_solutions = False
     for sol in nqueens_solutions(board_size0):
         has_solutions = True

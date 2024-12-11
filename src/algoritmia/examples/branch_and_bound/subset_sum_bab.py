@@ -24,7 +24,7 @@ def sumset_bab_solve(e: tuple[int, ...], s: int) -> Optional[ScoredSolution]:
         acc_sum: int = 0  # accumulated sum
         used_nums: int = 0
 
-    class SumSetDS(BabDecisionSequence[Decision, Extra]):
+    class SumSetDS(BabDecisionSequence[Decision, Extra, Score]):
         def calculate_opt_bound(self) -> Score:
             if self.extra.acc_sum == s:
                 return self.extra.used_nums
@@ -51,7 +51,10 @@ def sumset_bab_solve(e: tuple[int, ...], s: int) -> Optional[ScoredSolution]:
             return len(self), self.extra.acc_sum
 
     initial_ds = SumSetDS(Extra())
-    return bab_min_solve(initial_ds)
+    result = bab_min_solve(initial_ds)
+    if result is None: return None
+    score, ds_sol = result
+    return score, ds_sol.decisions()
 
 
 # --------------------------------------------------------------------------------

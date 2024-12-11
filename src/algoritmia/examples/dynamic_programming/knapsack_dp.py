@@ -8,7 +8,7 @@ type Decision = int  # 0 o 1
 type Solution = list[Decision]
 
 type Score = int
-type ScoredSolution = tuple[Score, Solution]
+type Result = tuple[Score, Solution]  # Siempre habrá solución, no hace falta añadir None
 
 type SParams = tuple[Capacity, int]
 
@@ -16,29 +16,24 @@ type SParams = tuple[Capacity, int]
 # Una solucion son len(v) valores (cada uno puede ser 0 o 1)
 # C.E. = O(C N)
 # C.T. = O(C N)
-def solve(C: Capacity, w: list[Weight], v: list[Value]) -> ScoredSolution:
+def solve(C: Capacity, w: list[Weight], v: list[Value]) -> Result:
     def S(c: Capacity, n: int) -> Score:
         # Caso base
-        if n == 0:
-            return 0
-
-        # Recursividad con memoización
+        if n == 0: return 0
+        # Recursividad memoizada
         if (c, n) not in mem:
-            # No coger el objeto
-            c_prev, n_prev = c, n - 1
-            mem[c, n] = (S(c_prev, n_prev), (c_prev, n_prev), 0)
-            # Coger el objeto (si cabe)
-            if w[n - 1] <= c:
-                c_prev, n_prev = c - w[n - 1], n - 1
-                mem[c, n] = max(mem[c, n],
-                                (S(c_prev, n_prev) + v[n - 1], (c_prev, n_prev), 1))
+            if w[n - 1] <= c:  # El objeto cabe
+                mem[c, n] = max((S(c, n - 1),                       (c, n - 1),    0),
+                                (S(c - w[n - 1], n - 1) + v[n - 1], (c - w[n - 1], n - 1), 1))
+            else:  # El objeto no cabe
+                mem[c, n] = S(c, n - 1), (c, n - 1), 0
         return mem[c, n][0]
 
     mem: dict[SParams, tuple[Score, SParams, Decision]] = {}
     score = S(C, len(v))
-    # Recuperación del camino
-    c, n = C, len(v)
+    # Recuperamos la solución de mem
     decisions = []
+    c, n = C, len(v)
     while n > 0:
         _, (c, n), d = mem[c, n]
         decisions.append(d)
@@ -49,7 +44,7 @@ def solve(C: Capacity, w: list[Weight], v: list[Value]) -> ScoredSolution:
 # Una solucion son K valores (los índices de los objetos que metemos en la mochila)
 # C.E. = O(C N)
 # C.T. = O(C N^2)
-def solve2(C: Capacity, w: list[Weight], v: list[Value]) -> ScoredSolution:
+def solve2(C: Capacity, w: list[Weight], v: list[Value]) -> Result:
     def S(c: Capacity, n: int) -> Score:
         # Caso base
         if n == 0:
@@ -100,5 +95,5 @@ if __name__ == '__main__':
     # w0, v0, C0 = create_knapsack_problem(35)  # Solution: value = 1830, weight = 543, decisions = (1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     print("Instance:", C0, w0, v0)
-    print("Scored Solution:", solve(C0, w0, v0))
-    print("Scored Solution (alternative X):", solve2(C0, w0, v0))
+    print("Result (traditional X):", solve(C0, w0, v0))
+    print("Result (alternative X):", solve2(C0, w0, v0))

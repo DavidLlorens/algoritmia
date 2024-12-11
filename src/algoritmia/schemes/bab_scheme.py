@@ -1,5 +1,6 @@
 """
-Version: 5.2 (01-dic-2023)
+Version: 6.0 (11-dic-2024)
+         5.2 (01-dic-2023)
          5.1 (23-nov-2023)
          5.0 (31-oct-2023)
          4.1 (29-sep-2022)
@@ -16,13 +17,13 @@ from typing import final, Optional, Self, Callable
 
 from algoritmia.datastructures.priorityqueues import MaxHeap, MinHeap, IPriorityQueue
 from algoritmia.schemes.bt_scheme import DecisionSequence, DecisionPath
-from algoritmia.utils import infinity
 
 
 # ACERCA DEL TIPO ScoredSolution (importado de bt_scheme)
 # Las funciones bab_min_solve y bab_max_solve devuelven Optional[ScoredSolution]:
-#   - Devuelven None si no hay solución.
-#   - Devuelven la tupla (Score, self.solution()) si hay solución.
+#   - Devuelven 'None' si no hay solución.
+#   - Devuelven la tupla '(score, ds_sol)' si hay solución: donde 'ds_sol' es la
+#     BabDecisionSequence que lleva a la solución óptima y 'score', su puntuación.
 
 # ACERCA DEL CÁLCULO EFICIENTE DE LAS COTAS
 # Dado que las cotas son inmutables solo deberían calcularse una vez:
@@ -63,13 +64,9 @@ class BabDecisionSequence[TDecision, TExtra, TScore](DecisionSequence[TDecision,
     # def is_solution(self) -> bool:
     #     pass
 
-    # --- Métodos heredados que se puede sobreescribir en las clases hijas: solution() y state() ---
+    # --- Método heredado que puede sobreescribirse en las clases hijas ---
 
-    # def solution(self) -> Solution:
-    #    return self.decisions()
-
-    # def state(self) -> State:
-    #    return self.decisions()
+    # def state(self) -> State:     # La implementación por defecto es O(n)
 
     # -- Métodos finales que NO se pueden sobreescribir en las clases hijas ---
 
@@ -92,6 +89,19 @@ class BabDecisionSequence[TDecision, TExtra, TScore](DecisionSequence[TDecision,
     def __eq__(self, other: Self) -> bool:
         return self._opt == other._opt
 
+    # -- Métodos finales heredados que NO pueden sobreescribirse en las clases hijas ---
+
+    # @final
+    # def add_decision(self, decision: TDecision, extra: TExtra = None) -> Self:    # O(1)
+
+    # @final
+    # def decisions(self) -> tuple[TDecision, ...]:     # O(n)
+
+    # @final
+    # def last_decision(self) -> TDecision:             # O(1)
+
+    # @final
+    # def __len__(self) -> int:                         # O(1)
 
 # Esquemas para BaB --------------------------------------------------------------------------
 

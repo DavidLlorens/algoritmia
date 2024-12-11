@@ -7,10 +7,16 @@ from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solutions, bt_vc_s
 
 # Tipos  --------------------------------------------------------------------------
 
-type Decision = int  # 0 o 1
-type Score = int  # El valor de la mochila
+type Decision = int                     # 1 o 0, (coger o no, el objeto)
+type Score = int                        # El valor de la mochila
+
+# Queremos que una solución sea la secuencia de decisiones (1/0) en forma de tupla:
 type Solution = tuple[Decision, ...]
 
+# - 'bt_solutions' y 'bt_vc_solutions' devuelven un Iterator con las DecisionSequence que
+#   llegan a una solución.
+# - Pero un objeto DecisionSequence no es una tupla de decisiones: debemos utilizar el método
+#   'decisions()' de la clase DecisionSequence para obtener la tupla.
 
 # Esquema básico  --------------------------------------------------------------------------
 
@@ -33,15 +39,12 @@ def knapsack_solutions(weights: list[int],
                     yield self.add_decision(1, Extra(new_weight))
                 yield self.add_decision(0, self.extra)
 
-        # Podríamos sobreescribir 'solution()' para devolver también el peso de la mochila:
-        # def solution(self) -> Solution:
-        #    return self.decisions(), self.extra.weight
-
     initial_ds = KnapsackDS(Extra())
-    return bt_solutions(initial_ds)
+    for ds_sol in bt_solutions(initial_ds):
+        yield ds_sol.decisions()  # Extraemos las decisiones del objeto ds_sol y las devolvemos
 
 
-ScoredSolution = tuple[int, Solution]
+type ScoredSolution = tuple[int, Solution]
 
 
 def knapsack_best_solution(weights: list[int],
@@ -78,12 +81,9 @@ def knapsack_vc_solutions(weights: list[int],
         def state(self):
             return len(self), self.extra.weight
 
-        # Podríamos sobreescribir 'solution()' para devolver también el valor y el peso de la mochila:
-        # def solution(self) -> Solution:
-        #    return self.extra.value, self.extra.weight, self.decisions()
-
     initial_ds = KnapsackDS(Extra())
-    return bt_vc_solutions(initial_ds)
+    for ds_sol in bt_vc_solutions(initial_ds):
+        yield ds_sol.decisions()
 
 
 # Funciones auxiliares para crear instancias  ----------------------------------------------

@@ -6,13 +6,16 @@ from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solutions, bt_vc_s
 
 # Tipos  --------------------------------------------------------------------------
 
-type Decision = int  # Número de monedas del tipo actual
-type Score = int  # Total de monedas utilizado
+type Decision = int     # Número de monedas del tipo actual
+type Score = int        # Total de monedas utilizado
 
-# 'bt_solutions' y 'bt_vc_solutions' devuelven un Iterator del tipo devuelto por el método 'solution' de
-# la clase 'DecisionSequence', cuya implementación por defecto devuelve una tupla con las decisiones:
+# Queremos que una solución sea la secuencia de decisiones (nº de monedas) en forma de tupla:
 type Solution = tuple[Decision, ...]
 
+# - 'bt_solutions' y 'bt_vc_solutions' devuelven un Iterator con las DecisionSequence que
+#   llegan a una solución.
+# - Pero un objeto DecisionSequence no es una tupla de decisiones: debemos utilizar el método
+#   'decisions()' de la clase DecisionSequence para obtener la tupla.
 
 # --------------------------------------------------------------------------------
 
@@ -34,7 +37,8 @@ def coin_change_solutions_naif(v: tuple[int, ...], Q: int) -> Iterator[Solution]
         return Q - sum(d * v[i] for i, d in enumerate(ds.decisions()))
 
     initial_ds = CoinChangeDS()
-    return bt_solutions(initial_ds)
+    for ds_sol in bt_solutions(initial_ds):
+        yield ds_sol.decisions()  # Extraemos las decisiones del objeto ds_sol y las devolvemos
 
 
 # --------------------------------------------------------------------------------
@@ -52,17 +56,18 @@ def coin_change_solutions(v: tuple[int, ...], Q: int) -> Iterator[Solution]:
             n = len(self)
             if n < len(v):
                 for num_coins in range(self.extra.pending // v[n] + 1):
-                    pending2 = self.extra.pending - num_coins * v[n]
-                    yield self.add_decision(num_coins, Extra(pending2))
+                    new_pending = self.extra.pending - num_coins * v[n]
+                    yield self.add_decision(num_coins, Extra(new_pending))
 
     initial_ds = CoinChangeDS(Extra(Q))
-    return bt_solutions(initial_ds)
+    for ds_sol in bt_solutions(initial_ds):
+        yield ds_sol.decisions()  # Extraemos las decisiones del objeto ds_sol y las devolvemos
 
 
-ScoredSolution = tuple[int, Solution]
+ScoredSolution = tuple[Score, Solution]
 
 
-def coin_change_best_solution(v: tuple[int, ...], Q: int) -> Optional[ScoredSolution]:
+def coin_change_best_solution(v: tuple[int, ...], Q: int) -> Optional[Solution]:
     def f(solution: Solution) -> int:
         return sum(solution)
 
@@ -85,14 +90,15 @@ def coin_change_vc_solutions(v: tuple[int, ...], Q: int) -> Iterator[Solution]:
             n = len(self)
             if n < len(v):
                 for num_coins in range(self.extra.pending // v[n] + 1):
-                    pending2 = self.extra.pending - num_coins * v[n]
-                    yield self.add_decision(num_coins, Extra(pending2))
+                    new_pending = self.extra.pending - num_coins * v[n]
+                    yield self.add_decision(num_coins, Extra(new_pending))
 
         def state(self) -> tuple[int, int]:
             return len(self), self.extra.pending
 
     initial_ds = CoinChangeDS(Extra(Q))
-    return bt_vc_solutions(initial_ds)
+    for ds_sol in bt_solutions(initial_ds):
+        yield ds_sol.decisions()  # Extraemos las decisiones del objeto ds_sol y las devolvemos
 
 
 # Programa principal --------------------------------------------------------------------------------

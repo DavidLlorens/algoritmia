@@ -47,7 +47,7 @@ class DecisionSequence[TDecision, TExtra](ABC, Sized):
     def successors(self) -> Iterator[Self]:
         pass
 
-    # --- Métodos que se pueden sobreescribir en las clases hijas: solution() y state() ---
+    # --- Método que se puede sobreescribir en las clases hijas: state() ---
 
     # Debe devolver siempre un objeto inmutable
     # Por defecto se devuelve el contenido de _decisions
@@ -56,9 +56,15 @@ class DecisionSequence[TDecision, TExtra](ABC, Sized):
 
     # -- Métodos finales que NO se pueden sobreescribir en las clases hijas ---
 
-    @final
+    @final  # quitado final para que BabDecisionSecuence pueda cambiar el tipo devuelto
     def add_decision(self, decision: TDecision, extra: TExtra = None) -> Self:
         return self.__class__(extra, (decision, self._decisions), self._len + 1)
+
+    @final
+    def last_decision(self) -> TDecision:  # Es O(1)
+        if len(self._decisions) > 0:
+            return self._decisions[0]
+        raise RuntimeError(f'last_decision() used on an empty {self.__class__.__name__} object')
 
     @final
     def decisions(self) -> tuple[TDecision, ...]:  # Es O(n)
