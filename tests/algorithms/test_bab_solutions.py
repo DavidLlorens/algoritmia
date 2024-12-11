@@ -9,7 +9,7 @@ class TestBAB_SOLUTIONS(unittest.TestCase):
 
     def test_knapsack_bab_max_solve(self):
         Score = int
-        State = tuple[int, int, int]
+        State = tuple[int, int]
 
         @dataclass
         class Extra:
@@ -37,14 +37,14 @@ class TestBAB_SOLUTIONS(unittest.TestCase):
                     yield self.add_decision(0, self.extra)
 
             def state(self) -> State:
-                return len(self), self.extra.weight, self.extra.value
+                return len(self), self.extra.weight
 
-        weights = [42, 55, 93, 89, 98, 77]
-        values = [168, 110, 186, 89, 98, 77]
+        weights = [ 42,  55,  93, 89, 98, 77]
+        values =  [168, 110, 186, 89, 98, 77]
         capacity = 136
         initial_ds = KnapsackBabDS(Extra(0, 0))
-        score, DS = bab_max_solve(initial_ds)
-        solution = score, DS.decisions()
+        score, solution_ds = bab_max_solve(initial_ds)
+        solution = score, solution_ds.decisions()
 
         self.assertEqual((354, (1, 0, 1, 0, 0, 0)), solution)
 
