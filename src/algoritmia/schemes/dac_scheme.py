@@ -59,7 +59,8 @@ def dec_solve[TSolution](problem: IDecreaseAndConquerProblem[TSolution]) -> TSol
         return problem.trivial_solution()
     else:
         smaller_problem = problem.decrease()
-        return problem.process(dec_solve(smaller_problem))
+        smaller_solution = dec_solve(smaller_problem)
+        return problem.process(smaller_solution)
 
 
 def tail_dec_solve[TSolution](problem: IDecreaseAndConquerProblem[TSolution]) -> TSolution:

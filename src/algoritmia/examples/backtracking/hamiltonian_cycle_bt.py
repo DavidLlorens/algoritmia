@@ -1,5 +1,5 @@
 from collections.abc import Iterator
-from typing import Optional, Self
+from typing import Self
 
 from algoritmia.datastructures.graphs import UndirectedGraph, WeightingFunction, IGraph
 from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solutions, min_solution
@@ -31,11 +31,11 @@ def hamiltoniancycle_solutions[TVertex](g: IGraph[TVertex]) -> Iterator[Solution
                     if v not in ds_set:  # O(1), |V| veces
                         yield self.add_decision(v)
 
-    initial_ds = HamiltonianCycleDS()
-    v_initial = next(iter(g.V))  # Elegimos un vértice cualquiera como inicial
-    initial_ds2 = initial_ds.add_decision(v_initial)  # Forzamos la primera decisión
-    for ds_sol in bt_solutions(initial_ds2):
-        yield ds_sol.decisions()  # Extraemos las decisiones del objeto ds_sol y las devolvemos
+    initial_ds0 = HamiltonianCycleDS()
+    v_initial = next(iter(g.V))  # Por eficiencia, fijamos el primer vértice
+    initial_ds = initial_ds0.add_decision(v_initial)
+    for solution_ds in bt_solutions(initial_ds):
+        yield solution_ds.decisions()
 
 
 type Score = int | float    # La longitud (suma de pesos) del ciclo
@@ -43,7 +43,7 @@ type ScoredSolution[TDecision] = tuple[Score, Solution[TDecision]]
 
 
 def hamiltoniancycle_best_solution[TVertex](g: IGraph[TVertex],
-                                            wf: WeightingFunction[TVertex]) -> Optional[ScoredSolution[TVertex]]:
+                                            wf: WeightingFunction[TVertex]) -> ScoredSolution[TVertex] | None:
     def f(sol: Solution) -> Score:
         return sum(wf(sol[i - 1], sol[i]) for i in range(len(sol)))
 

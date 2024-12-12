@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 from dataclasses import dataclass
 from random import seed, randint
-from typing import Optional, Self
+from typing import Self
 
 from algoritmia.schemes.bab_scheme import BabDecisionSequence, bab_max_solve
 from algoritmia.schemes.bt_scheme import State
@@ -54,8 +54,8 @@ def knapsack_bab_solve_naif(weights: list[int],
             return len(self), self.extra.weight
 
     initial_ds = KnapsackBabDS(Extra())
-    score, ds_sol = bab_max_solve(initial_ds)
-    return score, ds_sol.decisions()
+    score, solution_ds = bab_max_solve(initial_ds)
+    return score, solution_ds.decisions()
 
 
 # Versión con cotas informadas --------------------------------------------------------------------------
@@ -109,8 +109,8 @@ def knapsack_bab_solve(weights: list[int],
             return len(self), self.extra.weight
 
     initial_ds = KnapsackBabDS(Extra())
-    score, ds_sol = bab_max_solve(initial_ds)
-    return score, ds_sol.decisions()
+    score, solution_ds = bab_max_solve(initial_ds)
+    return score, solution_ds.decisions()
 
 
 # Funciones auxiliares para crear instancias  ----------------------------------------------

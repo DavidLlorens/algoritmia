@@ -32,8 +32,8 @@ def nqueens_solutions(board_size: int) -> Iterator[Solution]:
                         yield self.add_decision(row)
 
     initial_ds = NQueensDS()
-    for ds_sol in bt_solutions(initial_ds):
-        yield ds_sol.decisions()  # Extraemos las decisiones del objeto ds_sol y las devolvemos
+    for solution_ds in bt_solutions(initial_ds):
+        yield solution_ds.decisions()  # Extraemos las decisiones del objeto solution_ds y las devolvemos
 
 
 # Programa principal -----------------------------------

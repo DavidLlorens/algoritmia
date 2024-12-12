@@ -1,6 +1,6 @@
 from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import Optional, Self
+from typing import Self
 
 from algoritmia.datastructures.graphs import UndirectedGraph, WeightingFunction
 from algoritmia.schemes.bab_scheme import BabDecisionSequence, bab_min_solve
@@ -20,7 +20,7 @@ type ScoredSolution[T] = tuple[Score, Solution[T]]
 # --------------------------------------------------------------------------------
 
 def hamiltoniancycle_bab_solve[T](g: UndirectedGraph[T],
-                                  wf: WeightingFunction[T]) -> Optional[ScoredSolution[T]]:
+                                  wf: WeightingFunction[T]) -> ScoredSolution[T] | None:
     @dataclass
     class Extra:
         weight: int = 0
@@ -61,8 +61,8 @@ def hamiltoniancycle_bab_solve[T](g: UndirectedGraph[T],
 
     result = bab_min_solve(one_vertex_ds)
     if result is None: return None
-    score, ds_sol = result
-    return score, ds_sol.decisions()
+    score, solution_ds = result
+    return score, solution_ds.decisions()
 
 
 # Programa principal ---------------------------

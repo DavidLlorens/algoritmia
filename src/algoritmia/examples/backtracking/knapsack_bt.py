@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 from dataclasses import dataclass
 from random import seed, randint
-from typing import Optional, Self
+from typing import Self
 
 from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solutions, bt_vc_solutions, max_solution
 
@@ -40,8 +40,8 @@ def knapsack_solutions(weights: list[int],
                 yield self.add_decision(0, self.extra)
 
     initial_ds = KnapsackDS(Extra())
-    for ds_sol in bt_solutions(initial_ds):
-        yield ds_sol.decisions()  # Extraemos las decisiones del objeto ds_sol y las devolvemos
+    for solution_ds in bt_solutions(initial_ds):
+        yield solution_ds.decisions()  # Extraemos las decisiones del objeto solution_ds y las devolvemos
 
 
 type ScoredSolution = tuple[int, Solution]
@@ -49,7 +49,7 @@ type ScoredSolution = tuple[int, Solution]
 
 def knapsack_best_solution(weights: list[int],
                            values: list[int],
-                           capacity: int) -> Optional[ScoredSolution]:
+                           capacity: int) -> ScoredSolution | None:
     def f(solution: Solution) -> int:
         return sum(d * values[i] for i, d in enumerate(solution))
 
@@ -82,8 +82,8 @@ def knapsack_vc_solutions(weights: list[int],
             return len(self), self.extra.weight
 
     initial_ds = KnapsackDS(Extra())
-    for ds_sol in bt_vc_solutions(initial_ds):
-        yield ds_sol.decisions()
+    for solution_ds in bt_vc_solutions(initial_ds):
+        yield solution_ds.decisions()
 
 
 # Funciones auxiliares para crear instancias  ----------------------------------------------

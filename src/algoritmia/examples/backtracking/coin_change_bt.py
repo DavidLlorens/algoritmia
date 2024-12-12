@@ -1,6 +1,6 @@
 from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import Optional, Self
+from typing import Self
 
 from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solutions, bt_vc_solutions, min_solution
 
@@ -37,8 +37,8 @@ def coin_change_solutions_naif(v: tuple[int, ...], Q: int) -> Iterator[Solution]
         return Q - sum(d * v[i] for i, d in enumerate(ds.decisions()))
 
     initial_ds = CoinChangeDS()
-    for ds_sol in bt_solutions(initial_ds):
-        yield ds_sol.decisions()  # Extraemos las decisiones del objeto ds_sol y las devolvemos
+    for solution_ds in bt_solutions(initial_ds):
+        yield solution_ds.decisions()  # Extraemos las decisiones del objeto solution_ds y las devolvemos
 
 
 # --------------------------------------------------------------------------------
@@ -60,18 +60,19 @@ def coin_change_solutions(v: tuple[int, ...], Q: int) -> Iterator[Solution]:
                     yield self.add_decision(num_coins, Extra(new_pending))
 
     initial_ds = CoinChangeDS(Extra(Q))
-    for ds_sol in bt_solutions(initial_ds):
-        yield ds_sol.decisions()  # Extraemos las decisiones del objeto ds_sol y las devolvemos
+    for solution_ds in bt_solutions(initial_ds):
+        yield solution_ds.decisions()
 
 
 ScoredSolution = tuple[Score, Solution]
 
 
-def coin_change_best_solution(v: tuple[int, ...], Q: int) -> Optional[Solution]:
+def coin_change_best_solution(v: tuple[int, ...], Q: int) -> ScoredSolution | None:
     def f(solution: Solution) -> int:
         return sum(solution)
 
-    return min_solution(coin_change_solutions(v, Q), f)
+    all_solutions = coin_change_solutions(v, Q)
+    return min_solution(all_solutions, f)
 
 
 # --------------------------------------------------------------------------------
@@ -97,8 +98,8 @@ def coin_change_vc_solutions(v: tuple[int, ...], Q: int) -> Iterator[Solution]:
             return len(self), self.extra.pending
 
     initial_ds = CoinChangeDS(Extra(Q))
-    for ds_sol in bt_solutions(initial_ds):
-        yield ds_sol.decisions()  # Extraemos las decisiones del objeto ds_sol y las devolvemos
+    for solution_ds in bt_vc_solutions(initial_ds):
+        yield solution_ds.decisions()
 
 
 # Programa principal --------------------------------------------------------------------------------

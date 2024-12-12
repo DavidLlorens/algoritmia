@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 from dataclasses import dataclass
 from random import random, seed
-from typing import Optional, Self
+from typing import Self
 
 from algoritmia.schemes.bab_scheme import BabDecisionSequence, bab_min_solve
 from algoritmia.utils import infinity
@@ -18,7 +18,7 @@ ScoredSolution = tuple[Score, Solution]
 
 # --------------------------------------------------------------------------------
 
-def sumset_bab_solve(e: tuple[int, ...], s: int) -> Optional[ScoredSolution]:
+def sumset_bab_solve(e: tuple[int, ...], s: int) -> ScoredSolution | None:
     @dataclass
     class Extra:
         acc_sum: int = 0  # accumulated sum
@@ -53,8 +53,8 @@ def sumset_bab_solve(e: tuple[int, ...], s: int) -> Optional[ScoredSolution]:
     initial_ds = SumSetDS(Extra())
     result = bab_min_solve(initial_ds)
     if result is None: return None
-    score, ds_sol = result
-    return score, ds_sol.decisions()
+    score, solution_ds = result
+    return score, solution_ds.decisions()
 
 
 # --------------------------------------------------------------------------------

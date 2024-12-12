@@ -3,7 +3,7 @@ from typing import Self
 
 from algoritmia.schemes.dac_scheme import IDivideAndConquerProblem, div_solve
 
-type Solution = list[int]
+type Solution = list[int]  # La lista ordenada
 
 class MergesortProblem(IDivideAndConquerProblem[Solution]):
     def __init__(self, v: list[int]):
@@ -17,8 +17,8 @@ class MergesortProblem(IDivideAndConquerProblem[Solution]):
 
     def divide(self) -> Iterable[Self]:
         mid = len(self.v) // 2
-        yield MergesortProblem(self.v[:mid])
-        yield MergesortProblem(self.v[mid:])
+        yield MergesortProblem(self.v[:mid])  # O(n)
+        yield MergesortProblem(self.v[mid:])  # O(n)
 
     def combine(self, sols: Iterable[Solution]) -> Solution:
         left, right = sols

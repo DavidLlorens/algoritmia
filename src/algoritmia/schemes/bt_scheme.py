@@ -12,25 +12,25 @@ Version:  5.3 (09-ene-2024)
 from abc import ABC, abstractmethod
 from collections import deque
 from collections.abc import Iterator, Callable, Sized
-from typing import Any, final, Optional, Self
+from typing import Any, final, Self
 
 # Tipos  --------------------------------------------------------------------------
 
-# ACERCA DEL TIPO State
-# La implementación por defecto devuelve la tupla de decisiones.
-# Podemos sobreescribir state() en la clase hija para devolver otra cosa.
-type State = Any
-
-# El tipo para guardar las secuencias de decisiones como caminos en el árbol
+# El tipo para guardar las secuencias de decisiones (self._decisions) como caminos en el árbol
 # de todas las posibles secuencias. Dos secuencias que compartan un prefijo comparten
 # la memoria correspondiente a ese prefijo.
-type DecisionPath[TDecision] = tuple[()] | tuple[TDecision, DecisionPath[TDecision]]
+type DecisionPath[TDecision] = tuple[TDecision, DecisionPath[TDecision]] | tuple[()]
+
+# ACERCA DEL TIPO State
+# La implementación por defecto devuelve self._decisions.
+# Podemos sobreescribir state() en la clase hija para devolver otra cosa.
+type State = Any
 
 # La clase DecisionSequence -------------------------------------------------------
 
 class DecisionSequence[TDecision, TExtra](ABC, Sized):
     def __init__(self,
-                 extra: Optional[TExtra] = None,
+                 extra: TExtra | None = None,
                  decisions: DecisionPath[TDecision] = (),
                  length: int = 0):
         self.extra = extra
@@ -56,7 +56,7 @@ class DecisionSequence[TDecision, TExtra](ABC, Sized):
 
     # -- Métodos finales que NO se pueden sobreescribir en las clases hijas ---
 
-    @final  # quitado final para que BabDecisionSecuence pueda cambiar el tipo devuelto
+    @final
     def add_decision(self, decision: TDecision, extra: TExtra = None) -> Self:
         return self.__class__(extra, (decision, self._decisions), self._len + 1)
 
@@ -111,10 +111,10 @@ def bt_vc_solutions[TDecision, TExtra](initial_ds: DecisionSequence[TDecision, T
 
 
 def min_solution[TSolution, TScore](solutions: Iterator[TSolution],
-                                    f: Callable[[TSolution], TScore]) -> Optional[tuple[TScore, TSolution]]:
+                                    f: Callable[[TSolution], TScore]) -> tuple[TScore, TSolution] | None:
     return min(((f(sol), sol) for sol in solutions), default=None)
 
 
 def max_solution[TSolution, TScore](solutions: Iterator[TSolution],
-                                    f: Callable[[TSolution], TScore]) -> Optional[tuple[TScore, TSolution]]:
+                                    f: Callable[[TSolution], TScore]) -> tuple[TScore, TSolution] | None:
     return max(((f(sol), sol) for sol in solutions), default=None)

@@ -1,12 +1,23 @@
 # Changelog
+## [4.0.0-beta2] - 2024-12-05
+  - `algoritmia/examples/divide_and_conquer/binarysearch_scheme.py`. Reimplementación.
+  - `algoritmia/examples/divide_and_conquer/mergesort_scheme.py`. Añadidos commentarios.
+  - Eliminados los Optional de:
+    - `algoritmia/schemes/bab_scheme.py`
+    - `algoritmia/schemes/bt_scheme.py`
+    - `algoritmia/examples/backtracking/*.py`
+    - `algoritmia/examples/branch_and_bound/*.py`
 ## [4.0.0-beta1] - 2024-12-05
-  - `algoritmia/schemes/bt_scheme.py`. Cambios incompatibles con la versión anterior.
-    - `algoritmia/examples/backtracking`. Ejemplos actualizados.
-  - `algoritmia/schemes/bab_scheme.py`. Cambios incompatibles con la versión anterior.
-    - `algoritmia/examples/branch_and_bound`. Ejemplos actualizados.
-  - `algoritmia/schemes/dac_scheme.py`. Añade tipo genérico TSolution y cambiar Iterator por Iterable.
-    - `algoritmia/examples/divide_and_conquer`. Ejemplos actualizados.
-  - `algoritmia/examples/dynamic_programming`. Cambios en la relación entre los tipos `Result` y `Solution`:
+  - `algoritmia/schemes/bt_scheme.py`: Cambios incompatibles con la versión anterior.
+  - `algoritmia/schemes/bab_scheme.py`: Cambios incompatibles con la versión anterior.
+  - `algoritmia/schemes/dac_scheme.py`: Añade tipo genérico TSolution y cambia Iterator por Iterable.
+  
+  - Ejemplos actualizados:
+    - `algoritmia/examples/backtracking/*.py`
+    - `algoritmia/examples/divide_and_conquer/*.py`
+    - `algoritmia/examples/branch_and_bound/*.py`
+    
+  - `algoritmia/examples/dynamic_programming/*.py`: Cambios en la relación entre los tipos `Result` y `Solution`:
     - Si siempre hay solución: `type Result = tuple[Score, Solution]`
     - Si no siempre hay solución: `type Result = tuple[Score, Solution] | None`
 

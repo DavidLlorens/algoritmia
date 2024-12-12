@@ -13,7 +13,7 @@ Version: 6.0 (11-dic-2024)
 import operator
 from abc import abstractmethod
 from functools import total_ordering
-from typing import final, Optional, Self, Callable
+from typing import final, Self, Callable
 
 from algoritmia.datastructures.priorityqueues import MaxHeap, MinHeap, IPriorityQueue
 from algoritmia.schemes.bt_scheme import DecisionSequence, DecisionPath
@@ -37,7 +37,7 @@ from algoritmia.schemes.bt_scheme import DecisionSequence, DecisionPath
 @total_ordering  # Implementando < y ==, el resto de operadores de comparación se generan automáticamente
 class BabDecisionSequence[TDecision, TExtra, TScore](DecisionSequence[TDecision, TExtra]):
     def __init__(self,
-                 extra: Optional[TExtra] = None,
+                 extra: TExtra | None = None,
                  decisions: DecisionPath[TDecision] = (),
                  length: int = 0):
         DecisionSequence.__init__(self, extra, decisions, length)
@@ -108,7 +108,7 @@ class BabDecisionSequence[TDecision, TExtra, TScore](DecisionSequence[TDecision,
 def bab_solve[TDecision, TExtra, TScore](better: Callable[[TScore, TScore], bool],
                                          heap: IPriorityQueue[TScore],
                                          initial_ds: BabDecisionSequence[TDecision, TExtra, TScore]
-                                         ) -> Optional[tuple[TScore, BabDecisionSequence[TDecision, TExtra, TScore]]]:
+                                         ) -> tuple[TScore, BabDecisionSequence[TDecision, TExtra, TScore]] | None:
     bps = initial_ds.pes()
     heap.add(initial_ds)
     best_seen = {initial_ds.state(): initial_ds.opt()}
@@ -129,10 +129,10 @@ def bab_solve[TDecision, TExtra, TScore](better: Callable[[TScore, TScore], bool
 
 
 def bab_min_solve[TDecision, TExtra, TScore](initial_ds: BabDecisionSequence[TDecision, TExtra, TScore])\
-        -> Optional[tuple[TScore, BabDecisionSequence[TDecision, TExtra, TScore]]]:
+        -> tuple[TScore, BabDecisionSequence[TDecision, TExtra, TScore]] | None:
     return bab_solve(operator.lt, MinHeap(), initial_ds)
 
 
 def bab_max_solve[TDecision, TExtra, TScore](initial_ds: BabDecisionSequence[TDecision, TExtra, TScore])\
-        -> Optional[tuple[TScore, BabDecisionSequence[TDecision, TExtra, TScore]]]:
+        -> tuple[TScore, BabDecisionSequence[TDecision, TExtra, TScore]] | None:
     return bab_solve(operator.gt, MaxHeap(), initial_ds)

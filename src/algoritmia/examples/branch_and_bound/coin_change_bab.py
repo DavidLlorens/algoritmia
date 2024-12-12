@@ -1,6 +1,6 @@
 from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import Optional, Self
+from typing import Self
 
 from math import ceil
 
@@ -19,7 +19,7 @@ type ScoredSolution = tuple[Score, Solution]
 
 # --------------------------------------------------------------------------------
 
-def coin_change_bab_solve(v: tuple[int, ...], Q: int) -> Optional[ScoredSolution]:
+def coin_change_bab_solve(v: tuple[int, ...], Q: int) -> ScoredSolution | None:
     @dataclass
     class Extra:
         pending: int
@@ -56,8 +56,8 @@ def coin_change_bab_solve(v: tuple[int, ...], Q: int) -> Optional[ScoredSolution
     initial_ds = CoinChangeDS(Extra(Q, 0))
     result = bab_min_solve(initial_ds)
     if result is None: return None
-    score, ds_sol = result
-    return score, ds_sol.decisions()
+    score, solution_ds = result
+    return score, solution_ds.decisions()
 
 
 # Programa principal --------------------------------------------------------------------------------

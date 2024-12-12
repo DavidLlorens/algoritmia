@@ -37,8 +37,8 @@ def subsetsum_solutions(e: tuple[int, ...], s: int) -> Iterator[Solution]:
                     yield self.add_decision(1, Extra(acc_sum2))
 
     initial_ds = SumSetDS(Extra(0))
-    for ds_sol in bt_solutions(initial_ds):
-        yield ds_sol.decisions()  # Extraemos las decisiones del objeto ds_sol y las devolvemos
+    for solution_ds in bt_solutions(initial_ds):
+        yield solution_ds.decisions()  # Extraemos las decisiones del objeto solution_ds y las devolvemos
 
 
 type ScoredSolution = tuple[int, Solution]
@@ -74,8 +74,8 @@ def subsetsum_vc_solutions(e: tuple[int, ...], s: int) -> Iterator[Solution]:
             return len(self), self.extra.acc_sum
 
     initial_ds = SumSetDS(Extra(0))
-    for ds_sol in bt_vc_solutions(initial_ds):
-        yield ds_sol.decisions()  # Extraemos las decisiones del objeto ds_sol y las devolvemos
+    for solution_ds in bt_vc_solutions(initial_ds):
+        yield solution_ds.decisions()  # Extraemos las decisiones del objeto solution_ds y las devolvemos
 
 # --------------------------------------------------------------------------------
 

@@ -1,29 +1,29 @@
-from typing import Optional, Self
+from typing import Self
 
 from algoritmia.schemes.dac_scheme import IDecreaseAndConquerProblem, tail_dec_solve, iter_dec_solve
 
-type Solution = Optional[int]
+type Solution = int  # La posición del elemento buscado
 
 class BinarySearchProblem(IDecreaseAndConquerProblem[Solution]):
     def __init__(self, v: list[int], elem: int, start: int, end: int):
         self.v, self.elem, self.start, self.end = v, elem, start, end
+        self.mid = (self.start + self.end) // 2
 
     def is_simple(self) -> bool:
-        return self.end - self.start <= 1
+        return self.end - self.start <= 1 or self.elem == self.v[self.mid]
 
-    def trivial_solution(self) -> Solution:
+    def trivial_solution(self) -> Solution | None:
+        if self.elem == self.v[self.mid]:
+            return self.mid
         if self.start == self.end or self.elem != self.v[self.start]:
             return None
         return self.start
 
     def decrease(self) -> Self:
-        mid = (self.start + self.end) // 2
-        if self.elem < self.v[mid]:
-            return BinarySearchProblem(self.v, self.elem, self.start, mid)
-        elif self.elem > self.v[mid]:
-            return BinarySearchProblem(self.v, self.elem, mid + 1, self.end)
-        else:  # self.elem == self.v[mid]:
-            return BinarySearchProblem(self.v, self.elem, mid, mid + 1)
+        if self.elem < self.v[self.mid]:
+            return BinarySearchProblem(self.v, self.elem, self.start, self.mid)
+        else:
+            return BinarySearchProblem(self.v, self.elem, self.mid + 1, self.end)
 
 
 if __name__ == "__main__":
