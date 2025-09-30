@@ -2,7 +2,7 @@ from algoritmia.datastructures.graphs import UndirectedGraph, WeightingFunction
 
 type City = str
 
-km = WeightingFunction[City](
+_km = WeightingFunction[City](
     {('Alcúdia', 'Artà'): 36, ('Alcúdia', 'Inca'): 25,
      ('Alcúdia', 'Pollença'): 10, ('Andratx', 'Calvià'): 14,
      ('Andratx', 'Palma de Mallorca'): 30, ('Andratx', 'Sóller'): 56,
@@ -14,4 +14,4 @@ km = WeightingFunction[City](
      ('Pollença', 'Sóller'): 54},
     symmetrical=True)
 
-Mallorca = UndirectedGraph[City](E=km.keys())
+Mallorca = UndirectedGraph[City](E=_km.keys())

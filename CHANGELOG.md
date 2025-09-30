@@ -1,4 +1,7 @@
 # Changelog
+## [4.0.0] - 2025-09-30
+  - Añade `if __name__ == "__main__"` a los ficheros a los que les faltaba.
+  - `algoritmia/viewers/labyrinth_viewer.py`: cambios cosméticos.
 ## [4.0.0-beta2] - 2024-12-05
   - `algoritmia/examples/divide_and_conquer/binarysearch_scheme.py`. Reimplementación.
   - `algoritmia/examples/divide_and_conquer/mergesort_scheme.py`. Añadidos commentarios.
@@ -21,7 +24,7 @@
     - Si siempre hay solución: `type Result = tuple[Score, Solution]`
     - Si no siempre hay solución: `type Result = tuple[Score, Solution] | None`
 
-## [3.1.3] - 2024-09-28
+## [3.1.4] - 2024-09-28
   - `algoritmia/viewers/labyrinth_viewer_color.py`: Nueva versión 1.9. Restaura funcionalidad de la 1.7.
 ## [3.1.3] - 2024-09-28
   - `algoritmia/viewers/labyrinth_viewer.py`: Nueva versión 1.9. Restaura funcionalidad de la 1.7.

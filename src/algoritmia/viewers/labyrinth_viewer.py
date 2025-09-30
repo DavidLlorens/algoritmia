@@ -1,4 +1,6 @@
 """
+2025-09-30: Version 1.10 # wall_width también es el grosor de los caminos y de las líneas del grafo,
+            que pasan a dibujarse en negro con los nodos rellenos en palegreen
 2024-09-28: Version 1.9 # Restaura funcionalidad de versión 1.7
 2024-09-20: Version 1.8 # Deja cambiar el title, restaura las celdas marcadas al volver al modo laberinto
 2021-09-14: Version 1.7 # cambia las teclas: "esc" o "return" para cerrar
@@ -83,7 +85,7 @@ class LabyrinthViewer(EasyPaint):
         mh2 = self.mh / 2 + self.cell_size / 2 + offset
         for v in path[1:]:
             self.create_line(mw2 + u[1] * self.cell_size, mh2 + u[0] * self.cell_size, mw2 + v[1] * self.cell_size,
-                             mh2 + v[0] * self.cell_size, color,
+                             mh2 + v[0] * self.cell_size, color, width = self.wall_width,
                              capstyle=tkinter.PROJECTING)
             u = v
 
@@ -100,10 +102,10 @@ class LabyrinthViewer(EasyPaint):
         # Draw I and O on input and output cells
         if self.ip is not None:
             self.create_text(mw / 2 + (self.ip[1] + 0.5) * self.cell_size, mh / 2 + (self.ip[0] + 0.5) * self.cell_size,
-                             "I", int(self.cell_size / 1.5), "CENTER", "black")
+                             "I", int(self.cell_size / 1.5), "CENTER", "lightgray")
         if self.op is not None:
             self.create_text(mw / 2 + (self.op[1] + 0.5) * self.cell_size, mh / 2 + (self.op[0] + 0.5) * self.cell_size,
-                             "O", int(self.cell_size / 1.5), "CENTER", "black")
+                             "O", int(self.cell_size / 1.5), "CENTER", "lightgray")
 
         # Draw internal walls
         for r in range(self.max_row + 1):
@@ -132,6 +134,7 @@ class LabyrinthViewer(EasyPaint):
     def draw_graph(self):
         mw = self.mw
         mh = self.mh
+        width = self.wall_width
 
         y_off = 0  # (self.canvas_height + self.cell_size + self.cell_size / 4) / 2
         h = self.cell_size / 2
@@ -139,13 +142,13 @@ class LabyrinthViewer(EasyPaint):
         for (ru, cu), (rv, cv) in self.g.E:
             self.create_line(cu * self.cell_size + h + mw / 2, y_off + ru * self.cell_size + h + mh / 2,
                              cv * self.cell_size + h + mw / 2, y_off + rv * self.cell_size + h + mh / 2,
-                             color='darkgreen')
+                             color='black',width=width)
 
         for (ru, cu) in self.g.V:
             self.create_filled_circle(cu * self.cell_size + h + mw / 2,
                                       y_off + ru * self.cell_size + h + mh / 2,
-                                      self.cell_size / 8,
-                                      color='darkgreen',
+                                      self.cell_size / 8, width=width,
+                                      color='black',
                                       fill='palegreen')
 
     def on_key_press(self, keysym):

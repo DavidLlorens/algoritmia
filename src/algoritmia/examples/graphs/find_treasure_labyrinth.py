@@ -45,18 +45,19 @@ def find_treasure_depthfirst(g: UndirectedGraph[Vertex],
 
 # Main program -------------------------------------------------------------------------
 
-corridors = [((0, 0), (0, 1)), ((0, 2), (0, 3)), ((1, 0), (1, 1)), ((0, 1), (0, 2)),
-             ((2, 0), (1, 0)), ((2, 1), (2, 2)), ((2, 2), (2, 3)), ((0, 1), (1, 1)),
-             ((0, 2), (1, 2)), ((0, 3), (1, 3)), ((1, 1), (2, 1)), ((1, 2), (2, 2))]
-labyrinth = UndirectedGraph(E=corridors)
+if __name__ == "__main__":
+    corridors = [((0, 0), (0, 1)), ((0, 2), (0, 3)), ((1, 0), (1, 1)), ((0, 1), (0, 2)),
+                 ((2, 0), (1, 0)), ((2, 1), (2, 2)), ((2, 2), (2, 3)), ((0, 1), (1, 1)),
+                 ((0, 2), (1, 2)), ((0, 3), (1, 3)), ((1, 1), (2, 1)), ((1, 2), (2, 2))]
+    labyrinth = UndirectedGraph(E=corridors)
 
-pos_start = (0, 0)
-pos_treasure = (1, 3)
+    pos_start = (0, 0)
+    pos_treasure = (1, 3)
 
-# room = find_treasure_breadthfirst(labyrinth, pos_start, pos_treasure)
-room = find_treasure_depthfirst(labyrinth, pos_start, pos_treasure)
+    # room = find_treasure_breadthfirst(labyrinth, pos_start, pos_treasure)
+    room = find_treasure_depthfirst(labyrinth, pos_start, pos_treasure)
 
-if room is None:
-    print('Treasure not found.')
-else:
-    print(f'Treasure found on room {room}.')
+    if room is None:
+        print('Treasure not found.')
+    else:
+        print(f'Treasure found on room {room}.')

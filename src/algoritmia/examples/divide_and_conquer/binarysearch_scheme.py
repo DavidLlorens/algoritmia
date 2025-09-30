@@ -1,6 +1,6 @@
 from typing import Self
 
-from algoritmia.schemes.dac_scheme import IDecreaseAndConquerProblem, tail_dec_solve, iter_dec_solve
+from algoritmia.schemes.dac_scheme import IDecreaseAndConquerProblem, dec_solve, iter_dec_solve
 
 type Solution = int  # La posición del elemento buscado
 
@@ -33,8 +33,8 @@ if __name__ == "__main__":
     print('number to find:', num)
     problem = BinarySearchProblem(my_sorted_list, num, 0, len(my_sorted_list))
 
-    pos = tail_dec_solve(problem)
+    pos = dec_solve(problem)
+    print(f'dec_solve: number found at index {pos}')
 
-    print(f'tail_dec_solve: number found at index {pos}')
     pos = iter_dec_solve(problem)
     print(f'iter_dec_solve: number found at index {pos}')

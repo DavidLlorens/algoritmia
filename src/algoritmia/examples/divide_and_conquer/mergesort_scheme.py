@@ -36,11 +36,12 @@ class MergesortProblem(IDivideAndConquerProblem[Solution]):
 
 
 # Programa principal --------------------------------------
-v0 = [11, 21, 3, 1, 98, 0, 12, 82, 29, 30, 11, 18, 43, 4, 75, 37]
+if __name__ == "__main__":
+    v0 = [11, 21, 3, 1, 98, 0, 12, 82, 29, 30, 11, 18, 43, 4, 75, 37]
 
-# Creamos un problema que cumpla la interfaz IDivideAndConquerProblem
-ms_problem0 = MergesortProblem(v0)
+    # Creamos un problema que cumpla la interfaz IDivideAndConquerProblem
+    ms_problem0 = MergesortProblem(v0)
 
-# Se lo pasamos a la función div_solve(...) que nos devuelve la solución
-solution0 = div_solve(ms_problem0)
-print(solution0)
+    # Se lo pasamos a la función div_solve(...) que nos devuelve la solución
+    solution0 = div_solve(ms_problem0)
+    print(solution0)
