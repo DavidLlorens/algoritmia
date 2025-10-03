@@ -6,6 +6,7 @@ from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solutions
 # Tipos  --------------------------------------------------------------------------
 
 type Decision = int  # Número de fila donde colocar la reina
+type Extra = None    # Este problema no necesita almacenar información adicional junto a la decisión
 
 # Queremos que una solución sea la secuencia de decisiones (números de fila) en forma de tupla:
 type Solution = tuple[Decision, ...]
@@ -19,7 +20,7 @@ type Solution = tuple[Decision, ...]
 
 
 def nqueens_solutions(board_size: int) -> Iterator[Solution]:
-    class NQueensDS(DecisionSequence[Decision, None]):  # Como no hay Extra -> ponemos None
+    class NQueensDS(DecisionSequence[Decision, Extra]):  # Hemos definido Extra como None
         def is_solution(self) -> bool:
             return len(self) == board_size
 

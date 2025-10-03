@@ -1,4 +1,4 @@
-from algoritmia.examples.greedy.graph_coloring_greedy import coloring_solve
+from algoritmia._examples.greedy.graph_coloring_greedy import coloring_solve
 from algoritmia.viewers.graph2d_viewer import Graph2dViewer
 
 type Vertex = tuple[int, int]

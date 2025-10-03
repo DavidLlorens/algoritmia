@@ -1,4 +1,5 @@
 """
+01/10/2025: Version 1.6. Añade add_path(path, color).
 05/10/2021: Version 1.5. Tamaño nodos y margen.
 28/09/2021: Version 1.4. Actualizado a easypaint 2.x.
 28/09/2021: Version 1.3. Añadidos canvas_width y canvas_height en el constructor
@@ -79,6 +80,8 @@ class Graph2dViewer(EasyPaint):
         self.colors = colors if colors is not None else {}
         self.is_directed = isinstance(g, Digraph)
         self.v_label = v_label
+        self.path_info = None
+        self.vertexmode = vertexmode
         if not isinstance(g, UndirectedGraph) and not isinstance(g, Digraph):
             raise TypeError("The first parameter must be an UndirectedGraph or a Digraph")
         if any([not isinstance(p, tuple) or len(p) != 2 or
@@ -116,6 +119,12 @@ class Graph2dViewer(EasyPaint):
         if self.node_size is None:
             self.node_size = (w * h / len(self.g.V)) ** 0.5 / 10  # cell_size / 8
 
+    def add_path(self, path: list[Vertex], color: str = 'red'):
+        if self.vertexmode == Graph2dViewer.ROW_COL:
+            path = [(v, -u) for (u, v) in path]
+        edges = [(path[i], path[i+1]) for i in range(len(path)-1)]
+        self.path_info = set(edges), color
+
     def on_key_press(self, keysym):
         if keysym in ['Return', 'Escape']:
             self.close()
@@ -123,10 +132,23 @@ class Graph2dViewer(EasyPaint):
     def draw_arrow(self, u, v, color='black', width=1, tag='arrow'):
         cell_size = self.cell_size
         m = self.m
+
         if not self.is_directed:
+            if self.path_info is not None:
+                e_set, color2 = self.path_info
+                if (u, v) in e_set or (v, u) in e_set:
+                    width = 2
+                    color = color2
+
             self.create_line((u[0] + 0.5) * cell_size + m[0], (u[1] + 0.5) * cell_size + m[1],
-                             (v[0] + 0.5) * cell_size + m[0], (v[1] + 0.5) * cell_size + m[1])
+                             (v[0] + 0.5) * cell_size + m[0], (v[1] + 0.5) * cell_size + m[1],
+                             color, width=width)
         else:
+            if self.path_info is not None:
+                e_set, color2 = self.path_info
+                if (u, v) in e_set:
+                    width = 2
+                    color = color2
             p1, p2 = find_intersec_point(v[0], v[1], (self.node_size + width) / self.cell_size,
                                          u[0], u[1], v[0], v[1])
             _, (x2, y2) = min((dist(u, p1), p1), (dist(u, p2), p2))
@@ -162,6 +184,7 @@ class Graph2dViewer(EasyPaint):
             self.create_text((u[0] + 0.5) * self.cell_size + self.m[0],
                              (u[1] + 0.5) * self.cell_size + self.m[1],
                              label, fs, color=color, tag=tag)
+
 
     def main(self):
         width = 1

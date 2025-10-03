@@ -84,7 +84,7 @@ def int2gray(n: int, maxint: int = 255) -> str:
     return "#{:02x}{:02x}{:02x}".format(c, c, c)
 
 
-def create_laberinth(num_rows: int, num_cols: int, tipo: int) -> UndirectedGraph[Vertex]:
+def select_create_labyrinth(num_rows: int, num_cols: int, tipo: int) -> UndirectedGraph[Vertex]:
     if tipo == 1:
         g = create_labyrinth_mfset(num_rows, num_cols)
     elif tipo == 2:
@@ -105,18 +105,19 @@ def create_laberinth(num_rows: int, num_cols: int, tipo: int) -> UndirectedGraph
 
 if __name__ == '__main__':
     random.seed(1)
-    sys.setrecursionlimit(10000)
+    sys.setrecursionlimit(100000)
 
     cell_size0 = 13
     num_rows0, num_cols0 = 60, 80
 
     # Tipo: 1 - MFSet random, 2 - Anchura en lab sin paredes, 3 - Profundidad en lab sin paredes
     tipo0 = 1
-    g0 = create_laberinth(num_rows0, num_cols0, tipo0)
+    g0 = select_create_labyrinth(num_rows0, num_cols0, tipo0)
     lv0 = LabyrinthViewerColor(g0,
                                canvas_width=num_cols0 * cell_size0 + 20,
                                canvas_height=num_rows0 * cell_size0 + 20, margin=10,
-                               wall_width=4)
+                               wall_width=4,
+                               vertex_painted_per_iteration=20)
 
     start0 = (0, 0)  # (num_rows//2, num_cols//2)
     matriz_dist0 = matriz_distancias_anchura(g0, start0)

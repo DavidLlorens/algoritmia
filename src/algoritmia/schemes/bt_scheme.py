@@ -109,12 +109,13 @@ def bt_vc_solutions[TDecision, TExtra](initial_ds: DecisionSequence[TDecision, T
 
 #  Mejor solución --------------------------------------------------------
 
+type Result[TScore, TSolution] = tuple[TScore, TSolution] | None  # None si no hay solución
 
 def min_solution[TSolution, TScore](solutions: Iterator[TSolution],
-                                    f: Callable[[TSolution], TScore]) -> tuple[TScore, TSolution] | None:
+                                    f: Callable[[TSolution], TScore]) -> Result[TScore, TSolution]:
     return min(((f(sol), sol) for sol in solutions), default=None)
 
 
 def max_solution[TSolution, TScore](solutions: Iterator[TSolution],
-                                    f: Callable[[TSolution], TScore]) -> tuple[TScore, TSolution] | None:
+                                    f: Callable[[TSolution], TScore]) -> Result[TScore, TSolution]:
     return max(((f(sol), sol) for sol in solutions), default=None)

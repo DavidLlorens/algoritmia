@@ -1,4 +1,5 @@
 """
+2025-10-03: Versión 2.1 - valor por defecto de delay_ms cambiado de 0 a 1
 2024-09-30: Versión 2.0 - Por cambios en LabyrinthViewer
 2021-10-22: Versión 1.0 - Versión inicial
 @author: David Llorens (dllorens@uji.es)
@@ -17,7 +18,7 @@ class LabyrinthViewerColor(LabyrinthViewer):
     def __init__(self,
                  lab: UndirectedGraph[Vertex],
                  canvas_width: int = 400, canvas_height: int = 400,
-                 margin: int = 10, wall_width: int = 2, delay_ms: int = 0,
+                 margin: int = 10, wall_width: int = 2, delay_ms: int = 1,
                  vertex_painted_per_iteration: int = 1):
         LabyrinthViewer.__init__(self, lab, canvas_width, canvas_height, margin, wall_width)
         self.state = 0
@@ -51,7 +52,6 @@ class LabyrinthViewerColor(LabyrinthViewer):
         self.update()
         if i < max_pos:
             self.after(self.delay_ms, lambda: self.anim(i, len(self.marked_cells2)))
-            self.update()
 
     def add_marked_cell(self, cell, color='red'):
         self.marked_cells2.append((cell, color))

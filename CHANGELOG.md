@@ -1,4 +1,8 @@
 # Changelog
+## [4.0.1] - 2025-10-03
+  - `algoritmia/viewers/graph2d_viewer.py`:Añade `add_path(path, color_name)`.
+  - `algoritmia/examples`: renombrado `algoritmia/_examples` para evitar su espacio de nombres en PyCharm.
+  - `algoritmia/viewers/demo`: renombrado `algoritmia/viewers/_demo` para evitar su espacio de nombres en PyCharm.
 ## [4.0.0] - 2025-09-30
   - Añade `if __name__ == "__main__"` a los ficheros a los que les faltaba.
   - `algoritmia/viewers/labyrinth_viewer.py`: cambios cosméticos.
