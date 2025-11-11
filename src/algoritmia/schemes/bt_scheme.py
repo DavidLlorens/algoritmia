@@ -73,16 +73,21 @@ class DecisionSequence[D, E](ABC, Sized):
 
     @final
     def decisions(self) -> tuple[D, ...]:  # Es O(n)
-        ds = deque()
-        p = self._decisions
-        while p != ():
-            ds.appendleft(p[0])
-            p = p[1]
-        return tuple(ds)
+        return tuple(self)
 
     @final
     def __len__(self) -> int:  # len(objeto) devuelve el número de decisiones del objeto
         return self._len
+
+    @final
+    def __iter__(self) -> Iterator[D]:  # Iterador sobre las decisiones
+        ds = []
+        p = self._decisions
+        while p != ():
+            ds.append(p[0])
+            p = p[1]
+        for i in range(len(ds)-1, -1, -1):
+            yield ds[i]
 
 
 # Esquema para BT básico --------------------------------------------------------------------------
