@@ -1,4 +1,6 @@
 # Changelog
+## [4.0.10] - 2026-09-04
+  - `algoritmia/__init__.py`: No se cambio el número de versión.
 ## [4.0.9] - 2026-09-04
   - `pyproject.toml`: Corregido bug de la version anterior (ponia "==3.12" en vez de ">=3.12")
 ## [4.0.8] - 2026-09-04
