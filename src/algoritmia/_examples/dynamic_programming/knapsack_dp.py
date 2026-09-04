@@ -32,7 +32,7 @@ def solve(C: Capacity, w: list[Weight], v: list[Value]) -> Result:
     mem: dict[SParams, tuple[Score, SParams, Decision]] = {}
     score = S(C, len(v))
     # Recuperamos la solución de mem
-    decisions = []
+    decisions: list[Decision] = []
     c, n = C, len(v)
     while n > 0:
         _, (c, n), d = mem[c, n]
@@ -64,7 +64,7 @@ def solve2(C: Capacity, w: list[Weight], v: list[Value]) -> Result:
     score = S(C, len(v))
     # Recuperación del camino
     c, n = C, len(v)
-    decisions = []
+    decisions: list[Decision] = []
     while n > 0:
         _, (c, n), d = mem[c, n]
         if d != -1:
@@ -73,14 +73,14 @@ def solve2(C: Capacity, w: list[Weight], v: list[Value]) -> Result:
     return score, decisions
 
 
-def sorted_by_dec_ratio(w_old, v_old):
+def sorted_by_dec_ratio(w_old: list[Weight], v_old: list[Value]) -> tuple[list[Weight], list[Value]]:
     idxs = sorted(range(len(w_old)), key=lambda i: -v_old[i] / w_old[i])
     w_new = [w_old[i] for i in idxs]
     v_new = [v_old[i] for i in idxs]
     return w_new, v_new
 
 
-def create_knapsack_problem(num_objects):
+def create_knapsack_problem(num_objects: int) -> tuple[list[Weight], list[Value], Capacity]:
     seed(5)
     w_new = [randint(10, 100) for _ in range(num_objects)]
     v_new = [w_new[i] * randint(1, 4) for i in range(num_objects)]

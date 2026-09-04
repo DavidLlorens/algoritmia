@@ -7,7 +7,9 @@ from collections import deque
 
 
 class IQueue[T](ABC, Sized):
-    def __init__(self, data: deque[T] | list[T] = ()):
+    def __init__(self, data: deque[T] | list[T] | None = None):
+        if data is None:
+            data = deque()
         self._list = data
 
     @abstractmethod
@@ -28,7 +30,7 @@ class IQueue[T](ABC, Sized):
 
 class Fifo[T](IQueue[T]):
     def __init__(self, data: Iterable[T] = ()):
-        super().__init__(deque(data))
+        self._list: deque[T] = deque(data)
 
     def push(self, item: T):
         self._list.append(item)
@@ -42,7 +44,7 @@ class Fifo[T](IQueue[T]):
 
 class Lifo[T](IQueue[T]):
     def __init__(self, data: Iterable[T] = ()):
-        super().__init__(list(data))
+        self._list: list[T] = list(data)
 
     def push(self, item: T):
         self._list.append(item)
@@ -55,7 +57,10 @@ class Lifo[T](IQueue[T]):
 
 
 if __name__ == '__main__':
-    for q in [Fifo(), Lifo()]:
+    fifo = Fifo[int]()
+    lifo = Lifo[int]()
+    queues: list[IQueue[int]] = [fifo, lifo]
+    for q in queues:
         for i in range(3):
             q.push(i)
         print("q:", q)

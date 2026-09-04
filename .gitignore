@@ -44,6 +44,7 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
+.ruff_cache/
 nosetests.xml
 coverage.xml
 *.cover
@@ -114,6 +115,9 @@ venv.bak/
 .spyderproject
 .spyproject
 
+# VS Code workspace settings
+.vscode/
+
 # Rope project settings
 .ropeproject
 
@@ -133,3 +137,9 @@ dmypy.json
 pypi-*.txt
 /.idea/
 /private/
+upload*.sh
+install*sh
+uninstall.sh
+CAMBIAR_VERSION.txt
+run-tests.sh
+uv.lock

@@ -19,24 +19,25 @@ class LabyrinthViewerColor(LabyrinthViewer):
                  lab: UndirectedGraph[Vertex],
                  canvas_width: int = 400, canvas_height: int = 400,
                  margin: int = 10, wall_width: int = 2, delay_ms: int = 1,
-                 vertex_painted_per_iteration: int = 1):
+                 vertex_painted_per_iteration: int = 1) -> None:
         LabyrinthViewer.__init__(self, lab, canvas_width, canvas_height, margin, wall_width)
-        self.state = 0
-        self.vertex_painted_per_iteration = vertex_painted_per_iteration
-        self.tt = None
-        self.marked_cells2 = []
-        self.delay_ms = delay_ms
+        self.state: int = 0
+        self.vertex_painted_per_iteration: int = vertex_painted_per_iteration
+        self.tt: int | None = None
+        self.marked_cells2: list[tuple[Vertex, str]] = []
+        self.delay_ms: int = delay_ms
 
-    def on_key_press(self, keysym):
+    def on_key_press(self, keysym: str) -> None:
         if keysym != 'Return': return
         if self.state == 0:
             self.state = 1
-            self.erase(self.tt)
+            if self.tt is not None:
+                self.erase(self.tt)
             self.after(0, lambda: self.anim(0, len(self.marked_cells2)))
         elif self.state == 1:
             self.close()
 
-    def anim(self, pos, max_pos):
+    def anim(self, pos: int, max_pos: int) -> None:
         mw = self.mw
         mh = self.mh
         i = pos
@@ -53,14 +54,14 @@ class LabyrinthViewerColor(LabyrinthViewer):
         if i < max_pos:
             self.after(self.delay_ms, lambda: self.anim(i, len(self.marked_cells2)))
 
-    def add_marked_cell(self, cell, color='red'):
+    def add_marked_cell(self, cell: Vertex, color: str = 'red') -> None:
         self.marked_cells2.append((cell, color))
 
-    def main(self):
+    def main(self) -> None:
         self.title = 'Labyrinth Viewer (colored cells)'
         super().main()
         w, h = self.center
-        self.tt = self.create_text(w, h, "Press 'Return' to colorize", 14, "C", "red")
+        self.tt = self.create_text(w, h, "Press <enter> to colorize", 14, "C", "red")
 
 
 if __name__ == '__main__':
@@ -76,7 +77,7 @@ if __name__ == '__main__':
     def matriz_distancias_anchura(grafo: UndirectedGraph[Vertex],
                                   v_inicial: Vertex) -> dict[Vertex, int]:
         dist: dict[Vertex, int] = {}
-        queue = Fifo()
+        queue: Fifo[tuple[Vertex, Vertex]] = Fifo()
         seen: set[Vertex] = set()
         queue.push((v_inicial, v_inicial))
         seen.add(v_inicial)
@@ -103,7 +104,7 @@ if __name__ == '__main__':
 
     g0: UndirectedGraph[Vertex] = UndirectedGraph(E=e)
     num_rows, num_cols = max(v[0] for v in g0.V) + 1, max(v[1] for v in g0.V) + 1
-    cell_size = 40
+    cell_size = 50
     margin0 = 10
 
     # Laberinto en forma de grafo no dirigido
@@ -112,6 +113,7 @@ if __name__ == '__main__':
                               canvas_width=num_cols * cell_size + margin0 * 2,
                               canvas_height=num_rows * cell_size + margin0 * 2,
                               margin=margin0,
+                              wall_width=8,
                               delay_ms=300,
                               vertex_painted_per_iteration=1)
 

@@ -1,5 +1,7 @@
 """
-Version:  5.6 (14-oct-2025) - Acortados nombres parámetros tipo. Quitado tipo ScoredSolution.
+Version:  5.8 (08-jun-2026) - Corrección de tipos para evitar warnings de mypy
+          5.7 (11-nov-2025) - DecisionSequence ahora es Iterable.
+          5.6 (14-oct-2025) - Acortados nombres parámetros tipo. Quitado tipo ScoredSolution.
           5.5 (12-oct-2025) - Corregido bug en min_solution y max_solution
           5.4 (11-oct-2025)
           5.3 (09-ene-2024)
@@ -9,12 +11,11 @@ Version:  5.6 (14-oct-2025) - Acortados nombres parámetros tipo. Quitado tipo S
           4.0 (23-oct-2021)
 
 @author: David Llorens (dllorens@uji.es)
-         (c) Universitat Jaume I 2025
+         (c) Universitat Jaume I 2026
 @license: GPL3
 """
 from abc import ABC, abstractmethod
-from collections import deque
-from collections.abc import Iterator, Callable, Sized
+from collections.abc import Iterator, Reversible, Callable, Sized
 from typing import Any, final, Self
 
 # Tipos  --------------------------------------------------------------------------
@@ -33,9 +34,9 @@ type State = Any
 
 # La clase DecisionSequence -------------------------------------------------------
 
-class DecisionSequence[D, E](ABC, Sized):
+class DecisionSequence[D, E](ABC, Sized, Reversible[D]):
     def __init__(self,
-                 extra: E | None = None,
+                 extra: E = None,
                  decisions: DecisionPath[D] = (),
                  length: int = 0):
         self.extra = extra
@@ -55,7 +56,7 @@ class DecisionSequence[D, E](ABC, Sized):
     # --- Método que se puede sobreescribir en las clases hijas: state() ---
 
     # Debe devolver siempre un objeto inmutable
-    # Por defecto se devuelve el contenido de _decisions
+    # Por defecto se devuelve el atributo self._decisions
     def state(self) -> State:
         return self._decisions
 
@@ -73,21 +74,27 @@ class DecisionSequence[D, E](ABC, Sized):
 
     @final
     def decisions(self) -> tuple[D, ...]:  # Es O(n)
-        return tuple(self)
+        return tuple(iter(self))
 
     @final
     def __len__(self) -> int:  # len(objeto) devuelve el número de decisiones del objeto
         return self._len
 
     @final
-    def __iter__(self) -> Iterator[D]:  # Iterador sobre las decisiones
-        ds = []
-        p = self._decisions
-        while p != ():
-            ds.append(p[0])
-            p = p[1]
-        for i in range(len(ds)-1, -1, -1):
-            yield ds[i]
+    def __iter__(self) -> Iterator[D]: 
+        return reversed(list(reversed(self)))  # Iterador sobre las decisiones en orden normal
+
+    @final
+    def __reversed__(self) -> Iterator[D]:  # Iterador sobre las decisiones en orden inverso
+        p: DecisionPath[D] = self._decisions
+        while True:
+            match p:
+                case ():
+                    break
+                case (head, tail):
+                    p = tail
+                    yield head
+
 
 
 # Esquema para BT básico --------------------------------------------------------------------------
@@ -137,7 +144,7 @@ type Result[Sco, Sol] = tuple[Sco, Sol] | None
 
 # --- Funciones min_solution y max_solution ---
 
-def min_solution[Sco, Sol](solutions: Iterator[Sol],
+def min_solution[Sco: int | float, Sol](solutions: Iterator[Sol],
                          f: Callable[[Sol], Sco]) -> Result[Sco, Sol]:
     best: Result[Sco, Sol] = None
     for sol in solutions:
@@ -147,7 +154,7 @@ def min_solution[Sco, Sol](solutions: Iterator[Sol],
     return best
 
 
-def max_solution[Sco, Sol](solutions: Iterator[Sol],
+def max_solution[Sco: int | float, Sol](solutions: Iterator[Sol],
                          f: Callable[[Sol], Sco]) -> Result[Sco, Sol]:
     best: Result[Sco, Sol] = None
     for sol in solutions:

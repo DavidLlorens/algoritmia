@@ -27,7 +27,7 @@ Dos modos de funcionamiento según parámetro del constructor (vertexmode):
 """
 
 import tkinter
-from typing import Optional
+from typing import Any, Optional
 
 from easypaint import EasyPaint
 from math import sin, cos, pi, sqrt
@@ -36,15 +36,17 @@ from algoritmia.datastructures.graphs import IGraph, UndirectedGraph, Digraph
 
 type Num = int | float
 type Vertex = tuple[Num, Num]
+type Path = list[Vertex]
 
 
 # -------------------------------------------------------------------------------------
 
-def dist(p1, p2):
+def dist(p1: Vertex, p2: Vertex) -> float:
     return sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]))
 
 
-def find_intersec_point(cx, cy, radius, p1x, p1y, p2x, p2y):
+def find_intersec_point(cx: float, cy: float, radius: float,
+                        p1x: float, p1y: float, p2x: float, p2y: float) -> tuple[tuple[float, float], tuple[float, float]]:
     dx = p2x - p1x
     dy = p2y - p1y
 
@@ -58,7 +60,8 @@ def find_intersec_point(cx, cy, radius, p1x, p1y, p2x, p2y):
     if det == 0:
         # One solution.
         t = -B / (2 * A)
-        return (p1x + t * dx, p1y + t * dy), None
+        point = (p1x + t * dx, p1y + t * dy)
+        return point, point
     else:
         # Two solutions.
         t1 = (-B + sqrt(det)) / (2 * A)
@@ -73,9 +76,11 @@ class Graph2dViewer(EasyPaint):
     X_Y = 0
     ROW_COL = 1
 
-    def __init__(self, g: IGraph[Vertex], v_label=None, canvas_width: int = 400, canvas_height: int = 300,
-                 margin: int = 15, vertexmode=X_Y, background='white', node_size: Optional[float] = None,
-                 title=None, colors: Optional[dict[Vertex, str]] = None):
+    def __init__(self, g: IGraph[Vertex], v_label: dict[Any, str] | None = None,
+                 canvas_width: int = 400, canvas_height: int = 300,
+                 margin: int = 15, vertexmode: int = X_Y, background: str = 'white',
+                 node_size: Optional[float] = None, title: str | None = None,
+                 colors: Optional[dict[Vertex, str]] = None) -> None:
         self.node_size = node_size
         self.margin = margin
         self.colors = colors if colors is not None else {}
@@ -85,9 +90,7 @@ class Graph2dViewer(EasyPaint):
         self.vertexmode = vertexmode
         if not isinstance(g, UndirectedGraph) and not isinstance(g, Digraph):
             raise TypeError("The first parameter must be an UndirectedGraph or a Digraph")
-        if any([not isinstance(p, tuple) or len(p) != 2 or
-                not isinstance(p[0], int) and not isinstance(p[0], float) or
-                not isinstance(p[1], int) and not isinstance(p[1], float) for p in g.V]):
+        if any(len(p) != 2 for p in g.V):
             raise TypeError("Vertices must be tuples of two integers or floats")
 
         if vertexmode == Graph2dViewer.ROW_COL:
@@ -120,19 +123,21 @@ class Graph2dViewer(EasyPaint):
         if self.node_size is None:
             self.node_size = (w * h / len(self.g.V)) ** 0.5 / 10  # cell_size / 8
 
-    def add_path(self, path: list[Vertex], color: str = 'red'):
+    def add_path(self, path: Path, color: str = 'red') -> None:
         if self.vertexmode == Graph2dViewer.ROW_COL:
             path = [(v, -u) for (u, v) in path]
         edges = [(path[i], path[i+1]) for i in range(len(path)-1)]
         self.path_info = set(edges), color
 
-    def on_key_press(self, keysym):
+    def on_key_press(self, keysym: str) -> None:
         if keysym in ['Return', 'Escape']:
             self.close()
 
-    def draw_arrow(self, u, v, color='black', width=1, tag='arrow'):
+    def draw_arrow(self, u: Vertex, v: Vertex, color: str = 'black', width: int = 1, tag: str = 'arrow') -> None:
         cell_size = self.cell_size
         m = self.m
+        node_size = self.node_size
+        assert node_size is not None
 
         if not self.is_directed:
             if self.path_info is not None:
@@ -150,15 +155,15 @@ class Graph2dViewer(EasyPaint):
                 if (u, v) in e_set:
                     width = 3
                     color = color2
-            p1, p2 = find_intersec_point(v[0], v[1], (self.node_size + width) / self.cell_size,
+            p1, p2 = find_intersec_point(v[0], v[1], (node_size + width) / self.cell_size,
                                          u[0], u[1], v[0], v[1])
             _, (x2, y2) = min((dist(u, p1), p1), (dist(u, p2), p2))
             x1, y1 = u
-            l2 = self.node_size
+            l2 = node_size
 
             phi = 30 * pi / 180
             l1 = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
-            l2 /= self.cell_size
+            l2 /= self.cell_size * 2
 
             x3 = x2 + l2 / l1 * ((x1 - x2) * cos(phi) + (y1 - y2) * sin(phi))
             x4 = x2 + l2 / l1 * ((x1 - x2) * cos(phi) - (y1 - y2) * sin(phi))
@@ -176,18 +181,21 @@ class Graph2dViewer(EasyPaint):
                              (x4 + 0.5) * cell_size + m[0], (y4 + 0.5) * cell_size + m[1],
                              color, width=width, capstyle=tkinter.ROUND, tag=tag)
 
-    def draw_vertex(self, u: Vertex, color='black', fill='palegreen', width=1, tag='vertex'):
+    def draw_vertex(self, u: Vertex, color: str = 'black', fill: str = 'palegreen',
+                    width: int = 1, tag: str = 'vertex') -> None:
+        node_size = self.node_size
+        assert node_size is not None
         self.create_filled_circle((u[0] + 0.5) * self.cell_size + self.m[0],
                                   (u[1] + 0.5) * self.cell_size + self.m[1],
-                                  self.node_size, color=color, width=width, fill=fill, tag=tag)
+                      node_size, color=color, width=width, fill=fill, tag=tag)
         if self.v_label is not None:
-            label, fs = self.v_label[u], int(self.node_size)
+            label, fs = self.v_label[u], int(node_size*0.8)
             self.create_text((u[0] + 0.5) * self.cell_size + self.m[0],
                              (u[1] + 0.5) * self.cell_size + self.m[1],
                              label, fs, color=color, tag=tag)
 
 
-    def main(self):
+    def main(self) -> None:
         width = 1
         color = 'black'
         for u, v in self.g.E:

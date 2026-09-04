@@ -1,7 +1,7 @@
 # Búsqueda binaria en un vector ordenado
 
 def binarysearch_tail_rec(v: list[int], elem: int) -> int | None:
-    def rec(start: int, end: int):
+    def rec(start: int, end: int) -> int | None:
         if end - start == 0:
             return None
         mid = (start + end) // 2

@@ -13,10 +13,10 @@ type Vertex = tuple[int, int]
 
 def create_labyrinth_nowalls(num_rows: int, num_cols: int) -> UndirectedGraph[Vertex]:
     # Crear lista de vértices
-    v = [(r, c) for r in range(num_rows) for c in range(num_cols)]
+    v: list[Vertex] = [(r, c) for r in range(num_rows) for c in range(num_cols)]
 
     # Crear lista de aristas entre vértices vecinos
-    w = []
+    w: list[tuple[Vertex, Vertex]] = []
     for (r, c) in v:
         if r + 1 < num_rows: w.append(((r, c), (r + 1, c)))
         if c + 1 < num_cols: w.append(((r, c), (r, c + 1)))
@@ -26,20 +26,20 @@ def create_labyrinth_nowalls(num_rows: int, num_cols: int) -> UndirectedGraph[Ve
 
 def create_labyrinth_mfset(num_rows: int, num_cols: int) -> UndirectedGraph[Vertex]:
     # Crear lista de vértices
-    v = [(r, c) for r in range(num_rows) for c in range(num_cols)]
+    v: list[Vertex] = [(r, c) for r in range(num_rows) for c in range(num_cols)]
 
     # Crear lista de aristas entre vértices vecinos
-    w = []
+    w: list[tuple[Vertex, Vertex]] = []
     for (r, c) in v:
         if r + 1 < num_rows: w.append(((r, c), (r + 1, c)))
         if c + 1 < num_cols: w.append(((r, c), (r, c + 1)))
 
     # Barajar la lista de aristas entre vértices vecinos
     random.shuffle(w)
-    e = []
+    e: list[tuple[Vertex, Vertex]] = []
 
     # Crear un MFSet vacío
-    mfs = MergeFindSet()
+    mfs: MergeFindSet[Vertex] = MergeFindSet()
 
     # AÃ±adir los elementos de 'v' al MFSet
     for vertice in v: mfs.add(vertice)
@@ -55,10 +55,10 @@ def create_labyrinth_mfset(num_rows: int, num_cols: int) -> UndirectedGraph[Vert
     return UndirectedGraph(E=e)
 
 
-def matriz_distancias_anchura(grafo, v_inicial):
-    dist = {}
-    queue = Fifo()
-    seen = set()
+def matriz_distancias_anchura(grafo: UndirectedGraph[Vertex], v_inicial: Vertex) -> dict[Vertex, int]:
+    dist: dict[Vertex, int] = {}
+    queue: Fifo[tuple[Vertex, Vertex]] = Fifo()
+    seen: set[Vertex] = set()
     queue.push((v_inicial, v_inicial))
     seen.add(v_inicial)
     dist[v_inicial] = 0
@@ -112,17 +112,18 @@ if __name__ == '__main__':
 
     # Tipo: 1 - MFSet random, 2 - Anchura en lab sin paredes, 3 - Profundidad en lab sin paredes
     tipo0 = 1
-    g0 = select_create_labyrinth(num_rows0, num_cols0, tipo0)
+    g0: UndirectedGraph[Vertex] = select_create_labyrinth(num_rows0, num_cols0, tipo0)
     lv0 = LabyrinthViewerColor(g0,
                                canvas_width=num_cols0 * cell_size0 + 20,
                                canvas_height=num_rows0 * cell_size0 + 20, margin=10,
                                wall_width=4,
                                vertex_painted_per_iteration=20)
 
-    start0 = (0, 0)  # (num_rows//2, num_cols//2)
-    matriz_dist0 = matriz_distancias_anchura(g0, start0)
-    maxvalue0 = max(matriz_dist0.values())
-    for (v0, k0) in sorted([(v0, k0) for (k0, v0) in matriz_dist0.items()]):
+    start0: Vertex = (0, 0)  # (num_rows//2, num_cols//2)
+    matriz_dist0: dict[Vertex, int] = matriz_distancias_anchura(g0, start0)
+    maxvalue0: int = max(matriz_dist0.values())
+    colored_cells: list[tuple[int, Vertex]] = sorted([(v0, k0) for (k0, v0) in matriz_dist0.items()])
+    for (v0, k0) in colored_cells:
         lv0.add_marked_cell(k0, int2col(v0, maxvalue0))
 
     lv0.run()

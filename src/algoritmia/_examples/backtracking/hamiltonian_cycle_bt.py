@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 from typing import Self
 
-from algoritmia.datastructures.graphs import UndirectedGraph, WeightingFunction, IGraph
+from algoritmia.datastructures.graphs import UndirectedGraph, WeightingFunction, IGraph, Edge, Weight
 from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solutions, min_solution
 
 # Tipos  --------------------------------------------------------------------------
@@ -41,7 +41,7 @@ type Result[TDecision] = tuple[Score, Solution[TDecision]] | None   # None si no
 
 def hamiltoniancycle_best_solution[TVertex](g: IGraph[TVertex],
                                             wf: WeightingFunction[TVertex]) -> Result[TVertex]:
-    def f(sol: Solution) -> Score:
+    def f(sol: Solution[TVertex]) -> Score:
         return sum(wf(sol[i - 1], sol[i]) for i in range(len(sol)))
 
     return min_solution(hamiltoniancycle_solutions(g), f)
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     edges = [(0, 2), (0, 3), (0, 9), (1, 3), (1, 4), (1, 8), (2, 3), (2, 5), (3, 4),
              (3, 6), (4, 7), (5, 6), (5, 8), (6, 7), (6, 8), (6, 9)]
     g0 = UndirectedGraph[int](E=edges)
-    d0 = dict(((u2, v2), abs(u2 - v2)) for (u2, v2) in g0.E)
+    d0: dict[Edge[int], Weight] = dict(((u2, v2), abs(u2 - v2)) for (u2, v2) in g0.E)
     wf0 = WeightingFunction[int](d0, symmetrical=True)
 
     print('Basic versión (all solutions):')

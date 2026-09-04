@@ -50,6 +50,7 @@ def traverse_dijkstra_dict[T](g: IGraph[T],
     fixed: set[T] = set()
     while len(bp) > 0:  # O(|V|) veces
         v = argmin(bp.keys(), lambda u: D[u])  # O(|V|)
+        assert v is not None
         fixed.add(v)
         pred_v = bp[v]
         yield pred_v, v
@@ -92,6 +93,7 @@ def traverse_dijkstra_metric_dict[T](g: IGraph[T],
     fixed: set[T] = set()
     while len(bp) > 0:
         v = argmin(bp.keys(), lambda u: D[u] + eu_dist(u, v_final))
+        assert v is not None
         fixed.add(v)
         pred_v = bp[v]
         yield pred_v, v
@@ -107,14 +109,14 @@ def traverse_dijkstra_metric_dict[T](g: IGraph[T],
 if __name__ == '__main__':
     from algoritmia.datastructures.graphs import UndirectedGraph
 
-    type Vertex = tuple[int, int]
+    type GridVertex = tuple[int, int]
 
     my_edges = [((0, 0), (0, 1)), ((0, 2), (0, 3)), ((1, 0), (1, 1)), ((0, 1), (0, 2)),
                 ((2, 0), (1, 0)), ((2, 1), (2, 2)), ((2, 2), (2, 3)), ((0, 1), (1, 1)),
                 ((0, 2), (1, 2)), ((0, 3), (1, 3)), ((1, 1), (2, 1)), ((1, 2), (2, 2))]
 
-    my_graph = UndirectedGraph(E=my_edges)
-    initial_vertex = (0, 0)
+    my_graph: UndirectedGraph[GridVertex] = UndirectedGraph(E=my_edges)
+    initial_vertex: GridVertex = (0, 0)
 
     print('traverse_bf', list(traverse_bf(my_graph, initial_vertex)))
     print('traverse_df', list(traverse_df(my_graph, initial_vertex)))
@@ -123,14 +125,14 @@ if __name__ == '__main__':
 
     from algoritmia.data.iberia import iberia, km, coords2d
 
-    type Vertex = str  # Los vértices de iberia son nombres de ciudades
+    type City = str  # Los vértices de iberia son nombres de ciudades
 
     traverse_from_Madrid = traverse_dijkstra_dict(iberia, km, 'Madrid')
     # Muestra solo los vértices:
-    print('traverse_dijkstra_dict', [v for u, v in traverse_from_Madrid])
+    print('traverse_dijkstra_dict', [v for _, v in traverse_from_Madrid])
 
 
-    def eu_dist0(city_a: Vertex, city_b: Vertex) -> float:
+    def eu_dist0(city_a: City, city_b: City) -> float:
         pos2d_a, pos2d_b = coords2d[city_a], coords2d[city_b]
         dx, dy = pos2d_a[0] - pos2d_b[0], pos2d_a[1] - pos2d_b[1]
         return (dx * dx + dy * dy) ** 0.5
@@ -138,4 +140,4 @@ if __name__ == '__main__':
 
     Madrid_to_Bilbao = traverse_dijkstra_metric_dict(iberia, km, eu_dist0, 'Madrid', 'Bilbao')
     # Muestra solo los vértices:
-    print('traverse_dijkstra_metric_dict', [v for u, v in Madrid_to_Bilbao])
+    print('traverse_dijkstra_metric_dict', [v for _, v in Madrid_to_Bilbao])

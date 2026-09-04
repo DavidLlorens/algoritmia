@@ -18,16 +18,11 @@ class Graph2dMstViewer(EasyPaint):
 
     def __init__(self, g_all: UndirectedGraph[Vertex], g_mst: UndirectedGraph[Vertex],
                  canvas_width: int = 400, canvas_height: int = 300,
-                 margin: int = 15, background='white', node_size: Optional[float] = None,
-                 colors: dict[Vertex, str] = None):
+                 margin: int = 15, background: str = 'white', node_size: Optional[float] = None,
+                 colors: dict[Vertex, str] | None = None) -> None:
         self.node_size = node_size
         self.margin = margin
         self.colors = colors
-        if not isinstance(g_all, UndirectedGraph) or \
-                any([not isinstance(p, tuple) or len(p) != 2 or
-                     not isinstance(p[0], int) and not isinstance(p[0], float) or
-                     not isinstance(p[1], int) and not isinstance(p[1], float) for p in g_all.V]):
-            raise TypeError("The graph must be an UndirectedGraph. Vertices must be tuples of two integers or floats")
 
         self.g_all = g_all
         self.g_mst = g_mst
@@ -40,11 +35,11 @@ class Graph2dMstViewer(EasyPaint):
         self.min_x = min(p[0] for p in self.g.V)
 
         super().__init__()
-        self.easypaint_configure(title='2D Graph MST Viewer - Press <space> to toogle',
+        self.easypaint_configure(title='2D Graph MST Viewer',
                                  background=background,
                                  size=(canvas_width, canvas_height))
 
-    def on_key_press(self, keysym: str):
+    def on_key_press(self, keysym: str) -> None:
         if keysym.lower() in ['return', 'escape']:
             self.close()
         elif keysym.lower() == 'space':
@@ -57,8 +52,8 @@ class Graph2dMstViewer(EasyPaint):
             self.erase()
             self.draw_graph()
 
-    def draw_graph(self):
-        self.create_text(400, 40, "Press 'space' to toggle between GRAPH and MST", 14)
+    def draw_graph(self) -> None:
+        self.create_text(400, 40, "Press <space> to toggle between GRAPH and MST", 14)
         w, h = self.size
         w -= self.margin
         h -= self.margin
@@ -86,7 +81,7 @@ class Graph2dMstViewer(EasyPaint):
                 self.create_filled_circle((u[0] + 0.5) * cell_size + m[0], (u[1] + 0.5) * cell_size + m[1],
                                           self.node_size, fill=fill)
 
-    def main(self):
+    def main(self) -> None:
         self.draw_graph()
 
 

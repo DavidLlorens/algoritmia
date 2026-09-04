@@ -1,6 +1,6 @@
 import sys
 
-TVERSION = (4, 0, 6)  # Recuerda cambiarlo también en 'pyproject.toml' <--------- !!!!!
+TVERSION = (4, 0, 7)  # Recuerda cambiarlo también en 'pyproject.toml' <--------- !!!!!
 VERSION = '.'.join([str(e) for e in TVERSION])
 
 python_version = sys.version_info

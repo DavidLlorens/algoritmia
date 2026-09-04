@@ -1,5 +1,3 @@
-from typing import Self
-
 from algoritmia.schemes.dac_scheme import IDecreaseAndConquerProblem, dec_solve, iter_dec_solve
 
 type Solution = int  # La posición del elemento buscado
@@ -12,14 +10,12 @@ class BinarySearchProblem(IDecreaseAndConquerProblem[Solution]):
     def is_simple(self) -> bool:
         return self.end - self.start <= 1 or self.elem == self.v[self.mid]
 
-    def trivial_solution(self) -> Solution | None:
+    def trivial_solution(self) -> Solution:
         if self.elem == self.v[self.mid]:
             return self.mid
-        if self.start == self.end or self.elem != self.v[self.start]:
-            return None
         return self.start
 
-    def decrease(self) -> Self:
+    def decrease(self) -> BinarySearchProblem:
         if self.elem < self.v[self.mid]:
             return BinarySearchProblem(self.v, self.elem, self.start, self.mid)
         else:

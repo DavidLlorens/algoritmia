@@ -1,7 +1,7 @@
-from algoritmia.datastructures.graphs import UndirectedGraph, WeightingFunction
+from algoritmia.datastructures.graphs import UndirectedGraph, WeightingFunction, Edge, Weight
 
 if __name__ == "__main__":
-    weighted_edges = {('Castelló', 'Sagunt'): 43, ('Sagunt', 'València'): 50}
+    weighted_edges: dict[Edge[str], Weight] = {('Castelló', 'Sagunt'): 43, ('Sagunt', 'València'): 50}
 
     # Construimos la función de pesos a partir del diccionario anterior
     wf = WeightingFunction(weighted_edges, symmetrical=True)
@@ -13,4 +13,4 @@ if __name__ == "__main__":
     road_graph = UndirectedGraph(E=weighted_edges.keys())
 
     # Podemos considerar un grafo de carreteras con distancias (pesos en las aristas) como una tupla
-    weighted_road_graph = (road_graph, wf)
+    weighted_road_graph: tuple[UndirectedGraph[str], WeightingFunction[str]] = (road_graph, wf)

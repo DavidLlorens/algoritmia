@@ -4,7 +4,6 @@ from random import random, seed
 from typing import Self
 
 from algoritmia.schemes.bab_scheme import BabDecisionSequence, bab_min_solve
-from algoritmia.utils import infinity
 
 # Tipos  --------------------------------------------------------------------------
 
@@ -14,6 +13,8 @@ type Solution = tuple[Decision, ...]
 # 'bab_min_solve' devuelve Result
 type Score = int
 type Result = tuple[Score, Solution] | None  # Si no hay solución, None
+
+infinity = 10**100  # entero suficientemente grande 
 
 # --------------------------------------------------------------------------------
 
@@ -58,7 +59,7 @@ def sumset_bab_solve(e: tuple[int, ...], s: int) -> Result:
 
 # --------------------------------------------------------------------------------
 
-def subsetsum_problem(num_elem):
+def subsetsum_problem(num_elem: int):
     seed(42)
     elems = tuple(int(random() * 1000) + 1 for _ in range(num_elem))
     return elems, sum(elems) // 4  # sorted(elems, key=lambda x: -x), sum(elems) // 4

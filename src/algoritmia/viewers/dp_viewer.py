@@ -6,13 +6,15 @@ Visor de grafos de dependencias y trellis de programación dinámica
 """
 
 import tkinter
-from typing import Optional, Self
+from typing import Optional
 
 from easypaint import EasyPaint
 from math import sin, cos, pi, sqrt, atan2
 
 type Num = int | float
 type Label = str
+type Point = tuple[Num, Num]
+type PathInfo = tuple[set[tuple[Point, Point]], str]
 
 
 class NodeStyle:
@@ -29,7 +31,7 @@ class NodeStyle:
     def __hash__(self) -> int:
         return hash(self._key)
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, NodeStyle):
             return False
         return self._key() == other._key()
@@ -41,22 +43,20 @@ class EdgeStyle(NodeStyle):
         super().__init__(color, width, fontsize, fx, fy)
         self.pos = pos
 
-    def __key(self) -> tuple[tuple[str, int], float]:
-        return super()._key(), self.pos
-
 
 type Pos = tuple[Num, Num]
-type Node = tuple[Pos, Label, NodeStyle]
+type Node = tuple[Pos, Label | None, NodeStyle]
 type Edge = tuple[Node, Node, Label, NodeStyle]
 
 
 # -------------------------------------------------------------------------------------
 
-def dist(p1, p2):
+def dist(p1: Point, p2: Point) -> float:
     return sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]))
 
 
-def find_intersec_point(cx, cy, radius, p1x, p1y, p2x, p2y):
+def find_intersec_point(cx: float, cy: float, radius: float,
+                        p1x: float, p1y: float, p2x: float, p2y: float) -> tuple[tuple[float, float], tuple[float, float]]:
     dx = p2x - p1x
     dy = p2y - p1y
 
@@ -70,7 +70,8 @@ def find_intersec_point(cx, cy, radius, p1x, p1y, p2x, p2y):
     if det == 0:
         # One solution.
         t = -B / (2 * A)
-        return (p1x + t * dx, p1y + t * dy), None
+        point = (p1x + t * dx, p1y + t * dy)
+        return point, point
     else:
         # Two solutions.
         t1 = (-B + sqrt(det)) / (2 * A)
@@ -83,13 +84,13 @@ def find_intersec_point(cx, cy, radius, p1x, p1y, p2x, p2y):
 class DPViewer(EasyPaint):
     current = 0
 
-    def __init__(self, ledges: list[list[Edge]], lnodes: list[set[Node]], is_directed=True,
+    def __init__(self, ledges: list[list[Edge]], lnodes: list[set[Node]], is_directed: bool = True,
                  canvas_width: int = 400, canvas_height: int = 300, margin: int = 15,
-                 axes_names=('', ''),
-                 background='white',
+                 axes_names: tuple[str, str] = ('', ''),
+                 background: str = 'white',
                  node_size: Optional[float] = None,
-                 titles=None,
-                 swap: bool = False):
+                 titles: list[str] | None = None,
+                 swap: bool = False) -> None:
         super().__init__()
         self.easypaint_configure(size=(canvas_width, canvas_height),
                                  title='Graph Viewer' if titles is None else titles[0],
@@ -104,11 +105,12 @@ class DPViewer(EasyPaint):
         self.edges = ledges[self.current]
         self.lnodes = lnodes
         self.nodes = self.lnodes[self.current]
-        self.titles = titles
+        self.titles = ['Graph Viewer'] if titles is None else titles
         self.axes_names = axes_names
         self.swap = swap
 
         self.is_directed = is_directed
+        self.path_info: PathInfo | None = None
 
         self.num_x = len(set(p[0] for (p, _, _) in self.nodes))
         self.num_y = len(set(p[1] for (p, _, _) in self.nodes))
@@ -131,7 +133,7 @@ class DPViewer(EasyPaint):
         if self.node_size is None:
             self.node_size = (w * h / len(self.nodes)) ** 0.5 / 10  # cell_size / 8
 
-    def on_key_press(self, keysym):
+    def on_key_press(self, keysym: str) -> None:
         if keysym in ['Return', 'Escape']:
             self.close()
         if keysym.upper() == 'SPACE':
@@ -148,7 +150,7 @@ class DPViewer(EasyPaint):
         if keysym.upper() == 'P':
             self.save_eps("saved.eps")
 
-    def draw_arrow(self, edge, tag='arrow'):
+    def draw_arrow(self, edge: Edge, tag: str = 'arrow') -> None:
         cell_size = self.cell_size
         m = self.m
         (u, _, _), (v, _, _), label, style = edge
@@ -158,26 +160,31 @@ class DPViewer(EasyPaint):
             self.create_line((u[0] + 0.5) * cell_size + m[0], (u[1] + 0.5) * cell_size + m[1],
                              (v[0] + 0.5) * cell_size + m[0], (v[1] + 0.5) * cell_size + m[1])
         else:
-            p1, p2 = find_intersec_point(v[0], v[1], (self.node_size + width + 2) / self.cell_size,
+            node_size = self.node_size
+            assert node_size is not None
+            p1, p2 = find_intersec_point(v[0], v[1], (node_size + width + 2) / self.cell_size,
                                          u[0], u[1], v[0], v[1])
             _, (x2, y2) = min((dist(u, p1), p1), (dist(u, p2), p2))
 
-            p1, p2 = find_intersec_point(u[0], u[1], (self.node_size + width + 2) / self.cell_size,
+            p1, p2 = find_intersec_point(u[0], u[1], (node_size + width + 2) / self.cell_size,
                                          v[0], v[1], u[0], u[1])
             _, (x1, y1) = min((dist(v, p1), p1), (dist(v, p2), p2))
 
             self._draw_arrow(x1, y1, x2, y2, label, style, tag=tag)
 
-    def _draw_arrow(self, x1, y1, x2, y2, label, style, tag='arrow'):
+    def _draw_arrow(self, x1: float, y1: float, x2: float, y2: float, label: str,
+                style: NodeStyle, tag: str = 'arrow') -> None:
         cell_size = self.cell_size
         m = self.m
         color = style.color
         width = style.width
         fs = style.fontsize
-        pos = style.pos
+        pos = getattr(style, 'pos', 0.5)
 
         # x1, y1 = u
-        l2 = self.node_size
+        node_size = self.node_size
+        assert node_size is not None
+        l2 = node_size
 
         phi = 30 * pi / 180
         l1 = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
@@ -199,10 +206,10 @@ class DPViewer(EasyPaint):
                          (x4 + 0.5) * cell_size + m[0], (y4 + 0.5) * cell_size + m[1],
                          color, width=width, capstyle=tkinter.ROUND, tag=tag)
         if pos >= 0:
-            def x(t):
+            def x(t: float) -> float:
                 return t * x1 + (1 - t) * x2
 
-            def y(t):
+            def y(t: float) -> float:
                 return t * y1 + (1 - t) * y2
 
             xm, ym = x(pos), y(pos)
@@ -224,14 +231,16 @@ class DPViewer(EasyPaint):
                              (ym + 0.5) * self.cell_size + self.m[1],
                              label, fs, color=color, anchor=anchor, tag=tag)
 
-    def draw_vertex(self, node: Node, tag='vertex'):
+    def draw_vertex(self, node: Node, tag: str = 'vertex') -> None:
         u, label, style = node
         fill = style.color
         width = style.width
         fs = style.fontsize
+        node_size = self.node_size
+        assert node_size is not None
         self.create_filled_circle((u[0] + 0.5) * self.cell_size + self.m[0],
                                   (u[1] + 0.5) * self.cell_size + self.m[1],
-                                  self.node_size, color='black', width=width, fill=fill, tag=tag)
+                                  node_size, color='black', width=width, fill=fill, tag=tag)
         if label is not None:
             ls = label.split('\n')
             if len(ls) == 1:
@@ -248,7 +257,9 @@ class DPViewer(EasyPaint):
                                  (u[1] + 0.5) * self.cell_size + self.m[1] - 0.05 * self.cell_size,
                                  label2, fs, anchor="N", color='blue', tag=tag)
 
-    def main(self):
+    def main(self) -> None:
+        node_size = self.node_size
+        assert node_size is not None
         for edge in self.edges:
             self.draw_arrow(edge)
         for node in self.nodes:
@@ -259,7 +270,7 @@ class DPViewer(EasyPaint):
             lh, lv = self.axes_names[1], self.axes_names[0]
         else:
             lh, lv = self.axes_names[0], self.axes_names[1]
-        kk = 2 * self.node_size / self.cell_size
+        kk = 2 * node_size / self.cell_size
         if lv != '':
             self._draw_arrow(-kk, 0, -kk, (self.size[1] - 2 * self.m[1]) / self.cell_size - 1, lv, arrow_style,
                              tag='axe')
@@ -278,13 +289,13 @@ if __name__ == '__main__':
     b = ((15, 4), 'B', node_styleA)
     c = ((10, 7), 'C', node_style)
     d = ((20, 4), 'D', node_style)
-    nodes = {a, b, c, d}
+    nodes: set[Node] = {a, b, c, d}
 
-    edges = [(a, b, '7', arrow_style2), (c, a, '1', arrow_style), (b, d, '-2', arrow_style), (c, b, '4', arrow_style)]
-    edges2 = [(b, a, '-7', arrow_style2), (a, c, '-1', arrow_style), (d, b, '2', arrow_style),
-              (b, c, '-4', arrow_style)]
+    edges: list[Edge] = [(a, b, '7', arrow_style2), (c, a, '1', arrow_style), (b, d, '-2', arrow_style), (c, b, '4', arrow_style)]
+    edges2: list[Edge] = [(b, a, '-7', arrow_style2), (a, c, '-1', arrow_style), (d, b, '2', arrow_style),
+                          (b, c, '-4', arrow_style)]
 
     viewer = DPViewer([edges, edges2], [nodes, nodes],
-                      titles=["Grafo A (pulsa 'Space')", "Grafo B (pulsa 'Space')"],
-                      canvas_width=400, canvas_height=300, swap=True)
+                      titles=["Graph A (press <space>)", "Graph B (press <space>)"],
+                      canvas_width=480, canvas_height=300, swap=True)
     viewer.run()

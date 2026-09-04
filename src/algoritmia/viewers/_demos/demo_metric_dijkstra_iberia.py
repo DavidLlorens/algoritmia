@@ -1,6 +1,6 @@
 from algoritmia.algorithms.traverse import traverse_dijkstra_dict, traverse_dijkstra_metric_dict
 from algoritmia.data.iberia import iberia, km, coords2d, iberia2d
-from algoritmia.viewers.graph2d_viewer import Graph2dViewer
+from algoritmia.viewers.graph2d_viewer import Graph2dViewer, Vertex as Graph2dVertex
 
 
 def dist(city_a: str, city_b: str) -> float:
@@ -12,9 +12,11 @@ def dist(city_a: str, city_b: str) -> float:
 if __name__ == '__main__':
     v_initial = 'Madrid'
     v_final = 'Bilbao'
-    edges = traverse_dijkstra_dict(iberia, km, v_initial)
-    # edges = traverse_dijkstra_metric_dict(iberia, km, dist,v_initial, v_final)
-    colors = {}
+    if True:
+        edges = traverse_dijkstra_dict(iberia, km, v_initial)
+    else:
+        edges = traverse_dijkstra_metric_dict(iberia, km, dist,v_initial, v_final)
+    colors: dict[Graph2dVertex, str] = {}
     for (c1, c2) in edges:
         c1_pos = coords2d[c1]
         c2_pos = coords2d[c2]

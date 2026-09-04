@@ -2,7 +2,7 @@ from abc import abstractmethod, ABC
 from collections.abc import Iterable, Iterator, Collection, Sized
 
 
-class IMergeFindSet[T](ABC, Sized, Iterable):
+class IMergeFindSet[T](ABC, Sized, Iterable[list[T]]):
     @abstractmethod
     def add(self, x: T): pass
 
@@ -55,8 +55,8 @@ class MergeFindSet[T](IMergeFindSet[T]):
             self._parent[x], x = r, self._parent[x]
         return r
 
-    def __iter__(self) -> Iterator[Iterable[T]]:
-        aux = {}
+    def __iter__(self) -> Iterator[list[T]]:
+        aux: dict[T, list[T]] = {}
         for key in self._parent:
             aux.setdefault(self.find(key), []).append(key)
         for s in aux.values():

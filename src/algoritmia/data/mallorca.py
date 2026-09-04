@@ -15,3 +15,4 @@ _km = WeightingFunction[City](
     symmetrical=True)
 
 Mallorca = UndirectedGraph[City](E=_km.keys())
+km = _km

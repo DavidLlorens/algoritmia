@@ -1,12 +1,22 @@
 from abc import abstractmethod, ABC
-from collections.abc import Callable, Iterable, Iterator, Sequence
+from collections.abc import Callable, Iterable, Iterator, MutableMapping
 from itertools import repeat
-from typing import Optional
+from typing import Optional, Protocol, cast
 
 from math import log, sqrt
 
 
-class IPriorityMap[K, T](ABC, dict[K, T]):
+class SupportsRichComparison(Protocol):
+    def __lt__(self, other: object) -> bool: ...
+
+    def __le__(self, other: object) -> bool: ...
+
+    def __gt__(self, other: object) -> bool: ...
+
+    def __ge__(self, other: object) -> bool: ...
+
+
+class IPriorityMap[K, T](ABC, MutableMapping[K, T]):
     @abstractmethod
     def opt(self) -> K: pass
 
@@ -25,63 +35,70 @@ class IPriorityMap[K, T](ABC, dict[K, T]):
 
 # -------------------------------------------------------------------------
 
-class MinHeapMap[K, T](IPriorityMap[K, T]):
-    _opt: Callable[[T, T], T] = min
+class MinHeapMap[K, T: SupportsRichComparison](IPriorityMap[K, T]):
+    _opt: Callable[[T, T], T] = cast(Callable[[T, T], T], min)
 
     def __init__(self, data: Iterable[tuple[K, T]] | dict[K, T] = (), capacity: int = 0):
         super().__init__()
         # self._opt = opt
-        self._index = {}
+        self._index: dict[K, int] = {}
         if isinstance(data, dict):
-            data = data.items()
-        elif not isinstance(data, Sequence):
-            data = tuple(data)
-        for (i, (key, _)) in enumerate(data):
+            entries: Iterable[tuple[K, T]] = cast(Iterable[tuple[K, T]], data.items())
+        else:
+            entries = data
+        data_list: list[tuple[K, T]] = list(entries)
+        for i, (key, _) in enumerate(data_list):
             self._index[key] = i + 1
-        self._size = len(data)
+        self._size = len(data_list)
         self._heap: list[Optional[tuple[T, K]]] = [None]
-        self._heap.extend((v, k) for (k, v) in data)
+        self._heap.extend((v, k) for (k, v) in data_list)
         self._heap.extend(repeat(None, max(0, capacity - self._size)))
         for i in range(self._size // 2, 0, -1):
             self._heapify(i)
+
+    def _heap_item(self, i: int) -> tuple[T, K]:
+        item = self._heap[i]
+        assert item is not None
+        return item
 
     def _heapify(self, i: int):
         while True:
             left: int = 2 * i
             right: int = 2 * i + 1
-            if left <= self._size and self._opt(self._heap[left], self._heap[i]) != self._heap[i]:
+            if left <= self._size and self._opt(self._heap_item(left)[0], self._heap_item(i)[0]) != self._heap_item(i)[0]:
                 best = left
             else:
                 best = i
-            if right <= self._size and self._opt(self._heap[right], self._heap[best]) != self._heap[best]:
+            if right <= self._size and self._opt(self._heap_item(right)[0], self._heap_item(best)[0]) != self._heap_item(best)[0]:
                 best = right
             if best == i:
                 break
-            self._index[self._heap[i][1]], self._index[self._heap[best][1]] = best, i
+            self._index[self._heap_item(i)[1]], self._index[self._heap_item(best)[1]] = best, i
             self._heap[i], self._heap[best] = self._heap[best], self._heap[i]
             i = best
 
     def _bubble_up(self, i: int):
         p = i // 2
-        while i > 1 and self._opt(self._heap[i], self._heap[p]) != self._heap[p]:
-            self._index[self._heap[i][1]], self._index[self._heap[p][1]] = p, i
+        while i > 1 and self._opt(self._heap_item(i)[0], self._heap_item(p)[0]) != self._heap_item(p)[0]:
+            self._index[self._heap_item(i)[1]], self._index[self._heap_item(p)[1]] = p, i
             self._heap[i], self._heap[p] = self._heap[p], self._heap[i]
             i, p = p, p // 2
 
     def opt(self) -> K:
         if self._size == 0:
             raise IndexError('opt from an empty priority dict')
-        return self._heap[1][1]
+        return self._heap_item(1)[1]
 
     def opt_item(self) -> tuple[K, T]:
         if self._size == 0:
             raise IndexError('opt from an empty priority dict')
-        return self._heap[1][1], self._heap[1][0]
+        item = self._heap_item(1)
+        return item[1], item[0]
 
     def opt_value(self) -> T:
         if self._size == 0:
             raise IndexError('opt from an empty priority dict')
-        return self._heap[1][0]
+        return self._heap_item(1)[0]
 
     def extract_opt(self) -> K:
         return self.extract_opt_item()[0]
@@ -89,7 +106,8 @@ class MinHeapMap[K, T](IPriorityMap[K, T]):
     def extract_opt_item(self) -> tuple[K, T]:
         m = self.opt_item()
         if self._size > 1:
-            self._heap[1], self._index[self._heap[self._size][1]] = self._heap[self._size], 1
+            last_item = self._heap_item(self._size)
+            self._heap[1], self._index[last_item[1]] = self._heap[self._size], 1
             self._heap[self._size] = None
         self._size -= 1
         if self._size > 1:
@@ -97,68 +115,46 @@ class MinHeapMap[K, T](IPriorityMap[K, T]):
         del self._index[m[0]]
         return m
 
-    def __contains__(self, key: K) -> bool:
+    def __contains__(self, key: object) -> bool:
         return key in self._index
 
     def __getitem__(self, key: K) -> T:
-        return self._heap[self._index[key]][0]
+        return self._heap_item(self._index[key])[0]
 
-    def __setitem__(self, key: K, score: T) -> T:
+    def __setitem__(self, key: K, score: T) -> None:
         if key in self._index:
             i = self._index[key]
-            if score == self._heap[i][0]:
-                return score
-            if self._opt(score, self._heap[i][0]) != score:
+            item = self._heap_item(i)
+            if score == item[0]:
+                return
+            if self._opt(score, item[0]) != score:
                 self._heap[i] = (score, key)
                 self._heapify(i)
-                return score
+                return
         else:
             if self._size + 1 >= len(self._heap):
                 self._heap.append(None)
             self._index[key] = i = self._size = self._size + 1
         self._heap[i] = (score, key)
         self._bubble_up(i)
-        return score
 
     def __delitem__(self, key: K):
         if key not in self._index:
             raise KeyError(key)
         i = self._index[key]
-        self._heap[i], self._index[self._heap[self._size][1]] = self._heap[self._size], i
+        last_item = self._heap_item(self._size)
+        self._heap[i], self._index[last_item[1]] = last_item, i
         self._size -= 1
         self._heapify(i)
-        if i > 1 and self._heap[i] < self._heap[i // 2]:
+        if i > 1 and self._heap_item(i) < self._heap_item(i // 2):
             p = i // 2
-            while i > 1 and self._heap[i] < self._heap[p]:
-                self._index[self._heap[i][1]], self._index[self._heap[p][1]] = p, i
+            while i > 1 and self._heap_item(i) < self._heap_item(p):
+                self._index[self._heap_item(i)[1]], self._index[self._heap_item(p)[1]] = p, i
                 self._heap[i], self._heap[p] = self._heap[p], self._heap[i]
                 i, p = p, p // 2
         else:
             self._heapify(i)
         del self._index[key]
-
-    def keys(self) -> Iterator[K]:
-        for key in self._index:
-            yield key
-
-    def values(self) -> Iterator[T]:
-        for key in self._index:
-            yield self._heap[self._index[key]][0]
-
-    def items(self) -> Iterator[tuple[K, T]]:
-        for key in self._index:
-            yield self._heap[self._index[key]][1], self._heap[self._index[key]][0]
-
-    def get(self, key: K, default: T = None) -> T:
-        if key in self._index:
-            return self[key]
-        return default
-
-    def setdefault(self, key: K, default: T = None) -> T:
-        if key in self._index:
-            return self[key]
-        self[key] = default
-        return default
 
     def __iter__(self) -> Iterator[K]:
         for key in self._index:
@@ -174,45 +170,50 @@ class MinHeapMap[K, T](IPriorityMap[K, T]):
         return '{}({!r})'.format(self.__class__.__name__, [(k, self[k]) for k in self])
 
 
-class MaxHeapMap(MinHeapMap):
-    _opt = max
+class MaxHeapMap[K, T: SupportsRichComparison](MinHeapMap[K, T]):
+    _opt: Callable[[T, T], T] = cast(Callable[[T, T], T], max)
 
 
 # -------------------------------------------------------------------------
 
 class FibNode[K, T]:
     def __init__(self, key: K, value: T):
-        self.parent = self.child = None
-        self.left = self.right = self
+        self.parent: Optional[FibNode[K, T]] = None
+        self.child: Optional[FibNode[K, T]] = None
+        self.left: FibNode[K, T] = self
+        self.right: FibNode[K, T] = self
         self.key = key
-        self.value = value
+        self.value: T | None = value
         self.degree = 0
         self.mark = False
 
 
-class MinFibonacciHeap[K, T](IPriorityMap[K, T]):
-    _opt: Callable[[T, T], T] = min
+class MinFibonacciHeap[K, T: SupportsRichComparison](IPriorityMap[K, T]):
+    _opt: Callable[[T, T], T] = cast(Callable[[T, T], T], min)
 
     def __init__(self, data: Iterable[tuple[K, T]] = ()):
         super().__init__()
         self._size = 0
         self._minroot: Optional[FibNode[K, T]] = None
-        self._map = dict()
-        self._opt2 = lambda a, b: None if a is None or b is None else self._opt(a, b)
+        self._map: dict[K, FibNode[K, T]] = {}
+        self._opt2: Callable[[T | None, T | None], T | None] = lambda a, b: None if a is None or b is None else self._opt(a, b)
         for key, value in data:
             self.add(key, value)
 
     def __getitem__(self, key: K) -> T:
-        return self._map[key].value
+        return cast(T, self._map[key].value)
 
     def opt_item(self) -> tuple[K, T]:
-        return self._minroot.key, self._minroot.value
+        assert self._minroot is not None
+        return self._minroot.key, cast(T, self._minroot.value)
 
     def opt(self) -> K:
+        assert self._minroot is not None
         return self._minroot.key
 
     def opt_value(self) -> T:
-        return self._minroot.value
+        assert self._minroot is not None
+        return cast(T, self._minroot.value)
 
     def add(self, key: K, value: T):
         node = self._map[key] = FibNode(key, value)
@@ -231,43 +232,48 @@ class MinFibonacciHeap[K, T](IPriorityMap[K, T]):
         return opt
 
     def extract_opt_item(self) -> tuple[K, T]:
-        item = (self._minroot.key, self._minroot.value)
+        assert self._minroot is not None
+        item = (self._minroot.key, cast(T, self._minroot.value))
         self._remove_opt()
         return item
 
     def _remove_opt(self):
+        assert self._minroot is not None
         z = self._minroot
         del self._map[z.key]
-        if z is not None:
-            nchildren = z.degree
-            x = z.child
-            while nchildren > 0:
-                t = x.right
-                x.left.right, x.right.left = x.right, x.left
-                x.left, x.right = self._minroot, self._minroot.right
-                self._minroot.right = x.right.left = x
-                x.parent = None
-                x = t
-                nchildren -= 1
-            z.left.right, z.right.left = z.right, z.left
-            if z == z.right:
-                self._minroot = None
-            else:
-                self._minroot = z.right
-                self._consolidate()
-            self._size -= 1
+        nchildren = z.degree
+        x = z.child
+        while nchildren > 0:
+            assert x is not None
+            t = x.right
+            x.left.right, x.right.left = x.right, x.left
+            x.left, x.right = self._minroot, self._minroot.right
+            self._minroot.right = x.right.left = x
+            x.parent = None
+            x = t
+            nchildren -= 1
+        z.left.right, z.right.left = z.right, z.left
+        if z == z.right:
+            self._minroot = None
+        else:
+            self._minroot = z.right
+            self._consolidate()
+        self._size -= 1
 
     _philog = log((1 + sqrt(5)) / 2)
 
     def _consolidate(self):
+        assert self._minroot is not None
         a: list[Optional[FibNode[K, T]]] = [None] * int(log(self._size) / self._philog)
         n_roots = self._count_roots()
         x = self._minroot
         while n_roots > 0:
+            assert x is not None
             d = x.degree
             next0 = x.right
             while a[d] is not None:
                 y = a[d]
+                assert y is not None
                 if self._opt2(x.value, y.value) != x.value: x, y = y, x
                 self._link(y, x)
                 a[d] = None
@@ -318,7 +324,8 @@ class MinFibonacciHeap[K, T](IPriorityMap[K, T]):
         else:
             self._improve_value(key, value)
 
-    def _improve_value(self, key: K, value: T):
+    def _improve_value(self, key: K, value: T | None):
+        assert self._minroot is not None
         node = self._map[key]
         if self._opt2(value, node.value) != value:
             raise ValueError("{} at {} does not improve {}".format(value, key, node.value))
@@ -331,6 +338,7 @@ class MinFibonacciHeap[K, T](IPriorityMap[K, T]):
             self._minroot = node
 
     def _cut(self, x: FibNode[K, T], y: FibNode[K, T]):
+        assert self._minroot is not None
         x.left.right, x.right.left = x.right, x.left
         y.degree -= 1
         if y.child == x: y.child = x.right
@@ -354,29 +362,10 @@ class MinFibonacciHeap[K, T](IPriorityMap[K, T]):
         self._improve_value(key, None)
         self._remove_opt()
 
-    def keys(self) -> Iterable[K]:
-        return self._map.keys()
-
-    def values(self) -> Iterator[T]:
-        for key in self._map: yield self._map[key].value
-
-    def items(self) -> Iterator[tuple[K, T]]:
-        for key in self._map:
-            yield key, self._map[key].value
-
-    def get(self, key: K, default: T = None) -> T:
-        if key in self._map: return self[key]
-        return default
-
-    def setdefault(self, key: K, default: T = None):
-        if key in self._map: return self[key]
-        self[key] = default
-        return default
-
-    def __contains__(self, key: K) -> bool:
+    def __contains__(self, key: object) -> bool:
         return key in self._map
 
-    def __len__(self) -> "int":
+    def __len__(self) -> int:
         return self._size
 
     def __iter__(self) -> Iterator[K]:
@@ -389,7 +378,7 @@ class MinFibonacciHeap[K, T](IPriorityMap[K, T]):
         return '{}({!r})'.format(self.__class__.__name__, [(k, self[k]) for k in list(self)])
 
 
-class MaxFibonacciHeap(MinFibonacciHeap):
-    _opt = max
+class MaxFibonacciHeap[K, T: SupportsRichComparison](MinFibonacciHeap[K, T]):
+    _opt: Callable[[T, T], T] = cast(Callable[[T, T], T], max)
 
 # -------------------------------------------------------------------------

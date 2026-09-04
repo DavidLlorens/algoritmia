@@ -15,8 +15,8 @@ def topological_sort[T](g: Digraph[T]) -> list[T]:
             used.remove(suc_v)  # Cycle detection
         lv.append(v)
 
-    lv = []
-    seen = set()
+    lv: list[T] = []
+    seen: set[T] = set()
     for v in g.V:
         if len(g.preds(v)) == 0:
             traverse_from(v, set())

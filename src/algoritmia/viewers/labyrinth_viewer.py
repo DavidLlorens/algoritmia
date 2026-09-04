@@ -34,6 +34,7 @@ from easypaint import EasyPaint
 from algoritmia.datastructures.graphs import UndirectedGraph
 
 type Vertex = tuple[int, int]
+type Path = list[Vertex]
 
 
 class LabyrinthViewer(EasyPaint):
@@ -43,7 +44,7 @@ class LabyrinthViewer(EasyPaint):
                  canvas_height: int = 400,
                  margin: int = 10,
                  wall_width: int = 2,
-                 title: str = "Labyrinth Viewer - Press 'SPACE', 'g' or 'l'"):
+                 title: str = "Labyrinth Viewer - Press <space>, <g> or <l>") -> None:
         EasyPaint.__init__(self)
 
         self.visible_l = True
@@ -52,34 +53,29 @@ class LabyrinthViewer(EasyPaint):
         self.title = title
         self.canvas_width, self.canvas_height = canvas_width, canvas_height
 
-        # check 'lab' type
-        if not isinstance(lab, UndirectedGraph) or \
-                any([not isinstance(p, tuple) or len(p) != 2 or not isinstance(p[0], int) or
-                     not isinstance(p[1], int) for p in lab.V]):
-            raise TypeError("The labyrinth must be an UndirectedGraph where vertex are tuple[int,int]")
-
         self.g = lab
-        self.paths = []
-        self.marked_cells = []
+        self.paths: list[tuple[Path, str, int]] = []
+        self.marked_cells: list[tuple[Vertex, str]] = []
         self.margin = margin
         self.max_col = max(p[1] for p in self.g.V)
         self.max_row = max(p[0] for p in self.g.V)
 
-        self.ip = self.op = None
+        self.ip: Vertex | None = None
+        self.op: Vertex | None = None
 
-    def set_input_point(self, pos: Vertex):
+    def set_input_point(self, pos: Vertex) -> None:
         self.ip = pos
 
-    def set_output_point(self, pos: Vertex):
+    def set_output_point(self, pos: Vertex) -> None:
         self.op = pos
 
-    def add_marked_cell(self, cell, color='red'):
+    def add_marked_cell(self, cell: Vertex, color: str = 'red') -> None:
         self.marked_cells.append((cell, color))
 
-    def add_path(self, path: list[Vertex], color: str = 'red', offset: int = 0):
+    def add_path(self, path: Path, color: str = 'red', offset: int = 0) -> None:
         self.paths.append((path, color, offset))
 
-    def _draw_path(self, path: list[Vertex], color: str, offset: int):
+    def _draw_path(self, path: Path, color: str, offset: int) -> None:
         u = path[0]
         mw2 = self.mw / 2 + self.cell_size / 2 + offset
         mh2 = self.mh / 2 + self.cell_size / 2 + offset
@@ -89,7 +85,7 @@ class LabyrinthViewer(EasyPaint):
                              capstyle=tkinter.PROJECTING)
             u = v
 
-    def draw_lab(self):
+    def draw_lab(self) -> None:
         mw = self.mw
         mh = self.mh
         color = 'black'
@@ -131,7 +127,7 @@ class LabyrinthViewer(EasyPaint):
                                               cx + self.cell_size / 2, cy + self.cell_size / 2, color, color)
             self.tag_lower(tt)
 
-    def draw_graph(self):
+    def draw_graph(self) -> None:
         mw = self.mw
         mh = self.mh
         width = self.wall_width
@@ -151,7 +147,7 @@ class LabyrinthViewer(EasyPaint):
                                       color='black',
                                       fill='palegreen')
 
-    def on_key_press(self, keysym):
+    def on_key_press(self, keysym: str) -> None:
         if keysym in ['Escape', 'Return']:
             self.close()
         elif keysym.upper() in ['L', 'G', 'SPACE']:
@@ -172,7 +168,7 @@ class LabyrinthViewer(EasyPaint):
             if self.visible_g:
                 self.draw_graph()
 
-    def main(self):
+    def main(self) -> None:
         self.cell_size = min(int((self.canvas_width - self.margin * 2) / (self.max_col + 1)),
                              int((self.canvas_height - self.margin * 2) / (self.max_row + 1)))
 
@@ -206,8 +202,8 @@ if __name__ == '__main__':
     graph: UndirectedGraph[Vertex] = UndirectedGraph(E=e)
 
     # Crea un LabyrinthViewer pasándole el grafo del laberinto
-    num_rows = max(max(r1, r2) for (r1, c1), (r2, c2) in e) + 1
-    num_cols = max(max(c1, c2) for (r1, c1), (r2, c2) in e) + 1
+    num_rows = max(max(r1, r2) for (r1, _), (r2, _) in e) + 1
+    num_cols = max(max(c1, c2) for (_, c1), (_, c2) in e) + 1
     cell_size = min(int((max_canvas_width - margin * 2) / num_cols),
                     int((max_canvas_height - margin * 2) / num_rows))
     canvas_width = cell_size * num_cols + margin*2

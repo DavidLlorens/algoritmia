@@ -75,7 +75,7 @@ def subsetsum_vc_solutions(e: tuple[int, ...], s: int) -> Iterator[Solution]:
 
 # --------------------------------------------------------------------------------
 
-def subsetsum_problem(num_elem):
+def subsetsum_problem(num_elem: int) -> tuple[tuple[int, ...], int]:
     seed(42)
     elems = tuple(int(random() * 1000) + 1 for _ in range(num_elem))
     return elems, sum(elems) // 4  # sorted(elems, key=lambda x: -x), sum(elems) // 4

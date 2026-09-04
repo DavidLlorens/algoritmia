@@ -9,20 +9,20 @@ type Vertex = tuple[int, int]
 
 def create_labyrinth_mfset(num_rows: int, num_cols: int, extra_corridors: int = 0) -> UndirectedGraph[Vertex]:
     # Crear lista de vértices
-    v = [(r, c) for r in range(num_rows) for c in range(num_cols)]
+    v: list[Vertex] = [(r, c) for r in range(num_rows) for c in range(num_cols)]
 
     # Crear lista de aristas entre vértices vecinos
-    w = []
+    w: list[tuple[Vertex, Vertex]] = []
     for (r, c) in v:
         if r + 1 < num_rows: w.append(((r, c), (r + 1, c)))
         if c + 1 < num_cols: w.append(((r, c), (r, c + 1)))
 
     # Barajar la lista de aristas entre vértices vecinos
     random.shuffle(w)
-    e = []
+    e: list[tuple[Vertex, Vertex]] = []
 
     # Crear un MFSet vacío
-    mfs = MergeFindSet()
+    mfs: MergeFindSet[Vertex] = MergeFindSet()
 
     # Añadir los elementos de 'v' al MFSet
     for vertice in v: mfs.add(vertice)

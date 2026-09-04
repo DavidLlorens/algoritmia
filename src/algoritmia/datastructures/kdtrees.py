@@ -1,7 +1,8 @@
 from abc import abstractmethod, ABC
+from enum import IntEnum
 
 
-class Axis:
+class Axis(IntEnum):
     X = 0
     Y = 1
 

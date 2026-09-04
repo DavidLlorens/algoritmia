@@ -4,10 +4,10 @@ from algoritmia.datastructures.graphs import UndirectedGraph
 # agrupa los vertices que pueden compartir color
 def coloring_solve[T](g: UndirectedGraph[T]) -> list[set[T]]:
     solution: list[set[T]] = []
-    vertex_set = set(g.V)  # Creamos una copia de los vértices
+    vertex_set: set[T] = set(g.V)  # Creamos una copia de los vértices
 
     while len(vertex_set) > 0:
-        grupo = set()  # Creamos un nuevo grupo vacío
+        grupo: set[T] = set()  # Creamos un nuevo grupo vacío
         # Añadimos los vértices cuyos sucesores no estén ya en grupo
         for v in vertex_set:
             # Simple code --------

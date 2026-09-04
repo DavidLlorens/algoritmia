@@ -39,7 +39,7 @@ def find_treasure_depthfirst(g: UndirectedGraph[Vertex],
         # if v == v_treasure:     # postorder
         #    return v             # postorder
 
-    seen = set()
+    seen: set[Vertex] = set()
     return explorar_desde(v_start)
 
 

@@ -5,7 +5,6 @@ from typing import Self
 from math import ceil
 
 from algoritmia.schemes.bab_scheme import BabDecisionSequence, bab_min_solve
-from algoritmia.utils import infinity
 
 # Tipos  --------------------------------------------------------------------------
 
@@ -16,6 +15,7 @@ type Solution = tuple[Decision, ...]
 type Score = int                             # Total de monedas utilizado
 type Result = tuple[Score, Solution] | None  # Si no hay solución, None
 
+infinity = 10**100  # entero suficientemente grande 
 
 # --------------------------------------------------------------------------------
 

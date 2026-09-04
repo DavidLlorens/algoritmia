@@ -1,7 +1,7 @@
 import sys
 from abc import ABC, abstractmethod
-from collections.abc import Callable, Iterable
-from typing import Optional
+from collections.abc import Iterable
+from typing import Optional, cast, overload
 
 # T is a generic with the vertex type
 type Edge[T] = tuple[T, T]  # Edge is a generic type
@@ -154,7 +154,7 @@ class Digraph[T](IGraph[T]):
 # WeightingFunction -----------------------------------------------------------------
 
 
-class WeightingFunction[T](dict[Edge[T], Weight], Callable[[T | Edge[T], Optional[T]], Weight]):
+class WeightingFunction[T](dict[Edge[T], Weight]):
     # O(|data|) = O(|E|)
     def __init__(self, data: Iterable[tuple[Edge[T], Weight]] | dict[Edge[T], Weight], symmetrical: bool = False):
         super().__init__(data)
@@ -181,10 +181,18 @@ class WeightingFunction[T](dict[Edge[T], Weight], Callable[[T | Edge[T], Optiona
         for e in to_delete:
             del self[e]
 
+    @overload
+    def __call__(self, u: Edge[T]) -> Weight: ...
+
+    @overload
+    def __call__(self, u: T, v: T) -> Weight: ...
+
     # O(1)*
     def __call__(self, u: T | Edge[T], v: Optional[T] = None) -> Weight:
         if v is None:
-            u, v = u
+            u, v = cast(Edge[T], u)
+        else:
+            u = cast(T, u)
         # if u == v:
         #    return 0
         if (u, v) in self:
@@ -199,6 +207,4 @@ class WeightingFunction[T](dict[Edge[T], Weight], Callable[[T | Edge[T], Optiona
 if __name__ == '__main__':
     g = Digraph(E=[(1, 2)])
     print(g)
-    print(isinstance(g, IGraph))
-    print(isinstance(g, Digraph))
-    print(isinstance(g, UndirectedGraph))
+    print(g.is_directed())

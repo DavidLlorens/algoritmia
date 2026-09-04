@@ -1,15 +1,14 @@
 from algoritmia._examples.greedy.graph_coloring_greedy import coloring_solve
-from algoritmia.viewers.graph2d_viewer import Graph2dViewer
-
-type Vertex = tuple[int, int]
+from algoritmia.data.iberia import Pos2D
+from algoritmia.viewers.graph2d_viewer import Graph2dViewer, Vertex as Graph2dVertex
 
 
 if __name__ == '__main__':
     from algoritmia.data.iberia import iberia2d
 
-    colors_set = list(coloring_solve(iberia2d))
+    colors_set: list[set[Pos2D]] = list(coloring_solve(iberia2d))
     print(f"Solution with {len(colors_set)} colors.")
-    colors = {}
+    colors: dict[Graph2dVertex, str] = {}
     cols = ['red', 'green', 'blue', 'orange', 'yellow', 'brown', 'pink', 'black', 'white']
     if len(colors_set) > len(cols):
         raise Exception('Not enought colors')

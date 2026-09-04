@@ -11,14 +11,13 @@ from algoritmia.datastructures.kdtrees import Axis, KDTree, KDNode, KDLeaf
 
 
 class KDTreeViewer(EasyPaint):
-    def __init__(self, kdtree: KDTree):
+    def __init__(self, kdtree: KDTree) -> None:
         EasyPaint.__init__(self)
         self.kdtree = kdtree
 
-    def draw_kdtree(self, kdtree: KDTree, min_x: float, min_y: float, max_x: float, max_y: float):
+    def draw_kdtree(self, kdtree: KDTree, min_x: float, min_y: float, max_x: float, max_y: float) -> None:
         if isinstance(kdtree, KDLeaf):
-            if kdtree.point is not None:
-                self.create_point(kdtree.point[0], kdtree.point[1])
+            self.create_point(kdtree.point[0], kdtree.point[1])
         elif isinstance(kdtree, KDNode):
             if kdtree.axis == Axis.X:
                 self.create_line(kdtree.split_value, min_y, kdtree.split_value, max_y, 'red')
@@ -39,11 +38,11 @@ class KDTreeViewer(EasyPaint):
         else:
             raise TypeError("Wrong type on 'kdtree' parameter")
 
-    def on_key_press(self, keysym):
+    def on_key_press(self, keysym: str) -> None:
         if keysym in ['Return', 'Escape']:
             self.close()
 
-    def main(self):
+    def main(self) -> None:
         points = self.get_points(self.kdtree)
         x = list(map(lambda p: p[0], points))
         y = list(map(lambda p: p[1], points))
@@ -51,7 +50,7 @@ class KDTreeViewer(EasyPaint):
         min_y, max_y = min(y), max(y)
 
         sizex = 800
-        sizey = sizex * (max_y - min_y) / (max_x - min_x)
+        sizey = int(sizex * (max_y - min_y) / (max_x - min_x))
 
         b = (max_x - min_x) * 0.05  # el borde será el 5% del tamaño del eje x
         self.easypaint_configure(title='KDTreeViewer',

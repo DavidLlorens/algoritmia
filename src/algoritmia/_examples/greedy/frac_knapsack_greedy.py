@@ -4,19 +4,21 @@ def total_value(v: list[int], sol: list[float]) -> float:
 
 
 def frac_knapsack0(C: int, v: list[int], w: list[int]) -> list[float]:
+    c: float = float(C)
     x: list[float] = [0.0] * len(w)
     for i in range(len(w)):
-        x[i] = min(1.0, C / w[i])
-        C -= x[i] * w[i]
+        x[i] = min(1.0, c / w[i])
+        c -= x[i] * w[i]
     return x
 
 
 def frac_knapsack(C: int, v: list[int], w: list[int]) -> list[float]:
     sorted_indices: list[int] = sorted(range(len(w)), key=lambda i: -v[i] / w[i])
+    c: float = float(C)
     x: list[float] = [0.0] * len(w)
     for i in sorted_indices:
-        x[i] = min(1.0, C / w[i])
-        C -= x[i] * w[i]
+        x[i] = min(1.0, c / w[i])
+        c -= x[i] * w[i]
     return x
 
 

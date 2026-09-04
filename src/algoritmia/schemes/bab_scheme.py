@@ -1,5 +1,6 @@
 """
-Version: 6.1 (12-oct-2025)
+Version: 6.2 (08-jun-2026) - Corrección de tipos para evitar warnings de mypy
+         6.1 (12-oct-2025)
          6.0 (11-dic-2024)
          5.2 (01-dic-2023)
          5.1 (23-nov-2023)
@@ -8,13 +9,12 @@ Version: 6.1 (12-oct-2025)
          4.0 (23-oct-2021)
 
 @author: David Llorens (dllorens@uji.es)
-         (c) Universitat Jaume I 2025
+         (c) Universitat Jaume I 2026
 @license: GPL3
 """
 import operator
 from abc import abstractmethod
-from functools import total_ordering
-from typing import final, Self, Callable
+from typing import final, Callable, cast
 
 from algoritmia.datastructures.priorityqueues import MaxHeap, MinHeap, IPriorityQueue
 from algoritmia.schemes.bt_scheme import DecisionSequence, DecisionPath
@@ -22,7 +22,7 @@ from algoritmia.schemes.bt_scheme import DecisionSequence, DecisionPath
 
 # --- Tipo Result[D, E, S] ---
 
-type Result[D, E, S] = tuple[S, BabDecisionSequence[D, E, S]] | None
+type Result[D, E, S: int | float] = tuple[S, BabDecisionSequence[D, E, S]] | None
 
 # Parámetros de tipo:
 #   - D: el tipo de una decisión
@@ -46,15 +46,14 @@ type Result[D, E, S] = tuple[S, BabDecisionSequence[D, E, S]] | None
 # La clase BabDecisionSequence -------------------------------------------------------
 
 
-@total_ordering  # Implementando < y ==, el resto de operadores de comparación se generan automáticamente
-class BabDecisionSequence[D, E, S](DecisionSequence[D, E]):
+class BabDecisionSequence[D, E, S: int | float](DecisionSequence[D, E]):
     def __init__(self,
-                 extra: E | None = None,
+                 extra: E = None,
                  decisions: DecisionPath[D] = (),
                  length: int = 0):
-        DecisionSequence.__init__(self, extra, decisions, length)
-        self._pes = self.calculate_pes_bound()
-        self._opt = self.calculate_opt_bound()
+        DecisionSequence[D, E].__init__(self, extra, decisions, length)
+        self._pes: S = self.calculate_pes_bound()
+        self._opt: S = self.calculate_opt_bound()
 
     # --- Métodos abstractos nuevos ---
 
@@ -94,12 +93,39 @@ class BabDecisionSequence[D, E, S](DecisionSequence[D, E]):
 
     # Comparar dos BabDecisionSequence es comparar sus cotas optimistas
     @final
-    def __lt__(self, other: Self) -> bool:
-        return self._opt < other._opt
+    def __lt__(self, other: object) -> bool:
+        if not isinstance(other, BabDecisionSequence):
+            return NotImplemented
+        other_ds = cast(BabDecisionSequence[D, E, S], other)
+        return self._opt < other_ds._opt
 
     @final
-    def __eq__(self, other: Self) -> bool:
-        return self._opt == other._opt
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, BabDecisionSequence):
+            return NotImplemented
+        other_ds = cast(BabDecisionSequence[D, E, S], other)
+        return self._opt == other_ds._opt
+
+    @final
+    def __le__(self, other: object) -> bool:
+        if not isinstance(other, BabDecisionSequence):
+            return NotImplemented
+        other_ds = cast(BabDecisionSequence[D, E, S], other)
+        return self._opt <= other_ds._opt
+
+    @final
+    def __gt__(self, other: object) -> bool:
+        if not isinstance(other, BabDecisionSequence):
+            return NotImplemented
+        other_ds = cast(BabDecisionSequence[D, E, S], other)
+        return self._opt > other_ds._opt
+
+    @final
+    def __ge__(self, other: object) -> bool:
+        if not isinstance(other, BabDecisionSequence):
+            return NotImplemented
+        other_ds = cast(BabDecisionSequence[D, E, S], other)
+        return self._opt >= other_ds._opt
 
     # -- Métodos finales heredados que NO pueden sobreescribirse en las clases hijas ---
 
@@ -118,8 +144,8 @@ class BabDecisionSequence[D, E, S](DecisionSequence[D, E]):
 # Esquemas para BaB --------------------------------------------------------------------------
 
 
-def bab_solve[D, E, S](better: Callable[[S, S], bool],
-                       heap: IPriorityQueue[S],
+def bab_solve[D, E, S: int | float](better: Callable[[S, S], bool],
+                       heap: IPriorityQueue[BabDecisionSequence[D, E, S]],
                        initial_ds: BabDecisionSequence[D, E, S]
                       ) -> Result[D, E, S]:
     bps = initial_ds.pes()
@@ -141,9 +167,9 @@ def bab_solve[D, E, S](better: Callable[[S, S], bool],
                     heap.add(new_ds)
 
 
-def bab_min_solve[D, E, S](initial_ds: BabDecisionSequence[D, E, S]) -> Result[D, E, S]:
-    return bab_solve(operator.lt, MinHeap(), initial_ds)
+def bab_min_solve[D, E, S: int | float](initial_ds: BabDecisionSequence[D, E, S]) -> Result[D, E, S]:
+    return bab_solve(operator.lt, MinHeap[BabDecisionSequence[D, E, S]](), initial_ds)
 
 
-def bab_max_solve[D, E, S](initial_ds: BabDecisionSequence[D, E, S]) -> Result[D, E, S]:
-    return bab_solve(operator.gt, MaxHeap(), initial_ds)
+def bab_max_solve[D, E, S: int | float](initial_ds: BabDecisionSequence[D, E, S]) -> Result[D, E, S]:
+    return bab_solve(operator.gt, MaxHeap[BabDecisionSequence[D, E, S]](), initial_ds)

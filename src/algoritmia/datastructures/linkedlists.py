@@ -1,6 +1,7 @@
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, SupportsIndex, Any, overload
+import operator
 
 
 # Lista enlazada con puntero a cabeza y cola.
@@ -11,10 +12,10 @@ from typing import Optional
 
 class LinkedList[T](list[T]):
     @dataclass
-    class Node[T]:
-        value: T
-        prev: Optional['LinkedList.Node[T]']
-        next: Optional['LinkedList.Node[T]']
+    class Node[U]:
+        value: U
+        prev: Optional['LinkedList.Node[U]']
+        next: Optional['LinkedList.Node[U]']
 
     def __init__(self, seq: Iterable[T] = ()):
         super().__init__()
@@ -24,7 +25,7 @@ class LinkedList[T](list[T]):
         for item in seq:
             self.append(item)
 
-    def append(self, value: T):
+    def append(self, value: T) -> None:
         node = LinkedList.Node(value, self._last, None)
         if self._last is None:
             self._head = self._last = node
@@ -33,7 +34,11 @@ class LinkedList[T](list[T]):
             self._last = node
         self._length += 1
 
-    def _get_node_at(self, i: int) -> Node[T]:
+    def _normalize_index(self, i: SupportsIndex) -> int:
+        return operator.index(i)
+
+    def _get_node_at(self, i: SupportsIndex) -> Optional[Node[T]]:
+        i = self._normalize_index(i)
         if not (-self._length <= i < self._length): raise IndexError("{}".format(i))
         if i > self._length // 2:
             i -= self._length
@@ -47,30 +52,48 @@ class LinkedList[T](list[T]):
             while node and j < i: node, j = node.prev, j + 1
         return node
 
-    def __getitem__(self, i: int) -> T:
+    @overload
+    def __getitem__(self, i: SupportsIndex) -> T: ...
+
+    @overload
+    def __getitem__(self, i: slice[Any, Any, Any]) -> list[T]: ...
+
+    def __getitem__(self, i: SupportsIndex | slice[Any, Any, Any]) -> T | list[T]:
+        if isinstance(i, slice):
+            raise NotImplementedError('Slice access is not supported')
         node = self._get_node_at(i)
         if node is None: raise IndexError('No item at position {!r}'.format(i))
         return node.value
 
-    def __setitem__(self, i: int, value: T) -> T:
+    @overload
+    def __setitem__(self, i: SupportsIndex, value: T) -> None: ...
+
+    @overload
+    def __setitem__(self, i: slice[Any, Any, Any], value: Iterable[T]) -> None: ...
+
+    def __setitem__(self, i: SupportsIndex | slice[Any, Any, Any], value: T | Iterable[T]) -> None:
+        if isinstance(i, slice):
+            raise NotImplementedError('Slice assignment is not supported')
         node = self._get_node_at(i)
         if node is None: raise IndexError('No item at position {!r}'.format(i))
+        assert not isinstance(value, Iterable)
         node.value = value
-        return value
 
-    def _remove(self, node: Node[T]):
+    def _remove(self, node: Node[T]) -> None:
         if node.prev: node.prev.next = node.next
         if node.next: node.next.prev = node.prev
         if self._head == node: self._head = node.next
         if self._last == node: self._last = node.prev
 
-    def __delitem__(self, i: int):
+    def __delitem__(self, i: SupportsIndex | slice[Any, Any, Any]) -> None:
+        if isinstance(i, slice):
+            raise NotImplementedError('Slice deletion is not supported')
         node = self._get_node_at(i)
         if node is None: raise IndexError('No item at position {!r}'.format(i))
         self._remove(node)
         self._length -= 1
 
-    def remove(self, value: T):
+    def remove(self, value: T) -> None:
         if self._head is not None:
             node = self._head
             while node.value != value and node.next: node = node.next
@@ -80,7 +103,7 @@ class LinkedList[T](list[T]):
                 return
         raise ValueError("Cannot remove {!r}".format(value))
 
-    def pop(self, i: int = None) -> T:
+    def pop(self, i: SupportsIndex | None = None) -> T:
         if i is None:
             if self._last is None: raise IndexError('pop from an empty linked list')
             value = self._last.value
@@ -94,7 +117,8 @@ class LinkedList[T](list[T]):
             self._length -= 1
         return value
 
-    def insert(self, i: int, item: T):
+    def insert(self, i: SupportsIndex, item: T) -> None:
+        i = self._normalize_index(i)
         if i == 0:
             newnode = LinkedList.Node(item, None, self._head)
             if self._head is not None:
@@ -114,9 +138,10 @@ class LinkedList[T](list[T]):
             if node == self._last: self._last = newnode
             self._length += 1
 
-    def reverse(self):
+    def reverse(self) -> None:
         left, right = self._head, self._last
         for _ in range(len(self) // 2):
+            assert left is not None and right is not None
             left.value, right.value = right.value, left.value
             left = left.next
             right = right.prev
@@ -127,7 +152,7 @@ class LinkedList[T](list[T]):
             yield node.value
             node = node.next
 
-    def __contains__(self, value: T) -> bool:
+    def __contains__(self, value: object) -> bool:
         return any(value == v for v in self)
 
     def __len__(self) -> int:

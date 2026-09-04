@@ -1,4 +1,7 @@
 # Changelog
+## [4.0.7] - 2025-11-11
+  - Se han corregido los tipos de los ficheros para evitar los warnings en los editores.
+  - `algoritmia/schemes/bt_scheme.py`: DecisionSequence ahora es Iterable y Reversible.
 ## [4.0.6] - 2025-10-16
   - `algoritmia/schemes/bt_scheme.py`: corregido bug en tipo.
 ## [4.0.5] - 2025-10-15

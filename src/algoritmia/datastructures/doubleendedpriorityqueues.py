@@ -1,7 +1,15 @@
 from abc import abstractmethod
 from collections.abc import Iterator, Collection
+from typing import Optional, Protocol
 
 from algoritmia.datastructures.priorityqueues import IPriorityQueue
+
+
+class SupportsRichComparison(Protocol):
+    def __lt__(self, other: object) -> bool: ...
+    def __le__(self, other: object) -> bool: ...
+    def __gt__(self, other: object) -> bool: ...
+    def __ge__(self, other: object) -> bool: ...
 
 
 class IDoubleEndedPriorityQueue[T](IPriorityQueue[T]):
@@ -12,10 +20,10 @@ class IDoubleEndedPriorityQueue[T](IPriorityQueue[T]):
     def extract_worst(self) -> T: pass
 
 
-class IntervalHeap[T](IDoubleEndedPriorityQueue[T]):
+class IntervalHeap[T: SupportsRichComparison](IDoubleEndedPriorityQueue[T]):
     def __init__(self, data: Collection[T] = (), capacity: int = 0):
         capacity = max(capacity, len(data))
-        self._heap = list(data) + [None] * (capacity - len(data))
+        self._heap: list[Optional[T]] = list(data) + [None] * (capacity - len(data))
         self._size = len(data)
         for v in range(0, self._size, 2):
             if v + 1 < self._size: self._swap(v)
@@ -24,8 +32,13 @@ class IntervalHeap[T](IDoubleEndedPriorityQueue[T]):
             self._heapify_min(v)
             self._heapify_max(v)
 
+    def _heap_item(self, i: int) -> T:
+        item = self._heap[i]
+        assert item is not None
+        return item
+
     def _swap(self, i: int) -> bool:
-        if self._heap[i] > self._heap[i + 1]:
+        if self._heap_item(i) > self._heap_item(i + 1):
             self._heap[i], self._heap[i + 1] = self._heap[i + 1], self._heap[i]
             return True
         return False
@@ -38,7 +51,7 @@ class IntervalHeap[T](IDoubleEndedPriorityQueue[T]):
         smallest = i
         while True:
             for j in self._children(i):
-                if self._heap[j] < self._heap[smallest]: smallest = j
+                if self._heap_item(j) < self._heap_item(smallest): smallest = j
             if smallest == i: break
             self._heap[smallest], self._heap[i] = self._heap[i], self._heap[smallest]
             i = smallest
@@ -50,9 +63,9 @@ class IntervalHeap[T](IDoubleEndedPriorityQueue[T]):
         while True:
             for j in self._children(i):
                 if j + 1 < self._size:
-                    if self._heap[j + 1] > self._heap[largest]: largest = j + 1
+                    if self._heap_item(j + 1) > self._heap_item(largest): largest = j + 1
                 else:
-                    if self._heap[j] > self._heap[largest]: largest = j
+                    if self._heap_item(j) > self._heap_item(largest): largest = j
             if largest == i + 1: break
             self._heap[largest], self._heap[i + 1] = self._heap[i + 1], self._heap[largest]
             i = largest // 2 * 2
@@ -65,14 +78,14 @@ class IntervalHeap[T](IDoubleEndedPriorityQueue[T]):
         j += 2
         if j < self._size: yield j
 
-    def add(self, v: T):
+    def add(self, item: T):
         if self._size == len(self._heap):
             self._heap.append(None)
         if self._size == 0:
-            self._heap[0] = v
+            self._heap[0] = item
             self._size += 1
         else:
-            self._heap[self._size] = v
+            self._heap[self._size] = item
             self._size += 1
             if self._size % 2 == 0:
                 i = self._size - 2
@@ -84,11 +97,11 @@ class IntervalHeap[T](IDoubleEndedPriorityQueue[T]):
                 i = self._size - 1
                 parent = self._parent(i)
                 if parent >= 0:
-                    if self._heap[parent] <= v <= self._heap[parent + 1]: return
-                    if v > self._heap[parent + 1]:
+                    if self._heap_item(parent) <= item <= self._heap_item(parent + 1): return
+                    if item > self._heap_item(parent + 1):
                         self._heap[parent + 1], self._heap[i] = self._heap[i], self._heap[parent + 1]
                         self._bubble_up_max(parent)
-                    elif v < self._heap[parent]:
+                    elif item < self._heap_item(parent):
                         self._heap[parent], self._heap[i] = self._heap[i], self._heap[parent]
                         self._bubble_up_min(parent)
 
@@ -96,7 +109,7 @@ class IntervalHeap[T](IDoubleEndedPriorityQueue[T]):
         while True:
             parent = self._parent(i)
             if parent < 0: return
-            if self._heap[parent + 1] >= self._heap[i + 1]: return
+            if self._heap_item(parent + 1) >= self._heap_item(i + 1): return
             self._heap[parent + 1], self._heap[i + 1] = self._heap[i + 1], self._heap[parent + 1]
             i = parent
 
@@ -104,22 +117,22 @@ class IntervalHeap[T](IDoubleEndedPriorityQueue[T]):
         while True:
             parent = self._parent(i)
             if parent < 0: return
-            if self._heap[parent] <= self._heap[i]: return
+            if self._heap_item(parent) <= self._heap_item(i): return
             self._heap[parent], self._heap[i] = self._heap[i], self._heap[parent]
             i = parent
 
     def min(self) -> T:
         if self._size == 0: raise IndexError("Empty Interval Heap")
-        return self._heap[0]
+        return self._heap_item(0)
 
     def max(self) -> T:
         if self._size == 0: raise IndexError("Empty Interval Heap")
-        if self._size == 1: return self._heap[0]
-        return self._heap[1]
+        if self._size == 1: return self._heap_item(0)
+        return self._heap_item(1)
 
     def extract_min(self) -> T:
         if self._size == 0: raise IndexError("Empty Interval Heap")
-        retval = self._heap[0]
+        retval = self._heap_item(0)
         if self._size <= 2:
             if self._size == 1:
                 self._heap[0] = None
@@ -135,11 +148,11 @@ class IntervalHeap[T](IDoubleEndedPriorityQueue[T]):
     def extract_max(self) -> T:
         if self._size == 0: raise IndexError("Empty Interval Heap")
         if self._size == 1:
-            retval = self._heap[0]
+            retval = self._heap_item(0)
             self._heap[0] = None
             self._size -= 1
             return retval
-        retval = self._heap[1]
+        retval = self._heap_item(1)
         if self._size == 2:
             self._heap[1] = None
             self._size -= 1
@@ -154,7 +167,7 @@ class IntervalHeap[T](IDoubleEndedPriorityQueue[T]):
 
     def __iter__(self) -> Iterator[T]:
         for i in range(self._size):
-            yield self._heap[i]
+            yield self._heap_item(i)
 
     def __repr__(self) -> str:
         return '{}({!r})'.format(self.__class__.__name__, self._heap[:self._size])
@@ -166,17 +179,29 @@ class IntervalHeap[T](IDoubleEndedPriorityQueue[T]):
     extract_worst = extract_max
 
 
-class MinMaxIntervalHeap(IntervalHeap, IDoubleEndedPriorityQueue):
-    opt = IntervalHeap.min
-    extract_opt = IntervalHeap.extract_min
+class MinMaxIntervalHeap[T: SupportsRichComparison](IntervalHeap[T], IDoubleEndedPriorityQueue[T]):
+    def opt(self) -> T:
+        return self.min()
 
-    worst = IntervalHeap.max
-    extract_worst = IntervalHeap.extract_max
+    def extract_opt(self) -> T:
+        return self.extract_min()
+
+    def worst(self) -> T:
+        return self.max()
+
+    def extract_worst(self) -> T:
+        return self.extract_max()
 
 
-class MaxMinIntervalHeap(IntervalHeap, IDoubleEndedPriorityQueue):
-    opt = IntervalHeap.max
-    extract_opt = IntervalHeap.extract_max
+class MaxMinIntervalHeap[T: SupportsRichComparison](IntervalHeap[T], IDoubleEndedPriorityQueue[T]):
+    def opt(self) -> T:
+        return self.max()
 
-    worst = IntervalHeap.min
-    extract_worst = IntervalHeap.extract_min
+    def extract_opt(self) -> T:
+        return self.extract_max()
+
+    def worst(self) -> T:
+        return self.min()
+
+    def extract_worst(self) -> T:
+        return self.extract_min()

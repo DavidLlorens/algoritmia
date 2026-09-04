@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 from dataclasses import dataclass
 from random import seed, randint
-from typing import Self
+from typing import Self, cast
 
 from algoritmia.schemes.bt_scheme import DecisionSequence, bt_solutions, bt_vc_solutions, max_solution
 
@@ -50,7 +50,7 @@ def knapsack_best_solution(weights: list[int],
         return sum(d * values[i] for i, d in enumerate(solution))
 
     all_solutions: Iterator[Solution] = knapsack_solutions(weights, values, capacity)
-    return max_solution(all_solutions, f)
+    return cast(Result, max_solution(all_solutions, f))
 
 # Esquema con control de visitados  --------------------------------------------------------------------------
 

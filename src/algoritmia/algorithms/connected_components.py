@@ -6,23 +6,23 @@ from algoritmia.datastructures.graphs import UndirectedGraph
 type CC[T] = set[T]  # Connected Component
 
 def connected_components[T](g: UndirectedGraph[T],
-                            traverse: Traverse[T]) -> Iterator[CC]:
+                            traverse: Traverse[T]) -> Iterator[CC[T]]:
     pending_vertices = set(g.V)
     while len(pending_vertices) > 0:
         u = pending_vertices.pop()
-        cc_vertices = set([v for (u, v) in traverse(g, u)])
+        cc_vertices: CC[T] = set(v for (_, v) in traverse(g, u))
         pending_vertices -= cc_vertices
         yield cc_vertices
 
 
 if __name__ == '__main__':
-    from traverse import traverse_bf, traverse_df
+    from algoritmia.algorithms.traverse import traverse_bf, traverse_df
 
     edges = [((0, 0), (0, 1)), ((0, 2), (0, 3)), ((1, 0), (1, 1)),
              ((2, 2), (2, 3)), ((0, 1), (1, 1)), ((0, 2), (1, 2)),
              ((1, 2), (2, 2)), ((2, 0), (2, 1)), ((0, 3), (1, 3))]
 
-    my_graph = UndirectedGraph(E=edges)
+    my_graph: UndirectedGraph[tuple[int, int]] = UndirectedGraph(E=edges)
 
     ccs_bf = list(connected_components(my_graph, traverse_bf))
     print("Breath first:", ccs_bf)

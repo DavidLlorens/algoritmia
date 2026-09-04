@@ -39,7 +39,7 @@ def solve(Q: Quantity, v: list[int]) -> Result:
     score = S(Q, len(v))
     if score == infinity: return None
     # Si hay solución, la recuperamos de mem
-    decisions = []
+    decisions: list[Decision] = []
     q, n = Q, len(v)
     while n > 0:
         _, (q, n), d = mem[q, n]

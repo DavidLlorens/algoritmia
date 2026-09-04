@@ -56,7 +56,7 @@ def edit_distance(mode: RecMode, s: str, t: str) -> Result:
         score = D_optimized(len(s), len(t))
 
     # Recuperamos la solución de mem
-    decisions = []
+    decisions: list[Decision] = []
     m, n = len(s), len(t)
     while (m, n) != (0, 0):
         _, (m, n), dec = mem[m, n]

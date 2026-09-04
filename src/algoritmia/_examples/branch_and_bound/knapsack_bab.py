@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 from dataclasses import dataclass
 from random import seed, randint
-from typing import Self
+from typing import Self, cast
 
 from algoritmia.schemes.bab_scheme import BabDecisionSequence, bab_max_solve
 from algoritmia.schemes.bt_scheme import State
@@ -15,7 +15,7 @@ type Solution = tuple[Decision, ...]
 # type Solution = tuple[int, tuple[Decision, ...]]  # (weight, decisions)
 
 # 'bab_max_solve' devuelve Result
-type Score = int  # Valor de la mochila (suma del valor de los objetos que contiene)
+type Score = int | float  # Valor de la mochila (suma del valor de los objetos que contiene)
 type Result = tuple[Score, Solution]  # Siempre hay solución -> No necesitamos None
 
 
@@ -54,7 +54,8 @@ def knapsack_bab_solve_naif(weights: list[int],
             return len(self), self.extra.weight
 
     initial_ds = KnapsackBabDS(Extra())
-    score, solution_ds = bab_max_solve(initial_ds)
+    result = cast(tuple[Score, KnapsackBabDS], bab_max_solve(initial_ds) )
+    score, solution_ds = result
     return score, solution_ds.decisions()
 
 
@@ -71,7 +72,7 @@ def knapsack_bab_solve(weights: list[int],
 
     class KnapsackBabDS(BabDecisionSequence[Decision, Extra, Score]):
         # OPTIMISTA: resolver mochila fraccionaria para los objetos que quedan (tema Voraces)
-        def calculate_opt_bound(self) -> int:
+        def calculate_opt_bound(self) -> Score:
             value = self.extra.value
             weight = self.extra.weight
             for i in range(len(self), len(weights)):
@@ -83,7 +84,7 @@ def knapsack_bab_solve(weights: list[int],
             return value
 
         # PESIMISTA: modificación del optimista para que no fraccione
-        def calculate_pes_bound(self) -> int:
+        def calculate_pes_bound(self) -> Score:
             value = self.extra.value
             weight = self.extra.weight
             for i in range(len(self), len(weights)):
@@ -108,7 +109,9 @@ def knapsack_bab_solve(weights: list[int],
             return len(self), self.extra.weight
 
     initial_ds = KnapsackBabDS(Extra())
-    score, solution_ds = bab_max_solve(initial_ds)
+    result = bab_max_solve(initial_ds)
+    assert result is not None
+    score, solution_ds = result
     return score, solution_ds.decisions()
 
 
