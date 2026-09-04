@@ -1,6 +1,6 @@
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
-from typing import Optional, SupportsIndex, Any, overload
+from typing import Optional, SupportsIndex, overload
 import operator
 
 
@@ -56,9 +56,9 @@ class LinkedList[T](list[T]):
     def __getitem__(self, i: SupportsIndex) -> T: ...
 
     @overload
-    def __getitem__(self, i: slice[Any, Any, Any]) -> list[T]: ...
+    def __getitem__(self, i: slice) -> list[T]: ...
 
-    def __getitem__(self, i: SupportsIndex | slice[Any, Any, Any]) -> T | list[T]:
+    def __getitem__(self, i: SupportsIndex | slice) -> T | list[T]:
         if isinstance(i, slice):
             raise NotImplementedError('Slice access is not supported')
         node = self._get_node_at(i)
@@ -69,9 +69,9 @@ class LinkedList[T](list[T]):
     def __setitem__(self, i: SupportsIndex, value: T) -> None: ...
 
     @overload
-    def __setitem__(self, i: slice[Any, Any, Any], value: Iterable[T]) -> None: ...
+    def __setitem__(self, i: slice, value: Iterable[T]) -> None: ...
 
-    def __setitem__(self, i: SupportsIndex | slice[Any, Any, Any], value: T | Iterable[T]) -> None:
+    def __setitem__(self, i: SupportsIndex | slice, value: T | Iterable[T]) -> None:
         if isinstance(i, slice):
             raise NotImplementedError('Slice assignment is not supported')
         node = self._get_node_at(i)
@@ -85,7 +85,7 @@ class LinkedList[T](list[T]):
         if self._head == node: self._head = node.next
         if self._last == node: self._last = node.prev
 
-    def __delitem__(self, i: SupportsIndex | slice[Any, Any, Any]) -> None:
+    def __delitem__(self, i: SupportsIndex | slice) -> None:
         if isinstance(i, slice):
             raise NotImplementedError('Slice deletion is not supported')
         node = self._get_node_at(i)

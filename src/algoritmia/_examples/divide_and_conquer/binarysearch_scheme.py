@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from algoritmia.schemes.dac_scheme import IDecreaseAndConquerProblem, dec_solve, iter_dec_solve
 
 type Solution = int  # La posición del elemento buscado

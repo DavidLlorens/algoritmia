@@ -1,4 +1,8 @@
 # Changelog
+## [4.0.8] - 2026-09-04
+  - `algoritmia/_examples/divide_and_conquer/binarysearch_scheme.py`: Se han corregido un problema de tipos con Python 3.12.
+  - `algoritmia/_examples/divide_and_conquer/mergesort_scheme.py`: Se han corregido un problema de tipos con Python 3.12.
+  - `algoritmia/datastructures/linkedlists.py`: Se han corregido un problema de tipos con Python 3.12.
 ## [4.0.7] - 2025-11-11
   - Se han corregido los tipos de los ficheros para evitar los warnings en los editores.
   - `algoritmia/schemes/bt_scheme.py`: DecisionSequence ahora es Iterable y Reversible.

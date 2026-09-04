@@ -143,3 +143,4 @@ uninstall.sh
 CAMBIAR_VERSION.txt
 run-tests.sh
 uv.lock
+check_all_imports.py
