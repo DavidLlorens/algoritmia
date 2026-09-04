@@ -1,4 +1,6 @@
 # Changelog
+## [4.0.9] - 2026-09-04
+  - `pyproject.toml`: Corregido bug de la version anterior (ponia "==3.12" en vez de ">=3.12")
 ## [4.0.8] - 2026-09-04
   - `algoritmia/_examples/divide_and_conquer/binarysearch_scheme.py`: Se han corregido un problema de tipos con Python 3.12.
   - `algoritmia/_examples/divide_and_conquer/mergesort_scheme.py`: Se han corregido un problema de tipos con Python 3.12.
