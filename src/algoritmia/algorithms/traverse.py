@@ -10,34 +10,39 @@ type Traverse[T] = Callable[[IGraph[T], T], Iterator[Edge[T]]]
 
 def traverse_bf[T](graph: IGraph[T],
                    v_initial: T) -> Iterator[Edge[T]]:
-    queue: Fifo[Edge[T]] = Fifo()  # Cola de aristas
+    queue: Fifo[T] = Fifo()  # Cola de aristas
     seen: set[T] = set()  # Conjunto de vértices vistos
-    queue.push((v_initial, v_initial))  # Añadimos la arista fantasma inicial
+    yield v_initial, v_initial  # Arista fantasma inicial
+    queue.push(v_initial)
     seen.add(v_initial)
     while len(queue) > 0:
-        u, v = queue.pop()
-        yield u, v  # Generamos una arista
-        for suc in graph.succs(v):
-            if suc not in seen:
-                queue.push((v, suc))
-                seen.add(suc)
+        u = queue.pop()
+        for v in graph.succs(u):
+            if v not in seen:
+                yield u, v # Generamos la arista
+                queue.push(v)
+                seen.add(v)
 
 
 def traverse_df[T](graph: IGraph[T],
                    v_initial: T,
                    preorder: bool = True) -> Iterator[Edge[T]]:
-    def traverse_from(u: T, v: T) -> Iterator[Edge[T]]:
-        seen.add(v)
-        if preorder:
-            yield u, v  # Generamos una arista (recorrido en preorden)
-        for suc_v in graph.succs(v):
-            if suc_v not in seen:
-                yield from traverse_from(v, suc_v)
-        if not preorder:
-            yield u, v  # Generamos una arista (recorrido en postorden)
+    def traverse_from(u: T) -> Iterator[Edge[T]]:
+        seen.add(u)
+        for v in graph.succs(u):
+            if v not in seen:
+                if preorder:
+                    yield u, v # Generamos la arista (preorden)
+                yield from traverse_from(v)
+                if not preorder:
+                    yield u, v # Generamos la arista (postorden)
 
     seen: set[T] = set()
-    return traverse_from(v_initial, v_initial)  # Arista fantasma inicial
+    if preorder:
+        yield v_initial, v_initial  # Arista fantasma inicial
+    yield from traverse_from(v_initial)
+    if not preorder:
+        yield v_initial, v_initial  # Arista fantasma inicial
 
 
 # Con diccionario: O(|V|^2)
